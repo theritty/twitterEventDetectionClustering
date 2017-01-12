@@ -100,7 +100,7 @@ public class WordCountBolt extends BaseRichBolt {
           if (cosinevector == null) continue;
 
           double similarity = CosineSimilarity.cosineSimilarity(cosinevector, word);
-          if(similarity > 0.5) {
+          if(similarity > 0.2) {
             similarclusterfound = true;
             List<Object> values = new ArrayList<>();
             values.add(row.getUUID("id"));

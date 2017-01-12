@@ -1,10 +1,10 @@
 # twitterEventDetectionClustering
 
 CREATE TABLE tweetcollection.cluster (
-    id timeuuid,
     round bigint,
+    id timeuuid,
     cosinevector list<int>,
-    PRIMARY KEY (id)
+    PRIMARY KEY (round, id)
 )
 
 
