@@ -49,9 +49,8 @@ public class MatchEvents {
         Row row = iterator.next();
         List<Object> values = new ArrayList<>();
         values.add(row.getUUID("id"));
-        ResultSet resultSet2 = m.cassandraDao.getTweetsOfCluster(values.toArray());
         HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
-        Cluster c = new Cluster(row.getLong("round"), row.getUUID("id"), resultSet2.all().size(), cosinevector);
+        Cluster c = new Cluster(row.getLong("round"), row.getUUID("id"), row.getInt("numberoftweets"), cosinevector);
         clusters.add(c);
       }
 

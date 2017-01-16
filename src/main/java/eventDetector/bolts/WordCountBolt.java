@@ -102,7 +102,7 @@ public class WordCountBolt extends BaseRichBolt {
           if (cosinevector == null) continue;
 
           double similarity = CosineSimilarity.cosineSimilarityFromMap(cosinevector, tweetmap);
-          if(similarity > 0.5) {
+          if(similarity > 0.3) {
             similarclusterfound = true;
             updateCluster(row, tweetmap, tweetid);
             break;
