@@ -72,14 +72,14 @@ public class CassandraSpout extends BaseRichSpout {
             if(roundlist.size()==0)
             {
                 try {
-                    collector.emit("CAN", new Values(new HashMap<>(), 0L,current_round+1, true, new ArrayList<Long>()));
+                    collector.emit("CAN", new Values(new HashMap<>(), 0L,current_round+1, true));
                     try {
                             Thread.sleep(120000);
                     }
                     catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    collector.emit("CAN", new Values(new HashMap<>(), 0L,current_round+1, true, new ArrayList<Long>()));
+                    collector.emit("CAN", new Values(new HashMap<>(), 0L,current_round+1, true));
                     ExcelWriter.createTimeChart();
 
                     System.out.println("Number of tweets: " + count_tweets);
