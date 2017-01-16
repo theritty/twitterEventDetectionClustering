@@ -25,8 +25,8 @@ public class CassandraDao implements Serializable
     private transient BoundStatement boundStatement_cluster_get;
     private transient BoundStatement boundStatement_clusterandtweets_get;
 
-    private static String CLUSTER_FIELDS =   "(id, round, cosinevector)";
-    private static String CLUSTER_VALUES = "(?, ?, ?)";
+    private static String CLUSTER_FIELDS =   "(id, round, cosinevector, numberoftweets)";
+    private static String CLUSTER_VALUES = "(?, ?, ?, ?)";
 
     private static String CLUSTERANDTWEETS_FIELDS =   "(clusterid, tweetid)";
     private static String CLUSTERANDTWEETS_VALUES = "(?, ?)";
@@ -107,7 +107,7 @@ public class CassandraDao implements Serializable
         return resultSet;
     }
 
-    public ResultSet getCustersByRound( Object... values ) throws Exception
+    public ResultSet getClustersByRound(Object... values ) throws Exception
     {
         prepareAll();
         ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_get.bind(values));

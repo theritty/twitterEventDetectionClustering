@@ -1,80 +1,71 @@
 package eventDetector.algorithms;
 
+
 import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import topologyBuilder.TopologyHelper;
+
 import java.util.*;
 
 public class MatchEvents {
-  public static HashMap<String,ArrayList<Integer>> prepareEventVectors(ArrayList<String> events, long round) throws Exception {
-    CassandraDao cassandraDao = new CassandraDao("tweets", "counts8", "events8");
-    HashMap<String,ArrayList<Integer>> eventGroups = new HashMap<>();
 
-    for(String event:events) {
-      ArrayList<Integer> tmp = new ArrayList<>();
-      eventGroups.put(event,tmp);
+  public static class Cluster {
+    long round;
+    UUID id;
+    int number;
+    HashMap<String, Double> cosinevector;
+    Cluster(long round, UUID id, int number, HashMap<String, Double> cosinevector) {
+      this.round = round;
+      this.id = id;
+      this.number = number;
+      this.cosinevector = cosinevector;
     }
-
-    ResultSet resultSet = cassandraDao.getTweetsByRound(round);
-    Iterator<Row> iterator = resultSet.iterator();
-    while(iterator.hasNext())
-    {
-      Row row = iterator.next();
-      for(String eve:events) {
-        ArrayList<Integer> tmp = eventGroups.get(eve);
-        if (row.getString("tweet").contains(eve))  tmp.add(1);
-        else tmp.add(0);
-        eventGroups.put(eve,tmp);
-      }
-    }
-    return eventGroups;
-
   }
 
-  public static ArrayList<ArrayList<String>> groupEvents(ArrayList<String> events, long round, String country) throws Exception {
+  private static long start ;
+  private static long end ;
 
-    HashMap<String,ArrayList<Integer>> eventGroups=prepareEventVectors(events,round);
-    ArrayList<ArrayList<String>> grouping=new ArrayList<>();
-
-
-    for (int i=0;i<events.size()-1;i++)
-    {
-      boolean foundoverall=false;
-      String events1=events.get(i);
-      int place=0;
-
-      ArrayList<String> tmp = new ArrayList<>();
-      for(ArrayList<String> list : grouping)
-      {
-        boolean found = false;
-        for(String ev:list)
-        {
-          if(ev.equals(events1)) { found=true;break; }
-        }
-        if(found){ foundoverall=true; break; }
-        place++;
-      }
-      if(!foundoverall) { tmp.add(events1); grouping.add(tmp); }
-
-      for (int j=i+1;j<events.size();j++)
-      {
-        String events2=events.get(j);
-        double sim = CosineSimilarity.cosineSimilarity(eventGroups.get(events1), eventGroups.get(events2));
-        if(sim>0.1)  grouping.get(place).add(events2);
-      }
-    }
-
-    for(ArrayList<String> list : grouping) {
-      for (int i=0;i<list.size()-1;i++) {
-        for(int j=i+1;j<list.size();j++){
-          if(list.get(i).equals(list.get(j))) list.remove(j--);
-        }
-      }
-    }
-    return grouping;
+  private static CassandraDao cassandraDao;
+  public MatchEvents() throws Exception {
+    TopologyHelper topologyHelper = new TopologyHelper();
+    Properties properties = topologyHelper.loadProperties( "config.properties" );
+    String TWEETS_TABLE = properties.getProperty("tweets.table");
+    String CLUSTER_TABLE = properties.getProperty("clusters.table");
+    String CLUSTERANDTWEET_TABLE = properties.getProperty("clusterandtweets.table");
+    start = Long.parseLong(properties.getProperty("start.round"));
+    end = Long.parseLong(properties.getProperty("end.round"));
+    cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERANDTWEET_TABLE);
   }
 
   public static void main(String[] args) throws Exception {
 
+    MatchEvents m = new MatchEvents();
+    for (long i=m.start; i <= m.end; i++) {
+      ResultSet resultSet = m.cassandraDao.getClustersByRound(i);
+      Iterator<Row> iterator = resultSet.iterator();
+      List<Cluster> clusters = new ArrayList<>();
+      while (iterator.hasNext()) {
+        Row row = iterator.next();
+        List<Object> values = new ArrayList<>();
+        values.add(row.getUUID("id"));
+        ResultSet resultSet2 = m.cassandraDao.getTweetsOfCluster(values.toArray());
+        HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
+        Cluster c = new Cluster(row.getLong("round"), row.getUUID("id"), resultSet2.all().size(), cosinevector);
+        clusters.add(c);
+      }
+
+      Collections.sort(clusters, new Comparator<Cluster>() {
+
+        public int compare(Cluster o1, Cluster o2) {
+          return o1.number - o2.number;
+        }
+      });
+
+      for (Cluster p : clusters) {
+        if(p.number>=10 )
+          System.out.println(p.round + "\t" + p.id + "\t" + p.number + "\t" + p.cosinevector);
+      }
+    }
   }
 }
