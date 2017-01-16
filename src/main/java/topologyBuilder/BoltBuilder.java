@@ -32,8 +32,7 @@ public class BoltBuilder {
         System.out.println("Preparing Bolts...");
         TopologyBuilder builder = new TopologyBuilder();
 
-        CassandraSpout cassandraSpout = new CassandraSpout(cassandraDao, Integer.parseInt(properties.getProperty("topology.train.size")),
-                Integer.parseInt(properties.getProperty("topology.compare.size")), 20, FILENUM, START_ROUND, END_ROUND);
+        CassandraSpout cassandraSpout = new CassandraSpout(cassandraDao, FILENUM, START_ROUND, END_ROUND);
 
         WordCountBolt countBoltCAN = new WordCountBolt(COUNT_THRESHOLD, FILENUM, cassandraDao);
 

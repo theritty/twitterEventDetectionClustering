@@ -90,7 +90,6 @@ public class TopologyCreator {
                 if(localCluster==null) localCluster = new LocalCluster();
                 Config conf = new Config();
                 conf.setDebug(false);
-                conf.put(Config.TOPOLOGY_SLEEP_SPOUT_WAIT_STRATEGY_TIME_MS, 6);
                 localCluster.submitTopology( topologyName, conf, stormTopology );
 
                 //wait 40 hours

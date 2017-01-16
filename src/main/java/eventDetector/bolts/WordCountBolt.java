@@ -23,7 +23,6 @@ public class WordCountBolt extends BaseRichBolt {
   private OutputCollector collector;
   private HashMap<String, Long> countsForRounds = null;
   private long currentRound = 0;
-  private int threshold;
   private long ignoredCount = 0;
   private int componentId;
   private String fileNum;
@@ -35,7 +34,6 @@ public class WordCountBolt extends BaseRichBolt {
 
   public WordCountBolt(int threshold, String filenum, CassandraDao cassandraDao)
   {
-    this.threshold = threshold;
     this.fileNum = filenum + "/";
     this.cassandraDao = cassandraDao;
   }
@@ -55,7 +53,7 @@ public class WordCountBolt extends BaseRichBolt {
     long tweetid = tuple.getLongByField("tweetid");
 
     if(tweetmap.size() == 0) {
-        this.collector.emit(new Values(tweetmap, round, false, tuple.getValueByField("dates"), tuple.getSourceStreamId()));
+//        this.collector.emit(new Values(tweetmap, round, false, tuple.getValueByField("dates"), tuple.getSourceStreamId()));
         return;
     }
 
@@ -165,7 +163,7 @@ public class WordCountBolt extends BaseRichBolt {
   }
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("key", "round", "blockEnd", "rounds", "country"));
+//    declarer.declare(new Fields("key", "round", "blockEnd", "rounds", "country"));
   }
 
 }
