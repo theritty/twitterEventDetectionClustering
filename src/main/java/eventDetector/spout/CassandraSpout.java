@@ -118,9 +118,9 @@ public class CassandraSpout extends BaseRichSpout {
             vectorizeAndEmit(tweet, row.getLong("id"), current_round, country);
 //            collector.emit("USA", new Values(new HashMap<>(), 0L, current_round, true, tmp_roundlist));
             try {
-                    TopologyHelper.writeToFile(Constants.WORKHISTORY, new Date() + " Cass sleeping " + current_round);
-                    Thread.sleep(15000);
-                    TopologyHelper.writeToFile(Constants.WORKHISTORY, new Date() + " Cass wake up " + current_round);
+                    TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass sleeping " + current_round);
+                    Thread.sleep(20000);
+                    TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass wake up " + current_round);
             }
             catch (InterruptedException e) {
                 e.printStackTrace();
@@ -135,16 +135,16 @@ public class CassandraSpout extends BaseRichSpout {
 
 
         try {
-//                TopologyHelper.writeToFile(Constants.WORKHISTORY, new Date() + " Cass sleeping " + current_round);
+//                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass sleeping " + current_round);
                 Thread.sleep(5);
-//                TopologyHelper.writeToFile(Constants.WORKHISTORY, new Date() + " Cass wake up " + current_round);
+//                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass wake up " + current_round);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     public void vectorizeAndEmit(String tweetSentence, long id, long round, String country) {
-        TopologyHelper.writeToFile(Constants.WORKHISTORY, new Date() + " Cass goooooo " + current_round);
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass goooooo " + current_round);
         List<String> tweets = Arrays.asList(tweetSentence.split(" "));
         HashMap<String, Double> tweetMap = new HashMap<>();
         for (String tweet : tweets) {

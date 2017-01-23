@@ -1,26 +1,26 @@
 # twitterEventDetectionClustering
 
-CREATE TABLE tweetcollection.cluster (
+CREATE TABLE tweetcollection.cluster3 (
     id timeuuid,
     cosinevector map<text, double>,
     numberoftweets int,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE tweetcollection.clusterinfo (
+CREATE TABLE tweetcollection.clusterinfo3 (
     round bigint,
     id timeuuid,
     numberoftweets int,
     PRIMARY KEY (round, id)
 );
 
-CREATE TABLE tweetcollection.clusterandtweet (
+CREATE TABLE tweetcollection.clusterandtweet3 (
     clusterid timeuuid,
     tweetid bigint,
     PRIMARY KEY (clusterid, tweetid)
 );
 
-CREATE TABLE tweetcollection.eventcluster (
+CREATE TABLE tweetcollection.eventcluster3 (
     round bigint,
     clusterid timeuuid,
     country text,

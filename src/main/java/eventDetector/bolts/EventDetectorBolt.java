@@ -48,7 +48,7 @@ public class EventDetectorBolt extends BaseRichBolt {
         long round = tuple.getLongByField("round");
         String country = tuple.getStringByField("country");
 
-        TopologyHelper.writeToFile(Constants.WORKHISTORY, new Date() + " Event Detector " + componentId + " working "  + round);
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Event Detector " + componentId + " working "  + round);
         if(round > currentRound)
         {
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
