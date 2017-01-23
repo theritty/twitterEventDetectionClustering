@@ -94,18 +94,12 @@ public class CassandraSpout extends BaseRichSpout {
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + current_round + ".txt",
                     new Date() + ": Round submission from cass spout =>" + current_round );
 
-//            try {
+
                 if(!start) {
-//                    TopologyHelper.writeToFile(Constants.WORKHISTORY, new Date() + " Cass sleeping " + current_round);
-//                    Thread.sleep(120000);
-//                    TopologyHelper.writeToFile(Constants.WORKHISTORY, new Date() + " Cass wake up " + current_round);
                     ExcelWriter.putData(componentId,startDate,lastDate, "cassSpout", "both", current_round);
                 }
                 else start = false;
-//            }
-//            catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
+
             startDate = new Date();
 
             ResultSet resultSet = getDataFromCassandra(current_round);
@@ -123,6 +117,15 @@ public class CassandraSpout extends BaseRichSpout {
         else {
             vectorizeAndEmit(tweet, row.getLong("id"), current_round, country);
 //            collector.emit("USA", new Values(new HashMap<>(), 0L, current_round, true, tmp_roundlist));
+            try {
+                    TopologyHelper.writeToFile(Constants.WORKHISTORY, new Date() + " Cass sleeping " + current_round);
+                    Thread.sleep(15000);
+                    TopologyHelper.writeToFile(Constants.WORKHISTORY, new Date() + " Cass wake up " + current_round);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             collector.emit("CAN", new Values(new HashMap<>(), 0L, current_round, true));
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + current_round + ".txt",
                     new Date() + ": Round end from cass spout =>" + current_round );
@@ -150,7 +153,8 @@ public class CassandraSpout extends BaseRichSpout {
                 tweetMap.put(tweet,1.0);
         }
 
-        if(tweetMap.size()>2)
+//        System.out.println("Tweet " + tweetSentence + " map " + tweetMap + " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        if(tweetMap.size()>1)
             collector.emit(country, new Values(tweetMap, id, round, false));
     }
 

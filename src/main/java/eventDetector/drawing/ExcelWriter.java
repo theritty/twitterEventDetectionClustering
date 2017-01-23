@@ -51,7 +51,7 @@ public class ExcelWriter {
         while (duration-->0)
             times[(int) timeStart++][id + 16 * ((int) ((round - startRound)/2) % 10) ] = id;
 
-        System.out.println( "Key: " + id + ", name: " + boltName + ", country: " + country );
+//        System.out.println( "Key: " + id + ", name: " + boltName + ", country: " + country );
     }
 
     public static void createTimeChart () throws IOException {
