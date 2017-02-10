@@ -28,6 +28,7 @@ public class ExcelWriter {
     private static int lastInd ;
     private static int rowNum = 7200;
     private static int columnNum = 200;
+    private static int numOfBolts = 7;
 
     public static void putStartDate(Date date, String filenum, long round) {
         times = new int[rowNum][columnNum];
@@ -48,8 +49,11 @@ public class ExcelWriter {
         long timeStart = (boltStartTime.getTime()-startTime.getTime())/1000;
         long duration = (boltEndTime.getTime()-boltStartTime.getTime())/1000;
 
+        if(duration==0) duration = 1;
+
         while (duration-->0)
-            times[(int) timeStart++][id + 16 * ((int) ((round - startRound)/2) % 10) ] = id;
+            times[(int) timeStart++][id + numOfBolts * ((int) ((round - startRound)/2) % 10) ] = id;
+
 
 //        System.out.println( "Key: " + id + ", name: " + boltName + ", country: " + country );
     }

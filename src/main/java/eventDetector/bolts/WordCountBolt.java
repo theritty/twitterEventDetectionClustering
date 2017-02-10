@@ -8,7 +8,6 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import cassandraConnector.CassandraDao;
-import clojure.lang.Cons;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import eventDetector.algorithms.CosineSimilarity;
@@ -18,7 +17,6 @@ import topologyBuilder.TopologyHelper;
 import com.datastax.driver.core.utils.UUIDs;
 
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class WordCountBolt extends BaseRichBolt {
 
@@ -45,7 +43,7 @@ public class WordCountBolt extends BaseRichBolt {
         this.collector = collector;
         this.countsForRounds = new HashMap<>();
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("wc : " + componentId );
+        System.out.println("cluster : " + componentId );
     }
 
     @Override
@@ -54,13 +52,17 @@ public class WordCountBolt extends BaseRichBolt {
         long round = tuple.getLongByField("round");
         long tweetid = tuple.getLongByField("tweetid");
 
+        Date nowDate = new Date();
+        boolean skipPutData = false;
+
         if(tweetmap.size() == 0) {
-            System.out.println("round end " + round);
-        this.collector.emit(new Values( round, tuple.getSourceStreamId()));
+            System.out.println( new Date() + " round end " + round);
+            this.collector.emit(new Values( round, tuple.getSourceStreamId()));
             return;
         }
 
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Word count " + componentId + " working "  + round);
+
         if(round > currentRound)
         {
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
@@ -69,9 +71,10 @@ public class WordCountBolt extends BaseRichBolt {
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
                     "Word count "+ componentId + " time taken for round" + currentRound + " is " +
                             (lastDate.getTime()-startDate.getTime())/1000);
-            if ( currentRound!=0)
-                ExcelWriter.putData(componentId,startDate,lastDate, "wc",tuple.getSourceStreamId(), currentRound);
+//            if ( currentRound!=0)
+//                ExcelWriter.putData(componentId,startDate,lastDate, "wc",tuple.getSourceStreamId(), currentRound);
 
+            if(currentRound == 0) skipPutData = true;
             startDate = new Date();
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
                     "Word count "+ componentId + " starting for round " + round + " at " + startDate );
@@ -120,6 +123,10 @@ public class WordCountBolt extends BaseRichBolt {
             Constants.lock.unlock();
         }
         Constants.lock.unlock();
+        lastDate = new Date();
+
+        if ( !skipPutData )
+            ExcelWriter.putData(componentId,nowDate,lastDate, "wc",tuple.getSourceStreamId(), currentRound);
 
     }
 

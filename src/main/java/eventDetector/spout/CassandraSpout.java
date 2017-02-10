@@ -67,6 +67,7 @@ public class CassandraSpout extends BaseRichSpout {
          * we will wait and then return
          */
 
+        Date nowDate = new Date();
         if(iterator == null || !iterator.hasNext())
         {
             if(roundlist.size()==0)
@@ -82,7 +83,7 @@ public class CassandraSpout extends BaseRichSpout {
                     collector.emit("CAN", new Values(new HashMap<>(), 0L,current_round+1, true));
                     ExcelWriter.createTimeChart();
 
-                    System.out.println("Number of tweets: " + count_tweets);
+                    System.out.println(new Date() + " Number of tweets: " + count_tweets);
                     Thread.sleep(10000000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -95,16 +96,15 @@ public class CassandraSpout extends BaseRichSpout {
                     new Date() + ": Round submission from cass spout =>" + current_round );
 
 
-                if(!start) {
-                    ExcelWriter.putData(componentId,startDate,lastDate, "cassSpout", "both", current_round);
-                }
-                else start = false;
+            if(start) start = false;
 
             startDate = new Date();
 
             ResultSet resultSet = getDataFromCassandra(current_round);
             iterator = resultSet.iterator();
         }
+
+
         Row row = iterator.next();
         String tweet = row.getString("tweet");
         String country = row.getString("country");
@@ -116,7 +116,6 @@ public class CassandraSpout extends BaseRichSpout {
         }
         else {
             vectorizeAndEmit(tweet, row.getLong("id"), current_round, country);
-//            collector.emit("USA", new Values(new HashMap<>(), 0L, current_round, true, tmp_roundlist));
             try {
                     TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass sleeping " + current_round);
                     Thread.sleep(20000);
@@ -132,6 +131,8 @@ public class CassandraSpout extends BaseRichSpout {
 
         }
         lastDate = new Date();
+        if(!start )
+            ExcelWriter.putData(componentId,nowDate,lastDate, "cassSpout", "both", current_round);
 
 
         try {

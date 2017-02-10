@@ -3,7 +3,7 @@
 <Configuration status="DEBUG" monitorInterval="5">
 
     <Properties>
-        <Property name="log-path">/home/ceren/Desktop/logs</Property>
+        <Property name="log-path">/Users/ozlemcerensahin/Desktop/logs</Property>
     </Properties>
 
     <Appenders>

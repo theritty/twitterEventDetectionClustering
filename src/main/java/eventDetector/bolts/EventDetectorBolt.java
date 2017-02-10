@@ -40,7 +40,7 @@ public class EventDetectorBolt extends BaseRichBolt {
         this.collector = collector;
         this.countsForRounds = new HashMap<>();
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("wc : " + componentId );
+        System.out.println("eventdet : " + componentId );
     }
 
     @Override
@@ -49,6 +49,10 @@ public class EventDetectorBolt extends BaseRichBolt {
         String country = tuple.getStringByField("country");
 
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Event Detector " + componentId + " working "  + round);
+
+        Date nowDate = new Date();
+        boolean skipPutData = false;
+
         if(round > currentRound)
         {
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
@@ -57,8 +61,10 @@ public class EventDetectorBolt extends BaseRichBolt {
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
                     "Event Detector "+ componentId + " time taken for round" + currentRound + " is " +
                             (lastDate.getTime()-startDate.getTime())/1000);
-            if ( currentRound!=0)
-                ExcelWriter.putData(componentId,startDate,lastDate, "eventdetector",tuple.getSourceStreamId(), currentRound);
+//            if ( currentRound!=0)
+//                ExcelWriter.putData(componentId,startDate,lastDate, "eventdetector",tuple.getSourceStreamId(), currentRound);
+
+            if(currentRound == 0 ) skipPutData = true;
 
             startDate = new Date();
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
@@ -118,6 +124,10 @@ public class EventDetectorBolt extends BaseRichBolt {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        lastDate = new Date();
+
+        if ( !skipPutData )
+            ExcelWriter.putData(componentId,nowDate,lastDate, "eventdetector",tuple.getSourceStreamId(), currentRound);
 
     }
 
