@@ -13,12 +13,12 @@ import eventDetector.drawing.ExcelWriter;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
+import java.io.IOException;
 import java.util.*;
 
 public class EventDetectorBolt extends BaseRichBolt {
 
     private OutputCollector collector;
-    private HashMap<String, Long> countsForRounds = null;
     private long currentRound = 0;
     private long ignoredCount = 0;
     private int componentId;
@@ -38,7 +38,6 @@ public class EventDetectorBolt extends BaseRichBolt {
     public void prepare(Map config, TopologyContext context,
                         OutputCollector collector) {
         this.collector = collector;
-        this.countsForRounds = new HashMap<>();
         this.componentId = context.getThisTaskId()-1;
         System.out.println("eventdet : " + componentId );
     }
@@ -48,11 +47,17 @@ public class EventDetectorBolt extends BaseRichBolt {
         long round = tuple.getLongByField("round");
         String country = tuple.getStringByField("country");
 
+        if(round==0L) {
+            try {
+                ExcelWriter.createTimeChart();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Event Detector " + componentId + " working "  + round);
 
         Date nowDate = new Date();
-        boolean skipPutData = false;
-
         if(round > currentRound)
         {
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
@@ -61,16 +66,16 @@ public class EventDetectorBolt extends BaseRichBolt {
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
                     "Event Detector "+ componentId + " time taken for round" + currentRound + " is " +
                             (lastDate.getTime()-startDate.getTime())/1000);
+
+            System.out.println("round " + round + " end of.");
 //            if ( currentRound!=0)
 //                ExcelWriter.putData(componentId,startDate,lastDate, "eventdetector",tuple.getSourceStreamId(), currentRound);
 
-            if(currentRound == 0 ) skipPutData = true;
 
             startDate = new Date();
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
                     "Event Detector "+ componentId + " starting for round " + round + " at " + startDate );
 
-            countsForRounds.clear();
             currentRound = round;
         }
         else if(round < currentRound) {
@@ -92,42 +97,33 @@ public class EventDetectorBolt extends BaseRichBolt {
 
                 if(numtweets<60) continue;
                 ResultSet resultSet2 ;
-                try {
-                    resultSet2 = cassandraDao.getClusterinfoByRoundAndId(round-2, clusterid);
-                    Iterator<Row> iterator2 = resultSet2.iterator();
+                resultSet2 = cassandraDao.getClusterinfoByRoundAndId(round-2, clusterid);
+                Iterator<Row> iterator2 = resultSet2.iterator();
 
-                    if(!iterator2.hasNext()) {
-                        int numtweetsPrev = 1;
+                if(!iterator2.hasNext()) {
+                    int numtweetsPrev = 1;
 
-                        if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
-                            addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
-                        }
-//                        else
-//                            System.out.println("Not event for cluster " + clusterid + " since increment rate = " + ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) + " at round "  + round + " from 00000" );
+                    if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
+                        addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
                     }
-                    else {
-                        Row row2 = iterator2.next();
-                        int numtweetsPrev = row2.getInt("numberoftweets");
-
-                        if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
-                            addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
-                        }
-//                        else
-//                            System.out.println("Not event for cluster " + clusterid + " since increment rate = " + ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) + " at round "  + round );
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+                else {
+                    Row row2 = iterator2.next();
+                    int numtweetsPrev = row2.getInt("numberoftweets");
 
+                    if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
+                        addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
+                    }
+                }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         lastDate = new Date();
 
-        if ( !skipPutData )
-            ExcelWriter.putData(componentId,nowDate,lastDate, "eventdetector",tuple.getSourceStreamId(), currentRound);
+            System.out.println("round " + round + " put excel");
+            ExcelWriter.putData(componentId, nowDate, lastDate, "eventdetector", tuple.getSourceStreamId(), currentRound);
+
 
     }
 

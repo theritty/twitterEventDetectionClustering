@@ -28,7 +28,8 @@ public class ExcelWriter {
     private static int lastInd ;
     private static int rowNum = 7200;
     private static int columnNum = 200;
-    private static int numOfBolts = 7;
+    private static int numOfBolts = 13;
+    private static boolean createChart = false;
 
     public static void putStartDate(Date date, String filenum, long round) {
         times = new int[rowNum][columnNum];
@@ -60,8 +61,11 @@ public class ExcelWriter {
 
     public static void createTimeChart () throws IOException {
 
-        System.out.println("Excel creation started");
-        writeExcel();
+        if(!createChart) {
+            createChart = true;
+            System.out.println("Excel creation started");
+            writeExcel();
+        }
     }
 
 

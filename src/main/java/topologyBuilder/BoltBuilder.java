@@ -38,11 +38,15 @@ public class BoltBuilder {
         CassandraSpout cassandraSpout = new CassandraSpout(cassandraDao, FILENUM, START_ROUND, END_ROUND);
 
         WordCountBolt countBoltCAN = new WordCountBolt( FILENUM, cassandraDao);
-        EventDetectorBolt eventDetectorBolt = new EventDetectorBolt(FILENUM, cassandraDao);
+        WordCountBolt countBoltUSA = new WordCountBolt( FILENUM, cassandraDao);
+        EventDetectorBolt eventDetectorBoltCAN = new EventDetectorBolt(FILENUM, cassandraDao);
+        EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao);
 
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpout,1);
-        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,5).fieldsGrouping(Constants.CASS_SPOUT_ID, "CAN", new Fields("tweetmap"));
-        builder.setBolt(Constants.COUNTRY2_EVENTDETECTOR_BOLT_ID, eventDetectorBolt,1).shuffleGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
+        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,5).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");
+        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,5).shuffleGrouping(Constants.CASS_SPOUT_ID, "USA");
+        builder.setBolt(Constants.COUNTRY2_EVENTDETECTOR_BOLT_ID, eventDetectorBoltCAN,1).shuffleGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
+        builder.setBolt(Constants.COUNTRY1_EVENTDETECTOR_BOLT_ID, eventDetectorBoltUSA,1).shuffleGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
 
 
         return builder.createTopology();

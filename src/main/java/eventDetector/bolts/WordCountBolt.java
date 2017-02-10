@@ -51,10 +51,14 @@ public class WordCountBolt extends BaseRichBolt {
         HashMap<String, Double> tweetmap = (HashMap<String, Double>) tuple.getValueByField("tweetmap");
         long round = tuple.getLongByField("round");
         long tweetid = tuple.getLongByField("tweetid");
+        boolean streamEnd = tuple.getBooleanByField("streamEnd");
 
         Date nowDate = new Date();
-        boolean skipPutData = false;
 
+        if(streamEnd) {
+            this.collector.emit(new Values( 0L, tuple.getSourceStreamId()));
+            return;
+        }
         if(tweetmap.size() == 0) {
             System.out.println( new Date() + " round end " + round);
             this.collector.emit(new Values( round, tuple.getSourceStreamId()));
@@ -74,7 +78,6 @@ public class WordCountBolt extends BaseRichBolt {
 //            if ( currentRound!=0)
 //                ExcelWriter.putData(componentId,startDate,lastDate, "wc",tuple.getSourceStreamId(), currentRound);
 
-            if(currentRound == 0) skipPutData = true;
             startDate = new Date();
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
                     "Word count "+ componentId + " starting for round " + round + " at " + startDate );
@@ -125,8 +128,7 @@ public class WordCountBolt extends BaseRichBolt {
         Constants.lock.unlock();
         lastDate = new Date();
 
-        if ( !skipPutData )
-            ExcelWriter.putData(componentId,nowDate,lastDate, "wc",tuple.getSourceStreamId(), currentRound);
+        ExcelWriter.putData(componentId,nowDate,lastDate, "wc",tuple.getSourceStreamId(), currentRound);
 
     }
 

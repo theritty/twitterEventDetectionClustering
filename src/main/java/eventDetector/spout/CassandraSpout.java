@@ -73,15 +73,17 @@ public class CassandraSpout extends BaseRichSpout {
             if(roundlist.size()==0)
             {
                 try {
-                    collector.emit("CAN", new Values(new HashMap<>(), 0L,current_round+1, true));
+                    collector.emit("CAN", new Values(new HashMap<>(), 0L,current_round+1, true, true));
+                    collector.emit("USA", new Values(new HashMap<>(), 0L,current_round+1, true, true));
                     try {
                             Thread.sleep(120000);
                     }
                     catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    collector.emit("CAN", new Values(new HashMap<>(), 0L,current_round+1, true));
-                    ExcelWriter.createTimeChart();
+                    collector.emit("CAN", new Values(new HashMap<>(), 0L,current_round+1, true, true));
+                    collector.emit("USA", new Values(new HashMap<>(), 0L,current_round+1, true, true));
+//                    ExcelWriter.createTimeChart();
 
                     System.out.println(new Date() + " Number of tweets: " + count_tweets);
                     Thread.sleep(10000000);
@@ -125,7 +127,8 @@ public class CassandraSpout extends BaseRichSpout {
                 e.printStackTrace();
             }
 
-            collector.emit("CAN", new Values(new HashMap<>(), 0L, current_round, true));
+            collector.emit("CAN", new Values(new HashMap<>(), 0L, current_round, true, false));
+            collector.emit("USA", new Values(new HashMap<>(), 0L, current_round, true, false));
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + current_round + ".txt",
                     new Date() + ": Round end from cass spout =>" + current_round );
 
@@ -154,9 +157,8 @@ public class CassandraSpout extends BaseRichSpout {
                 tweetMap.put(tweet,1.0);
         }
 
-//        System.out.println("Tweet " + tweetSentence + " map " + tweetMap + " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         if(tweetMap.size()>1)
-            collector.emit(country, new Values(tweetMap, id, round, false));
+            collector.emit(country, new Values(tweetMap, id, round, false, false));
     }
 
     public void getRoundListFromCassandra(){
@@ -238,8 +240,8 @@ public class CassandraSpout extends BaseRichSpout {
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-//        declarer.declareStream("USA", new Fields("tweetmap", "tweetid", "round", "blockEnd"));
-        declarer.declareStream("CAN", new Fields("tweetmap", "tweetid", "round", "blockEnd"));
+        declarer.declareStream("USA", new Fields("tweetmap", "tweetid", "round", "blockEnd", "streamEnd"));
+        declarer.declareStream("CAN", new Fields("tweetmap", "tweetid", "round", "blockEnd", "streamEnd"));
     }
 
 }
