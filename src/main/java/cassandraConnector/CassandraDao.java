@@ -23,6 +23,7 @@ public class CassandraDao implements Serializable
     private transient PreparedStatement statement_clusterandtweet_get;
     private transient PreparedStatement statement_tweet_get;
     private transient PreparedStatement statement_round_get;
+    private transient PreparedStatement statement_cluster_delete;
     private transient BoundStatement boundStatement_tweets_get;
     private transient BoundStatement boundStatement_rounds_get;
     private transient BoundStatement boundStatement_cluster;
@@ -34,15 +35,16 @@ public class CassandraDao implements Serializable
     private transient BoundStatement boundStatement_clusterinfo_get;
     private transient BoundStatement boundStatement_clusterinfo_id_get;
     private transient BoundStatement boundStatement_clusterandtweets_get;
+    private transient BoundStatement boundStatement_cluster_delete;
 
-    private static String CLUSTER_FIELDS =   "(id, cosinevector, numberoftweets)";
-    private static String CLUSTER_VALUES = "(?, ?, ?)";
+    private static String CLUSTER_FIELDS =   "(id, country, cosinevector, numberoftweets, lastTweetTime)";
+    private static String CLUSTER_VALUES = "(?, ?, ?, ?, ?)";
 
     private static String EVENT_FIELDS =   "(round, clusterid, country, cosinevector, incrementrate, numtweet)";
     private static String EVENT_VALUES = "(?, ?, ?, ?, ?, ?)";
 
-    private static String CLUSTERINFO_FIELDS =   "(round, id, numberoftweets)";
-    private static String CLUSTERINFO_VALUES = "(?, ?, ?)";
+    private static String CLUSTERINFO_FIELDS =   "(round, country, id, numberoftweets)";
+    private static String CLUSTERINFO_VALUES = "(?, ?, ?, ?)";
 
     private static String CLUSTERANDTWEETS_FIELDS =   "(clusterid, tweetid)";
     private static String CLUSTERANDTWEETS_VALUES = "(?, ?)";
@@ -98,24 +100,29 @@ public class CassandraDao implements Serializable
         }
         if(statement_cluster_get==null) {
             statement_cluster_get = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + clusterTable + ";");
+                    "SELECT * FROM " + clusterTable + " WHERE country=?;");
         }
         if(statement_cluster_get_by_id ==null) {
             statement_cluster_get_by_id = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + clusterTable + " WHERE id=?;");
+                    "SELECT * FROM " + clusterTable + " WHERE country=? AND id=?;");
         }
         if(statement_clusterinfo_get==null) {
             statement_clusterinfo_get = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + clusterinfoTable + " WHERE round=?;");
+                    "SELECT * FROM " + clusterinfoTable + " WHERE round=? AND country=?;");
         }
         if(statement_clusterinfo_id_get==null) {
             statement_clusterinfo_id_get = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + clusterinfoTable + " WHERE round=? AND id=?;");
+                    "SELECT * FROM " + clusterinfoTable + " WHERE round=? AND country=? AND id=?;");
         }
         if(statement_clusterandtweet_get==null) {
             statement_clusterandtweet_get = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + clusterandtweetTable + " WHERE clusterid=?;");
         }
+        if(statement_cluster_delete==null) {
+            statement_cluster_delete = CassandraConnection.connect().prepare(
+                    "DELETE FROM " + clusterTable + " WHERE country=? AND id=?;");
+        }
+
 
         if(boundStatement_tweets_get == null)
             boundStatement_tweets_get = new BoundStatement(statement_tweet_get);
@@ -139,6 +146,8 @@ public class CassandraDao implements Serializable
             boundStatement_clusterandtweets = new BoundStatement(statement_clusterandtweet);
         if(boundStatement_event == null)
             boundStatement_event = new BoundStatement(statement_event);
+        if(boundStatement_cluster_delete == null)
+            boundStatement_cluster_delete = new BoundStatement(statement_cluster_delete);
     }
 
     public void insertIntoClusters( Object[] values ) throws Exception
@@ -173,7 +182,7 @@ public class CassandraDao implements Serializable
         return resultSet;
     }
 
-    public ResultSet getClusterinfoByRound( Object... values ) throws Exception
+    public ResultSet getClusterinfoByRoundAndCountry(Object... values ) throws Exception
     {
         prepareAll();
         ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_clusterinfo_get.bind(values));
@@ -189,10 +198,10 @@ public class CassandraDao implements Serializable
         return resultSet;
     }
 
-    public ResultSet getClusters( ) throws Exception
+    public ResultSet getClusters( Object... values  ) throws Exception
     {
         prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_get.bind());
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_get.bind(values));
 
         return resultSet;
     }
@@ -201,6 +210,13 @@ public class CassandraDao implements Serializable
     {
         prepareAll();
         ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_get_by_id.bind(values));
+
+        return resultSet;
+    }
+    public ResultSet deleteCluster( Object... values ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_delete.bind(values));
 
         return resultSet;
     }

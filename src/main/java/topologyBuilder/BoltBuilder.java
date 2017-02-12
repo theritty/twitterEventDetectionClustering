@@ -37,10 +37,10 @@ public class BoltBuilder {
 
         CassandraSpout cassandraSpout = new CassandraSpout(cassandraDao, FILENUM, START_ROUND, END_ROUND);
 
-        WordCountBolt countBoltCAN = new WordCountBolt( FILENUM, cassandraDao);
-        WordCountBolt countBoltUSA = new WordCountBolt( FILENUM, cassandraDao);
-        EventDetectorBolt eventDetectorBoltCAN = new EventDetectorBolt(FILENUM, cassandraDao);
-        EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao);
+        WordCountBolt countBoltCAN = new WordCountBolt( FILENUM, cassandraDao, "CAN");
+        WordCountBolt countBoltUSA = new WordCountBolt( FILENUM, cassandraDao, "USA");
+        EventDetectorBolt eventDetectorBoltCAN = new EventDetectorBolt(FILENUM, cassandraDao, "CAN");
+        EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao, "USA");
 
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpout,1);
         builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,5).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");

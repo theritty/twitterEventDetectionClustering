@@ -25,23 +25,46 @@ public class EventDetectorBolt extends BaseRichBolt {
     private String fileNum;
     private Date lastDate = new Date();
     private Date startDate = new Date();
+    private String country;
+    private int tweetTime=0;
 
     private CassandraDao cassandraDao;
 
 
-    public EventDetectorBolt(String filenum, CassandraDao cassandraDao)
+    public EventDetectorBolt(String filenum, CassandraDao cassandraDao, String country)
     {
         this.fileNum = filenum + "/";
         this.cassandraDao = cassandraDao;
+        this.country = country;
     }
     @Override
     public void prepare(Map config, TopologyContext context,
                         OutputCollector collector) {
         this.collector = collector;
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("eventdet : " + componentId );
+        System.out.println("eventdet : " + componentId + " " + country );
     }
 
+    private void cleanUp(long tweetTime, String country) {
+        if(++tweetTime >= 1000)  {
+//            ResultSet resultSet ;
+//            try {
+//                resultSet = cassandraDao.getClusters(country);
+//                Iterator<Row> iterator = resultSet.iterator();
+//                while (iterator.hasNext()) {
+//                    Row row = iterator.next();
+//                    long lastTweetTime = row.getLong("lastTweetTime");
+//
+//                  if(tweetTime - lastTweetTime >= 720000) {
+//                      cassandraDao.deleteCluster(country, row.getUUID("id"));
+////                      System.out.println("Deleting......................   Time: " + (tweetTime - lastTweetTime)/1000 + " secs");
+//                  }
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+        }
+    }
     @Override
     public void execute(Tuple tuple) {
         long round = tuple.getLongByField("round");
@@ -88,7 +111,7 @@ public class EventDetectorBolt extends BaseRichBolt {
 
         ResultSet resultSet ;
         try {
-            resultSet = cassandraDao.getClusterinfoByRound(round);
+            resultSet = cassandraDao.getClusterinfoByRoundAndCountry(round, country);
             Iterator<Row> iterator = resultSet.iterator();
             while (iterator.hasNext()) {
                 Row row = iterator.next();
@@ -97,11 +120,11 @@ public class EventDetectorBolt extends BaseRichBolt {
 
                 if(numtweets<60) continue;
                 ResultSet resultSet2 ;
-                resultSet2 = cassandraDao.getClusterinfoByRoundAndId(round-2, clusterid);
+                resultSet2 = cassandraDao.getClusterinfoByRoundAndId(round-1, country, clusterid);
                 Iterator<Row> iterator2 = resultSet2.iterator();
 
                 if(!iterator2.hasNext()) {
-                    int numtweetsPrev = 1;
+                    int numtweetsPrev = 30;
 
                     if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
                         addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
@@ -116,6 +139,7 @@ public class EventDetectorBolt extends BaseRichBolt {
                     }
                 }
             }
+            cleanUp(tuple.getLongByField("tweetdate"), country);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -128,10 +152,10 @@ public class EventDetectorBolt extends BaseRichBolt {
     }
 
     public  void addEvent(UUID clusterid, long round, double incrementrate, String country, int numtweet) {
-//        System.out.println("Event found Cluster id " + clusterid + " at round " + round + " increment rate " + incrementrate + " from 00000" );
+        System.out.println("Event found Cluster id " + clusterid + " at round " + round + " increment rate " + incrementrate + " from 00000" );
         ResultSet resultSet ;
         try {
-            resultSet = cassandraDao.getClustersById(clusterid);
+            resultSet = cassandraDao.getClustersById(country, clusterid);
             Iterator<Row> iterator = resultSet.iterator();
 
             if(!iterator.hasNext()) {

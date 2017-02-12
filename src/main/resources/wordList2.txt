@@ -11,6 +11,7 @@ izmir
 bolu
 abant
 picnic
+picnici
 ecem
 deniz
 anane
@@ -18,3 +19,5 @@ necdet
 hellp
 evee
 gell
+ordu
+deniz

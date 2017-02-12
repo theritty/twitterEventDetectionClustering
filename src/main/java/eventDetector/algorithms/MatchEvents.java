@@ -42,9 +42,11 @@ public class MatchEvents {
 
     public static void main(String[] args) throws Exception {
 
+        String country = "CAN";
         MatchEvents m = new MatchEvents();
         for (long i=m.start; i <= m.end; i++) {
-            ResultSet resultSet = m.cassandraDao.getClusters();
+
+            ResultSet resultSet = m.cassandraDao.getClusters(country);
             Iterator<Row> iterator = resultSet.iterator();
             List<Cluster> clusters = new ArrayList<>();
             while (iterator.hasNext()) {

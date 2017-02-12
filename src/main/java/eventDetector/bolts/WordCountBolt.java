@@ -28,14 +28,16 @@ public class WordCountBolt extends BaseRichBolt {
     private String fileNum;
     private Date lastDate = new Date();
     private Date startDate = new Date();
+    private String country;
 
     private CassandraDao cassandraDao;
 
 
-    public WordCountBolt( String filenum, CassandraDao cassandraDao)
+    public WordCountBolt( String filenum, CassandraDao cassandraDao, String country)
     {
         this.fileNum = filenum + "/";
         this.cassandraDao = cassandraDao;
+        this.country = country;
     }
     @Override
     public void prepare(Map config, TopologyContext context,
@@ -43,7 +45,7 @@ public class WordCountBolt extends BaseRichBolt {
         this.collector = collector;
         this.countsForRounds = new HashMap<>();
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("cluster : " + componentId );
+        System.out.println("cluster : " + componentId + " " + country);
     }
 
     @Override
@@ -52,16 +54,17 @@ public class WordCountBolt extends BaseRichBolt {
         long round = tuple.getLongByField("round");
         long tweetid = tuple.getLongByField("tweetid");
         boolean streamEnd = tuple.getBooleanByField("streamEnd");
+        String country = tuple.getSourceStreamId();
 
         Date nowDate = new Date();
 
         if(streamEnd) {
-            this.collector.emit(new Values( 0L, tuple.getSourceStreamId()));
+            this.collector.emit(new Values( 0L, country, tuple.getLongByField("tweetdate")));
             return;
         }
         if(tweetmap.size() == 0) {
             System.out.println( new Date() + " round end " + round);
-            this.collector.emit(new Values( round, tuple.getSourceStreamId()));
+            this.collector.emit(new Values( round, country, tuple.getLongByField("tweetdate")));
             return;
         }
 
@@ -97,11 +100,11 @@ public class WordCountBolt extends BaseRichBolt {
         ResultSet resultSet ;
         Constants.lock.lock();
         try {
-            resultSet = cassandraDao.getClusters();
+            resultSet = cassandraDao.getClusters(country);
             Iterator<Row> iterator = resultSet.iterator();
 
             if(!iterator.hasNext()) {
-                addNewCluster(round, tweetmap, tweetid);
+                addNewCluster(round, tweetmap, tweetid, country, tuple.getLongByField("tweetdate"));
             }
             else {
                 boolean similarclusterfound = false;
@@ -113,12 +116,12 @@ public class WordCountBolt extends BaseRichBolt {
                     double similarity = CosineSimilarity.cosineSimilarityFromMap(cosinevector, tweetmap);
                     if(similarity > 0.5) {
                         similarclusterfound = true;
-                        updateCluster(row, tweetmap, tweetid, round);
+                        updateCluster(row, tweetmap, tweetid, round, country, tuple.getLongByField("tweetdate"));
                         break;
                     }
                 }
                 if(!similarclusterfound) {
-                    addNewCluster(round, tweetmap, tweetid);
+                    addNewCluster(round, tweetmap, tweetid, country, tuple.getLongByField("tweetdate"));
                 }
             }
         } catch (Exception e) {
@@ -127,12 +130,10 @@ public class WordCountBolt extends BaseRichBolt {
         }
         Constants.lock.unlock();
         lastDate = new Date();
-
         ExcelWriter.putData(componentId,nowDate,lastDate, "wc",tuple.getSourceStreamId(), currentRound);
-
     }
 
-    public void updateCluster(Row row, HashMap<String, Double> tweetmap, long tweetid, long round) throws Exception {
+    public void updateCluster(Row row, HashMap<String, Double> tweetmap, long tweetid, long round, String country, long tweetTime) throws Exception {
         HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
         int numTweets = row.getInt("numberoftweets");
         for(Map.Entry<String, Double> entry : tweetmap.entrySet()) {
@@ -150,8 +151,10 @@ public class WordCountBolt extends BaseRichBolt {
         }
         List<Object> values = new ArrayList<>();
         values.add(row.getUUID("id"));
+        values.add(country);
         values.add(cosinevector);
         values.add(numTweets+1);
+        values.add(tweetTime);
         cassandraDao.insertIntoClusters(values.toArray());
         List<Object> values2 = new ArrayList<>();
         values2.add(row.getUUID("id"));
@@ -159,6 +162,7 @@ public class WordCountBolt extends BaseRichBolt {
         cassandraDao.insertIntoClusterAndTweets(values2.toArray());
         values = new ArrayList<>();
         values.add(round);
+        values.add(country);
         values.add(row.getUUID("id"));
         values.add(numTweets+1);
         cassandraDao.insertIntoClusterinfo(values.toArray());
@@ -167,12 +171,14 @@ public class WordCountBolt extends BaseRichBolt {
 
     }
 
-    public void addNewCluster(long round, HashMap<String, Double> tweet, long tweetid) throws Exception {
+    public void addNewCluster(long round, HashMap<String, Double> tweet, long tweetid, String country, long tweetTime) throws Exception {
         UUID clusterid = UUIDs.timeBased();
         List<Object> values = new ArrayList<>();
         values.add(clusterid);
+        values.add(country);
         values.add(tweet);
         values.add(1);
+        values.add(tweetTime);
         cassandraDao.insertIntoClusters(values.toArray());
         values = new ArrayList<>();
         values.add(clusterid);
@@ -180,6 +186,7 @@ public class WordCountBolt extends BaseRichBolt {
         cassandraDao.insertIntoClusterAndTweets(values.toArray());
         values = new ArrayList<>();
         values.add(round);
+        values.add(country);
         values.add(clusterid);
         values.add(1);
         cassandraDao.insertIntoClusterinfo(values.toArray());
@@ -187,7 +194,7 @@ public class WordCountBolt extends BaseRichBolt {
     }
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields( "round", "country"));
+        declarer.declare(new Fields( "round", "country", "tweetdate"));
     }
 
 }

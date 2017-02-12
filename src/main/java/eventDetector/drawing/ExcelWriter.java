@@ -26,10 +26,11 @@ public class ExcelWriter {
     private static long startRound = 0;
     private static String fileNum="12345";
     private static int lastInd ;
-    private static int rowNum = 7200;
+    private static int rowNum = 21600;
     private static int columnNum = 200;
     private static int numOfBolts = 13;
     private static boolean createChart = false;
+    private static int createChartInt = 0;
 
     public static void putStartDate(Date date, String filenum, long round) {
         times = new int[rowNum][columnNum];
@@ -60,8 +61,8 @@ public class ExcelWriter {
     }
 
     public static void createTimeChart () throws IOException {
-
-        if(!createChart) {
+        createChartInt++;
+        if(createChartInt>=4 && !createChart) {
             createChart = true;
             System.out.println("Excel creation started");
             writeExcel();
