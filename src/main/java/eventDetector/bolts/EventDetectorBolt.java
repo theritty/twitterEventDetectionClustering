@@ -49,6 +49,7 @@ public class EventDetectorBolt extends BaseRichBolt {
 
         if(round==0L) {
             try {
+                System.out.println("trololo");
                 ExcelWriter.createTimeChart();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -97,7 +98,7 @@ public class EventDetectorBolt extends BaseRichBolt {
 
                 if(numtweets<60) continue;
                 ResultSet resultSet2 ;
-                resultSet2 = cassandraDao.getClusterinfoByRoundAndId(round-2, clusterid);
+                resultSet2 = cassandraDao.getClusterinfoByRoundAndId(round-1, clusterid);
                 Iterator<Row> iterator2 = resultSet2.iterator();
 
                 if(!iterator2.hasNext()) {
@@ -121,14 +122,13 @@ public class EventDetectorBolt extends BaseRichBolt {
         }
         lastDate = new Date();
 
-            System.out.println("round " + round + " put excel");
-            ExcelWriter.putData(componentId, nowDate, lastDate, "eventdetector", tuple.getSourceStreamId(), currentRound);
+        System.out.println("round " + round + " put excel");
+        ExcelWriter.putData(componentId, nowDate, lastDate, currentRound);
 
 
     }
 
     public  void addEvent(UUID clusterid, long round, double incrementrate, String country, int numtweet) {
-//        System.out.println("Event found Cluster id " + clusterid + " at round " + round + " increment rate " + incrementrate + " from 00000" );
         ResultSet resultSet ;
         try {
             resultSet = cassandraDao.getClustersById(clusterid);

@@ -4,6 +4,7 @@ CREATE TABLE tweetcollection.cluster3 (
     id timeuuid,
     cosinevector map<text, double>,
     numberoftweets int,
+    lastround bigint,
     PRIMARY KEY (id)
 );
 

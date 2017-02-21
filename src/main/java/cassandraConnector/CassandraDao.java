@@ -13,6 +13,8 @@ import java.io.Serializable;
 public class CassandraDao implements Serializable
 {
     private transient PreparedStatement statement_cluster;
+    private transient PreparedStatement statement_cluster_delete;
+    private transient PreparedStatement statement_cluster_get_with_lastround;
     private transient PreparedStatement statement_event;
     private transient PreparedStatement statement_clusterinfo;
     private transient PreparedStatement statement_clusterandtweet;
@@ -26,6 +28,8 @@ public class CassandraDao implements Serializable
     private transient BoundStatement boundStatement_tweets_get;
     private transient BoundStatement boundStatement_rounds_get;
     private transient BoundStatement boundStatement_cluster;
+    private transient BoundStatement boundStatement_cluster_delete;
+    private transient BoundStatement boundStatement_cluster_get_with_lastround;
     private transient BoundStatement boundStatement_event;
     private transient BoundStatement boundStatement_clusterinfo;
     private transient BoundStatement boundStatement_clusterandtweets;
@@ -35,8 +39,8 @@ public class CassandraDao implements Serializable
     private transient BoundStatement boundStatement_clusterinfo_id_get;
     private transient BoundStatement boundStatement_clusterandtweets_get;
 
-    private static String CLUSTER_FIELDS =   "(id, cosinevector, numberoftweets)";
-    private static String CLUSTER_VALUES = "(?, ?, ?)";
+    private static String CLUSTER_FIELDS =   "(id, cosinevector, numberoftweets, lastround)";
+    private static String CLUSTER_VALUES = "(?, ?, ?, ?)";
 
     private static String EVENT_FIELDS =   "(round, clusterid, country, cosinevector, incrementrate, numtweet)";
     private static String EVENT_VALUES = "(?, ?, ?, ?, ?, ?)";
@@ -76,6 +80,11 @@ public class CassandraDao implements Serializable
                             + " VALUES " + CLUSTER_VALUES + ";");
         }
 
+        if(statement_cluster_delete==null) {
+            statement_cluster_delete = CassandraConnection.connect().prepare(
+                    "DELETE FROM " + clusterTable + " WHERE id=?;");
+        }
+
         if(statement_clusterinfo==null) {
             statement_clusterinfo = CassandraConnection.connect().prepare(
                     "INSERT INTO " + clusterinfoTable + " " + CLUSTERINFO_FIELDS
@@ -100,6 +109,11 @@ public class CassandraDao implements Serializable
             statement_cluster_get = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + clusterTable + ";");
         }
+        if(statement_cluster_get_with_lastround==null) {
+            statement_cluster_get_with_lastround = CassandraConnection.connect().prepare(
+                    "SELECT * FROM " + clusterTable + " WHERE lastround<? ALLOW FILTERING;");
+        }
+
         if(statement_cluster_get_by_id ==null) {
             statement_cluster_get_by_id = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + clusterTable + " WHERE id=?;");
@@ -123,6 +137,8 @@ public class CassandraDao implements Serializable
             boundStatement_rounds_get = new BoundStatement(statement_round_get);
         if(boundStatement_cluster_get == null)
             boundStatement_cluster_get = new BoundStatement(statement_cluster_get);
+        if(boundStatement_cluster_get_with_lastround == null)
+            boundStatement_cluster_get_with_lastround = new BoundStatement(statement_cluster_get_with_lastround);
         if(boundStatement_cluster_get_by_id == null)
             boundStatement_cluster_get_by_id = new BoundStatement(statement_cluster_get_by_id);
         if(boundStatement_clusterinfo_get == null)
@@ -133,6 +149,8 @@ public class CassandraDao implements Serializable
             boundStatement_clusterandtweets_get = new BoundStatement(statement_clusterandtweet_get);
         if(boundStatement_cluster == null)
             boundStatement_cluster = new BoundStatement(statement_cluster);
+        if(boundStatement_cluster_delete == null)
+            boundStatement_cluster_delete = new BoundStatement(statement_cluster_delete);
         if(boundStatement_clusterinfo == null)
             boundStatement_clusterinfo = new BoundStatement(statement_clusterinfo);
         if(boundStatement_clusterandtweets == null)
@@ -145,6 +163,11 @@ public class CassandraDao implements Serializable
     {
         prepareAll();
         CassandraConnection.connect().executeAsync(boundStatement_cluster.bind(values));
+    }
+    public void deleteFromClusters( Object... values ) throws Exception
+    {
+        prepareAll();
+        CassandraConnection.connect().executeAsync(boundStatement_cluster_delete.bind(values));
     }
 
     public void insertIntoEvents( Object[] values ) throws Exception
@@ -177,6 +200,14 @@ public class CassandraDao implements Serializable
     {
         prepareAll();
         ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_clusterinfo_get.bind(values));
+
+        return resultSet;
+    }
+
+    public ResultSet getClusterByLastRound( Object... values ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_get_with_lastround.bind(values));
 
         return resultSet;
     }

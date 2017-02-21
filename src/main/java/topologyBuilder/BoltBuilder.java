@@ -2,14 +2,11 @@ package topologyBuilder;
 
 import backtype.storm.generated.StormTopology;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
-import clojure.lang.Cons;
 import eventDetector.bolts.*;
 import cassandraConnector.CassandraDao;
 import eventDetector.spout.CassandraSpout;
 
 import java.util.Properties;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 public class BoltBuilder {
@@ -37,14 +34,14 @@ public class BoltBuilder {
 
         CassandraSpout cassandraSpout = new CassandraSpout(cassandraDao, FILENUM, START_ROUND, END_ROUND);
 
-        WordCountBolt countBoltCAN = new WordCountBolt( FILENUM, cassandraDao);
-        WordCountBolt countBoltUSA = new WordCountBolt( FILENUM, cassandraDao);
+        ClusteringBolt countBoltCAN = new ClusteringBolt( FILENUM, cassandraDao);
+        ClusteringBolt countBoltUSA = new ClusteringBolt( FILENUM, cassandraDao);
         EventDetectorBolt eventDetectorBoltCAN = new EventDetectorBolt(FILENUM, cassandraDao);
         EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao);
 
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpout,1);
-        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,5).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");
-        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,5).shuffleGrouping(Constants.CASS_SPOUT_ID, "USA");
+        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,4).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");
+        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,4).shuffleGrouping(Constants.CASS_SPOUT_ID, "USA");
         builder.setBolt(Constants.COUNTRY2_EVENTDETECTOR_BOLT_ID, eventDetectorBoltCAN,1).shuffleGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
         builder.setBolt(Constants.COUNTRY1_EVENTDETECTOR_BOLT_ID, eventDetectorBoltUSA,1).shuffleGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
 

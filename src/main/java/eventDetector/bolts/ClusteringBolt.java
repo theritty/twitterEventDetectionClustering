@@ -18,7 +18,7 @@ import com.datastax.driver.core.utils.UUIDs;
 
 import java.util.*;
 
-public class WordCountBolt extends BaseRichBolt {
+public class ClusteringBolt extends BaseRichBolt {
 
     private OutputCollector collector;
     private HashMap<String, Long> countsForRounds = null;
@@ -32,7 +32,7 @@ public class WordCountBolt extends BaseRichBolt {
     private CassandraDao cassandraDao;
 
 
-    public WordCountBolt( String filenum, CassandraDao cassandraDao)
+    public ClusteringBolt(String filenum, CassandraDao cassandraDao)
     {
         this.fileNum = filenum + "/";
         this.cassandraDao = cassandraDao;
@@ -44,6 +44,28 @@ public class WordCountBolt extends BaseRichBolt {
         this.countsForRounds = new HashMap<>();
         this.componentId = context.getThisTaskId()-1;
         System.out.println("cluster : " + componentId );
+    }
+
+    public void cleanupclusters(long round) {
+        ResultSet resultSet ;
+//        Constants.lock.lock();
+        try {
+            resultSet = cassandraDao.getClusters();
+            Iterator<Row> iterator = resultSet.iterator();
+            while (iterator.hasNext()) {
+                Row row = iterator.next();
+                long lastround = row.getLong("lastround");
+                int numberoftweets = row.getInt("numberoftweets");
+                if(round - lastround>= 2 || numberoftweets<30) {
+                    UUID clusterid = row.getUUID("id");
+                    cassandraDao.deleteFromClusters(clusterid);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+//            Constants.lock.unlock();
+        }
+//        Constants.lock.unlock();
     }
 
     @Override
@@ -62,25 +84,24 @@ public class WordCountBolt extends BaseRichBolt {
         if(tweetmap.size() == 0) {
             System.out.println( new Date() + " round end " + round);
             this.collector.emit(new Values( round, tuple.getSourceStreamId()));
+            cleanupclusters(round);
             return;
         }
 
-        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Word count " + componentId + " working "  + round);
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Clustering " + componentId + " working "  + round);
 
         if(round > currentRound)
         {
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
-                    "Word count "+ componentId + " end for round " + currentRound + " at " + lastDate);
+                    "Clustering "+ componentId + " end for round " + currentRound + " at " + lastDate);
 
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
-                    "Word count "+ componentId + " time taken for round" + currentRound + " is " +
+                    "Clustering "+ componentId + " time taken for round" + currentRound + " is " +
                             (lastDate.getTime()-startDate.getTime())/1000);
-//            if ( currentRound!=0)
-//                ExcelWriter.putData(componentId,startDate,lastDate, "wc",tuple.getSourceStreamId(), currentRound);
 
             startDate = new Date();
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
-                    "Word count "+ componentId + " starting for round " + round + " at " + startDate );
+                    "Clustering "+ componentId + " starting for round " + round + " at " + startDate );
 
             countsForRounds.clear();
             currentRound = round;
@@ -90,12 +111,12 @@ public class WordCountBolt extends BaseRichBolt {
             ignoredCount++;
             if(ignoredCount%1000==0)
                 TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + "ignoreCount.txt",
-                        "Word count ignored count " + componentId + ": " + ignoredCount );
+                        "Clustering ignored count " + componentId + ": " + ignoredCount );
             return;
         }
 
         ResultSet resultSet ;
-        Constants.lock.lock();
+//        Constants.lock.lock();
         try {
             resultSet = cassandraDao.getClusters();
             Iterator<Row> iterator = resultSet.iterator();
@@ -123,12 +144,12 @@ public class WordCountBolt extends BaseRichBolt {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Constants.lock.unlock();
+//            Constants.lock.unlock();
         }
-        Constants.lock.unlock();
+//        Constants.lock.unlock();
         lastDate = new Date();
 
-        ExcelWriter.putData(componentId,nowDate,lastDate, "wc",tuple.getSourceStreamId(), currentRound);
+        ExcelWriter.putData(componentId,nowDate,lastDate, currentRound);
 
     }
 
@@ -143,15 +164,25 @@ public class WordCountBolt extends BaseRichBolt {
             else
                 cosinevector.put(key, value / numTweets);
         }
-        for(Map.Entry<String, Double> entry : cosinevector.entrySet()) {
+
+        Iterator<Map.Entry<String, Double>> it = cosinevector.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry<String, Double> entry = it.next();
             String key = entry.getKey();
             double value = entry.getValue();
-            cosinevector.put(key, value * numTweets / (numTweets+1));
+            double newValue = value * numTweets / (numTweets+1);
+            if(newValue < 0.001) {
+                it.remove();
+            }
+            else {
+                cosinevector.put(key, newValue);
+            }
         }
         List<Object> values = new ArrayList<>();
         values.add(row.getUUID("id"));
         values.add(cosinevector);
         values.add(numTweets+1);
+        values.add(round);
         cassandraDao.insertIntoClusters(values.toArray());
         List<Object> values2 = new ArrayList<>();
         values2.add(row.getUUID("id"));
@@ -163,8 +194,6 @@ public class WordCountBolt extends BaseRichBolt {
         values.add(numTweets+1);
         cassandraDao.insertIntoClusterinfo(values.toArray());
 
-//        System.out.println("Similar cluster cluster id " + row.getUUID("id") + ", round " + round + ", tweet " + tweetmap + ", id " + tweetid + ", cosine " + cosinevector);
-
     }
 
     public void addNewCluster(long round, HashMap<String, Double> tweet, long tweetid) throws Exception {
@@ -173,6 +202,7 @@ public class WordCountBolt extends BaseRichBolt {
         values.add(clusterid);
         values.add(tweet);
         values.add(1);
+        values.add(round);
         cassandraDao.insertIntoClusters(values.toArray());
         values = new ArrayList<>();
         values.add(clusterid);
@@ -183,8 +213,8 @@ public class WordCountBolt extends BaseRichBolt {
         values.add(clusterid);
         values.add(1);
         cassandraDao.insertIntoClusterinfo(values.toArray());
-//        System.out.println("New cluster cluster id " +clusterid + ", round " + round + ", tweet " + tweet + ", id " + tweetid);
     }
+
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields( "round", "country"));

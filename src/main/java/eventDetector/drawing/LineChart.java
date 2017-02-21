@@ -21,7 +21,6 @@ public class LineChart
     DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
     String date = df.format(new Date(new Long(round) * 12*60*1000));
 
-    //System.out.println("Date::::: " + date + " round " + round);
     JFreeChart lineChartObject = ChartFactory.createLineChart(
             "Count graph for \"" + word + "\" in " + date + " in " + country,
             "Document order",
