@@ -9,7 +9,7 @@ public class Constants {
     public static final String COUNTRY1_EVENTDETECTOR_BOLT_ID = "eventdetector-bolt1";
     public static final String COUNTRY2_EVENTDETECTOR_BOLT_ID = "eventdetector-bolt2";
     public static ReentrantLock lock = new ReentrantLock();
-
+//
 //    public static final String IMAGES_FILE_PATH = "/home/ceren/Desktop/thesis/results/charts/";
 //    public static final String RESULT_FILE_PATH = "/home/ceren/Desktop/thesis/results/";
 //    public static final String TIMEBREAKDOWN_FILE_PATH = "/home/ceren/Desktop/thesis/results/timebreakdown/";
