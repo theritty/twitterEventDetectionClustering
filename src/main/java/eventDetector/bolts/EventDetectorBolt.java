@@ -25,21 +25,23 @@ public class EventDetectorBolt extends BaseRichBolt {
     private String fileNum;
     private Date lastDate = new Date();
     private Date startDate = new Date();
+    private String country;
 
     private CassandraDao cassandraDao;
 
 
-    public EventDetectorBolt(String filenum, CassandraDao cassandraDao)
+    public EventDetectorBolt(String filenum, CassandraDao cassandraDao, String country)
     {
         this.fileNum = filenum + "/";
         this.cassandraDao = cassandraDao;
+        this.country = country;
     }
     @Override
     public void prepare(Map config, TopologyContext context,
                         OutputCollector collector) {
         this.collector = collector;
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("eventdet : " + componentId );
+        System.out.println("eventdet : " + componentId + " " + country );
     }
 
     @Override

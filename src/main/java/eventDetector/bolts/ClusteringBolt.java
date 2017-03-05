@@ -28,14 +28,16 @@ public class ClusteringBolt extends BaseRichBolt {
     private String fileNum;
     private Date lastDate = new Date();
     private Date startDate = new Date();
+    private String country ;
 
     private CassandraDao cassandraDao;
 
 
-    public ClusteringBolt(String filenum, CassandraDao cassandraDao)
+    public ClusteringBolt(String filenum, CassandraDao cassandraDao, String country)
     {
         this.fileNum = filenum + "/";
         this.cassandraDao = cassandraDao;
+        this.country = country;
     }
     @Override
     public void prepare(Map config, TopologyContext context,
@@ -43,7 +45,7 @@ public class ClusteringBolt extends BaseRichBolt {
         this.collector = collector;
         this.countsForRounds = new HashMap<>();
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("cluster : " + componentId );
+        System.out.println("cluster : " + componentId + " " + country);
     }
 
     public void cleanupclusters(long round) {
@@ -59,6 +61,24 @@ public class ClusteringBolt extends BaseRichBolt {
                 if(round - lastround>= 2 || numberoftweets<30) {
                     UUID clusterid = row.getUUID("id");
                     cassandraDao.deleteFromClusters(clusterid);
+                }
+                else {
+                    HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
+                    int numTweets = row.getInt("numberoftweets");
+                    Iterator<Map.Entry<String, Double>> it = cosinevector.entrySet().iterator();
+                    while(it.hasNext()) {
+                        Map.Entry<String, Double> entry = it.next();
+                        double value = entry.getValue();
+                        if(value < 0.01) {
+                            it.remove();
+                        }
+                    }
+                    List<Object> values = new ArrayList<>();
+                    values.add(row.getUUID("id"));
+                    values.add(cosinevector);
+                    values.add(numTweets);
+                    values.add(round);
+                    cassandraDao.insertIntoClusters(values.toArray());
                 }
             }
         } catch (Exception e) {
@@ -82,7 +102,7 @@ public class ClusteringBolt extends BaseRichBolt {
             return;
         }
         if(tweetmap.size() == 0) {
-            System.out.println( new Date() + " round end " + round);
+            System.out.println( new Date() + " round end " + round + " for " + country);
             this.collector.emit(new Values( round, tuple.getSourceStreamId()));
             cleanupclusters(round);
             return;
@@ -171,12 +191,12 @@ public class ClusteringBolt extends BaseRichBolt {
             String key = entry.getKey();
             double value = entry.getValue();
             double newValue = value * numTweets / (numTweets+1);
-            if(newValue < 0.001) {
-                it.remove();
-            }
-            else {
+//            if(newValue < 0.001) {
+//                it.remove();
+//            }
+//            else {
                 cosinevector.put(key, newValue);
-            }
+//            }
         }
         List<Object> values = new ArrayList<>();
         values.add(row.getUUID("id"));

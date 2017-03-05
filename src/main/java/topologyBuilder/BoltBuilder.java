@@ -34,14 +34,14 @@ public class BoltBuilder {
 
         CassandraSpout cassandraSpout = new CassandraSpout(cassandraDao, FILENUM, START_ROUND, END_ROUND);
 
-        ClusteringBolt countBoltCAN = new ClusteringBolt( FILENUM, cassandraDao);
-        ClusteringBolt countBoltUSA = new ClusteringBolt( FILENUM, cassandraDao);
-        EventDetectorBolt eventDetectorBoltCAN = new EventDetectorBolt(FILENUM, cassandraDao);
-        EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao);
+        ClusteringBolt countBoltCAN = new ClusteringBolt( FILENUM, cassandraDao, "CAN");
+        ClusteringBolt countBoltUSA = new ClusteringBolt( FILENUM, cassandraDao, "USA");
+        EventDetectorBolt eventDetectorBoltCAN = new EventDetectorBolt(FILENUM, cassandraDao, "CAN");
+        EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao, "USA");
 
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpout,1);
-        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,4).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");
-        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,4).shuffleGrouping(Constants.CASS_SPOUT_ID, "USA");
+        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,2).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");
+        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,6).shuffleGrouping(Constants.CASS_SPOUT_ID, "USA");
         builder.setBolt(Constants.COUNTRY2_EVENTDETECTOR_BOLT_ID, eventDetectorBoltCAN,1).shuffleGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
         builder.setBolt(Constants.COUNTRY1_EVENTDETECTOR_BOLT_ID, eventDetectorBoltUSA,1).shuffleGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
 
