@@ -16,6 +16,8 @@ public class CassandraDao implements Serializable
     private transient PreparedStatement statement_cluster_delete;
     private transient PreparedStatement statement_cluster_get_with_lastround;
     private transient PreparedStatement statement_event;
+    private transient PreparedStatement statement_event_get;
+    private transient PreparedStatement statement_event_wordbased;
     private transient PreparedStatement statement_clusterinfo;
     private transient PreparedStatement statement_clusterandtweet;
     private transient PreparedStatement statement_cluster_get;
@@ -31,6 +33,8 @@ public class CassandraDao implements Serializable
     private transient BoundStatement boundStatement_cluster_delete;
     private transient BoundStatement boundStatement_cluster_get_with_lastround;
     private transient BoundStatement boundStatement_event;
+    private transient BoundStatement boundStatement_event_get;
+    private transient BoundStatement boundStatement_event_wordBased;
     private transient BoundStatement boundStatement_clusterinfo;
     private transient BoundStatement boundStatement_clusterandtweets;
     private transient BoundStatement boundStatement_cluster_get;
@@ -39,14 +43,17 @@ public class CassandraDao implements Serializable
     private transient BoundStatement boundStatement_clusterinfo_id_get;
     private transient BoundStatement boundStatement_clusterandtweets_get;
 
-    private static String CLUSTER_FIELDS =   "(id, cosinevector, numberoftweets, lastround)";
-    private static String CLUSTER_VALUES = "(?, ?, ?, ?)";
+    private static String CLUSTER_FIELDS =   "(id, country, cosinevector, numberoftweets, lastround)";
+    private static String CLUSTER_VALUES = "(?, ?, ?, ?, ?)";
 
     private static String EVENT_FIELDS =   "(round, clusterid, country, cosinevector, incrementrate, numtweet)";
     private static String EVENT_VALUES = "(?, ?, ?, ?, ?, ?)";
 
-    private static String CLUSTERINFO_FIELDS =   "(round, id, numberoftweets)";
-    private static String CLUSTERINFO_VALUES = "(?, ?, ?)";
+    private static String EVENTS_WORDBASED_FIELDS = "(round, country, word, incrementpercent)";
+    private static String EVENTS_VALUES = "(?, ?, ?, ?)";
+    
+    private static String CLUSTERINFO_FIELDS =   "(round, id, country, numberoftweets)";
+    private static String CLUSTERINFO_VALUES = "(?, ?, ?, ?)";
 
     private static String CLUSTERANDTWEETS_FIELDS =   "(clusterid, tweetid)";
     private static String CLUSTERANDTWEETS_VALUES = "(?, ?)";
@@ -54,15 +61,17 @@ public class CassandraDao implements Serializable
     private String tweetsTable;
     private String clusterTable;
     private String eventTable;
+    private String eventWordBasedTable;
     private String clusterinfoTable;
     private String clusterandtweetTable;
 
-    public CassandraDao(String tweetsTable, String clusterTable, String clusterinfoTable, String clusterandtweetTable, String eventTable) throws Exception {
+    public CassandraDao(String tweetsTable, String clusterTable, String clusterinfoTable, String clusterandtweetTable, String eventTable, String eventWordBasedTable) throws Exception {
         this.tweetsTable = tweetsTable;
         this.clusterTable = clusterTable;
         this.clusterinfoTable = clusterinfoTable;
         this.clusterandtweetTable = clusterandtweetTable;
         this.eventTable = eventTable;
+        this.eventWordBasedTable = eventWordBasedTable;
 
         prepareAll();
     }
@@ -82,7 +91,7 @@ public class CassandraDao implements Serializable
 
         if(statement_cluster_delete==null) {
             statement_cluster_delete = CassandraConnection.connect().prepare(
-                    "DELETE FROM " + clusterTable + " WHERE id=?;");
+                    "DELETE FROM " + clusterTable + " WHERE country=? AND id=?;");
         }
 
         if(statement_clusterinfo==null) {
@@ -97,9 +106,19 @@ public class CassandraDao implements Serializable
                             + " VALUES " + CLUSTERANDTWEETS_VALUES + ";");
         }
 
+        if(statement_event_wordbased==null) {
+            statement_event_wordbased = CassandraConnection.connect().prepare(
+                    "SELECT * FROM " + eventWordBasedTable );
+        }
+
         if(statement_tweet_get==null) {
             statement_tweet_get = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + tweetsTable + " WHERE round=?;");
+        }
+
+        if(statement_event_get==null) {
+            statement_event_get = CassandraConnection.connect().prepare(
+                    "SELECT * FROM " + eventTable + " WHERE country=? ALLOW FILTERING;");
         }
         if(statement_round_get==null) {
             statement_round_get = CassandraConnection.connect().prepare(
@@ -107,7 +126,7 @@ public class CassandraDao implements Serializable
         }
         if(statement_cluster_get==null) {
             statement_cluster_get = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + clusterTable + ";");
+                    "SELECT * FROM " + clusterTable + " WHERE country=?;");
         }
         if(statement_cluster_get_with_lastround==null) {
             statement_cluster_get_with_lastround = CassandraConnection.connect().prepare(
@@ -116,15 +135,15 @@ public class CassandraDao implements Serializable
 
         if(statement_cluster_get_by_id ==null) {
             statement_cluster_get_by_id = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + clusterTable + " WHERE id=?;");
+                    "SELECT * FROM " + clusterTable + " WHERE country=? AND id=?;");
         }
         if(statement_clusterinfo_get==null) {
             statement_clusterinfo_get = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + clusterinfoTable + " WHERE round=?;");
+                    "SELECT * FROM " + clusterinfoTable + " WHERE round=? AND country=?;");
         }
         if(statement_clusterinfo_id_get==null) {
             statement_clusterinfo_id_get = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + clusterinfoTable + " WHERE round=? AND id=?;");
+                    "SELECT * FROM " + clusterinfoTable + " WHERE round=? AND country=? AND id=?;");
         }
         if(statement_clusterandtweet_get==null) {
             statement_clusterandtweet_get = CassandraConnection.connect().prepare(
@@ -157,6 +176,10 @@ public class CassandraDao implements Serializable
             boundStatement_clusterandtweets = new BoundStatement(statement_clusterandtweet);
         if(boundStatement_event == null)
             boundStatement_event = new BoundStatement(statement_event);
+        if(boundStatement_event_get == null)
+            boundStatement_event_get = new BoundStatement(statement_event_get);
+        if(boundStatement_event_wordBased == null)
+            boundStatement_event_wordBased = new BoundStatement(statement_event_wordbased);
     }
 
     public void insertIntoClusters( Object[] values ) throws Exception
@@ -220,10 +243,26 @@ public class CassandraDao implements Serializable
         return resultSet;
     }
 
-    public ResultSet getClusters( ) throws Exception
+    public ResultSet getClusters( Object... values ) throws Exception
     {
         prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_get.bind());
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_get.bind(values));
+
+        return resultSet;
+    }
+
+    public ResultSet getEvents( Object... values ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_event_get.bind(values));
+
+        return resultSet;
+    }
+
+    public ResultSet getEventsWordBased( ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_event_wordBased.bind());
 
         return resultSet;
     }

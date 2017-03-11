@@ -17,6 +17,7 @@ public class BoltBuilder {
         String FILENUM = properties.getProperty("topology.file.number");
         String TWEETS_TABLE = properties.getProperty("tweets.table");
         String EVENTS_TABLE = properties.getProperty("events.table");
+        String EVENTS_WORDBASED_TABLE = properties.getProperty("events_wordbased.table");
         String CLUSTER_TABLE = properties.getProperty("clusters.table");
         String CLUSTERINFO_TABLE = properties.getProperty("clusterinfo.table");
         String CLUSTERANDTWEET_TABLE = properties.getProperty("clusterandtweets.table");
@@ -28,7 +29,7 @@ public class BoltBuilder {
         TopologyHelper.createFolder(Constants.IMAGES_FILE_PATH + FILENUM);
         TopologyHelper.createFolder(Constants.TIMEBREAKDOWN_FILE_PATH + FILENUM);
 
-        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE);
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE);
         System.out.println("Preparing Bolts...");
         TopologyBuilder builder = new TopologyBuilder();
 

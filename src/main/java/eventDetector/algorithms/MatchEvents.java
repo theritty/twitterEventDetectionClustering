@@ -35,9 +35,10 @@ public class MatchEvents {
     String CLUSTERINFO_TABLE = properties.getProperty("clusterinfo.table");
     String CLUSTERANDTWEET_TABLE = properties.getProperty("clusterandtweets.table");
     String EVENTS_TABLE = properties.getProperty("events.table");
+    String EVENTS_WORDBASED_TABLE = properties.getProperty("events_wordbased.table");
     start = Long.parseLong(properties.getProperty("start.round"));
     end = Long.parseLong(properties.getProperty("end.round"));
-    cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE);
+    cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE);
   }
 
 //    public static void main(String[] args) throws Exception {

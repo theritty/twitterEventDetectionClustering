@@ -5,14 +5,16 @@ CREATE TABLE tweetcollection.cluster3 (
     cosinevector map<text, double>,
     numberoftweets int,
     lastround bigint,
-    PRIMARY KEY (id)
+    country text,
+    PRIMARY KEY (country, id)
 );
 
 CREATE TABLE tweetcollection.clusterinfo3 (
     round bigint,
     id timeuuid,
     numberoftweets int,
-    PRIMARY KEY (round, id)
+    country text,
+    PRIMARY KEY (round, country, id)
 );
 
 CREATE TABLE tweetcollection.clusterandtweet3 (

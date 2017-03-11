@@ -52,7 +52,7 @@ public class ClusteringBolt extends BaseRichBolt {
         ResultSet resultSet ;
 //        Constants.lock.lock();
         try {
-            resultSet = cassandraDao.getClusters();
+            resultSet = cassandraDao.getClusters(country);
             Iterator<Row> iterator = resultSet.iterator();
             while (iterator.hasNext()) {
                 Row row = iterator.next();
@@ -60,7 +60,7 @@ public class ClusteringBolt extends BaseRichBolt {
                 int numberoftweets = row.getInt("numberoftweets");
                 if(round - lastround>= 2 || numberoftweets<30) {
                     UUID clusterid = row.getUUID("id");
-                    cassandraDao.deleteFromClusters(clusterid);
+                    cassandraDao.deleteFromClusters(country, clusterid);
                 }
                 else {
                     HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
@@ -75,6 +75,7 @@ public class ClusteringBolt extends BaseRichBolt {
                     }
                     List<Object> values = new ArrayList<>();
                     values.add(row.getUUID("id"));
+                    values.add(country);
                     values.add(cosinevector);
                     values.add(numTweets);
                     values.add(round);
@@ -138,7 +139,7 @@ public class ClusteringBolt extends BaseRichBolt {
         ResultSet resultSet ;
 //        Constants.lock.lock();
         try {
-            resultSet = cassandraDao.getClusters();
+            resultSet = cassandraDao.getClusters(country);
             Iterator<Row> iterator = resultSet.iterator();
 
             if(!iterator.hasNext()) {
@@ -200,6 +201,7 @@ public class ClusteringBolt extends BaseRichBolt {
         }
         List<Object> values = new ArrayList<>();
         values.add(row.getUUID("id"));
+        values.add(country);
         values.add(cosinevector);
         values.add(numTweets+1);
         values.add(round);
@@ -211,6 +213,7 @@ public class ClusteringBolt extends BaseRichBolt {
         values = new ArrayList<>();
         values.add(round);
         values.add(row.getUUID("id"));
+        values.add(country);
         values.add(numTweets+1);
         cassandraDao.insertIntoClusterinfo(values.toArray());
 
@@ -220,6 +223,7 @@ public class ClusteringBolt extends BaseRichBolt {
         UUID clusterid = UUIDs.timeBased();
         List<Object> values = new ArrayList<>();
         values.add(clusterid);
+        values.add(country);
         values.add(tweet);
         values.add(1);
         values.add(round);
@@ -231,6 +235,7 @@ public class ClusteringBolt extends BaseRichBolt {
         values = new ArrayList<>();
         values.add(round);
         values.add(clusterid);
+        values.add(country);
         values.add(1);
         cassandraDao.insertIntoClusterinfo(values.toArray());
     }

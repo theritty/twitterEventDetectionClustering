@@ -91,20 +91,20 @@ public class EventDetectorBolt extends BaseRichBolt {
 
         ResultSet resultSet ;
         try {
-            resultSet = cassandraDao.getClusterinfoByRound(round);
+            resultSet = cassandraDao.getClusterinfoByRound(round, country);
             Iterator<Row> iterator = resultSet.iterator();
             while (iterator.hasNext()) {
                 Row row = iterator.next();
                 UUID clusterid = row.getUUID("id");
                 int numtweets = row.getInt("numberoftweets");
 
-                if(numtweets<60) continue;
+                if(numtweets<100) continue;
                 ResultSet resultSet2 ;
-                resultSet2 = cassandraDao.getClusterinfoByRoundAndId(round-1, clusterid);
+                resultSet2 = cassandraDao.getClusterinfoByRoundAndId(round-1, country, clusterid);
                 Iterator<Row> iterator2 = resultSet2.iterator();
 
                 if(!iterator2.hasNext()) {
-                    int numtweetsPrev = 1;
+                    int numtweetsPrev = 50;
 
                     if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
                         addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
@@ -133,7 +133,7 @@ public class EventDetectorBolt extends BaseRichBolt {
     public  void addEvent(UUID clusterid, long round, double incrementrate, String country, int numtweet) {
         ResultSet resultSet ;
         try {
-            resultSet = cassandraDao.getClustersById(clusterid);
+            resultSet = cassandraDao.getClustersById(country, clusterid);
             Iterator<Row> iterator = resultSet.iterator();
 
             if(!iterator.hasNext()) {
