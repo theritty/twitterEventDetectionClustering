@@ -27,7 +27,15 @@ public class CassandraDao implements Serializable
     private transient PreparedStatement statement_clusterandtweet_get;
     private transient PreparedStatement statement_tweet_get;
     private transient PreparedStatement statement_round_get;
+    private transient PreparedStatement statement_processedTweets_get;
+    private transient PreparedStatement statement_processedTweets_getCountry;
+    private transient PreparedStatement statement_processedTweets_getAll;
+    private transient PreparedStatement statement_processedTweets;
     private transient BoundStatement boundStatement_tweets_get;
+    private transient BoundStatement boundStatement_processedTweets_get;
+    private transient BoundStatement boundStatement_processedTweets_getCountry;
+    private transient BoundStatement boundStatement_processedTweets_getAll;
+    private transient BoundStatement boundStatement_processedTweets;
     private transient BoundStatement boundStatement_rounds_get;
     private transient BoundStatement boundStatement_cluster;
     private transient BoundStatement boundStatement_cluster_delete;
@@ -58,20 +66,25 @@ public class CassandraDao implements Serializable
     private static String CLUSTERANDTWEETS_FIELDS =   "(clusterid, tweetid)";
     private static String CLUSTERANDTWEETS_VALUES = "(?, ?)";
 
+    private static String PROCESSED_FIELDS =   "(round, boltid, spoutSent, boltProcessed, finished, country)";
+    private static String PROCESSED_VALUES = "(?, ?, ?, ?, ?, ?)";
+
     private String tweetsTable;
     private String clusterTable;
     private String eventTable;
     private String eventWordBasedTable;
     private String clusterinfoTable;
     private String clusterandtweetTable;
+    private String processedTweetsTable;
 
-    public CassandraDao(String tweetsTable, String clusterTable, String clusterinfoTable, String clusterandtweetTable, String eventTable, String eventWordBasedTable) throws Exception {
+    public CassandraDao(String tweetsTable, String clusterTable, String clusterinfoTable, String clusterandtweetTable, String eventTable, String eventWordBasedTable, String processedTweetsTable) throws Exception {
         this.tweetsTable = tweetsTable;
         this.clusterTable = clusterTable;
         this.clusterinfoTable = clusterinfoTable;
         this.clusterandtweetTable = clusterandtweetTable;
         this.eventTable = eventTable;
         this.eventWordBasedTable = eventWordBasedTable;
+        this.processedTweetsTable = processedTweetsTable;
 
         prepareAll();
     }
@@ -82,6 +95,11 @@ public class CassandraDao implements Serializable
             statement_event = CassandraConnection.connect().prepare(
                     "INSERT INTO " + eventTable + " " + EVENT_FIELDS
                             + " VALUES " + EVENT_VALUES + ";");
+        }
+        if(statement_processedTweets==null) {
+            statement_processedTweets = CassandraConnection.connect().prepare(
+                    "INSERT INTO " + processedTweetsTable + " " + PROCESSED_FIELDS
+                            + " VALUES " + PROCESSED_VALUES + ";");
         }
         if(statement_cluster==null) {
             statement_cluster = CassandraConnection.connect().prepare(
@@ -109,6 +127,21 @@ public class CassandraDao implements Serializable
         if(statement_event_wordbased==null) {
             statement_event_wordbased = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + eventWordBasedTable );
+        }
+
+        if(statement_processedTweets_get==null) {
+            statement_processedTweets_get = CassandraConnection.connect().prepare(
+                    "SELECT * FROM " + processedTweetsTable + " WHERE round=? AND boltid=?;" );
+        }
+
+        if(statement_processedTweets_getCountry==null) {
+            statement_processedTweets_getCountry = CassandraConnection.connect().prepare(
+                    "SELECT * FROM " + processedTweetsTable + " WHERE round=? AND country=? ALLOW FILTERING;" );
+        }
+
+        if(statement_processedTweets_getAll==null) {
+            statement_processedTweets_getAll = CassandraConnection.connect().prepare(
+                    "SELECT * FROM " + processedTweetsTable + " WHERE round=? ;" );
         }
 
         if(statement_tweet_get==null) {
@@ -152,6 +185,14 @@ public class CassandraDao implements Serializable
 
         if(boundStatement_tweets_get == null)
             boundStatement_tweets_get = new BoundStatement(statement_tweet_get);
+        if(boundStatement_processedTweets_get == null)
+            boundStatement_processedTweets_get = new BoundStatement(statement_processedTweets_get);
+        if(boundStatement_processedTweets_getCountry == null)
+            boundStatement_processedTweets_getCountry = new BoundStatement(statement_processedTweets_getCountry);
+        if(boundStatement_processedTweets_getAll == null)
+            boundStatement_processedTweets_getAll = new BoundStatement(statement_processedTweets_getAll);
+        if(boundStatement_processedTweets == null)
+            boundStatement_processedTweets = new BoundStatement(statement_processedTweets);
         if(boundStatement_rounds_get == null)
             boundStatement_rounds_get = new BoundStatement(statement_round_get);
         if(boundStatement_cluster_get == null)
@@ -182,33 +223,38 @@ public class CassandraDao implements Serializable
             boundStatement_event_wordBased = new BoundStatement(statement_event_wordbased);
     }
 
+    public void insertIntoProcessed( Object[] values ) throws Exception
+    {
+        prepareAll();
+        CassandraConnection.connect().execute(boundStatement_processedTweets.bind(values));
+    }
     public void insertIntoClusters( Object[] values ) throws Exception
     {
         prepareAll();
-        CassandraConnection.connect().executeAsync(boundStatement_cluster.bind(values));
+        CassandraConnection.connect().execute(boundStatement_cluster.bind(values));
     }
     public void deleteFromClusters( Object... values ) throws Exception
     {
         prepareAll();
-        CassandraConnection.connect().executeAsync(boundStatement_cluster_delete.bind(values));
+        CassandraConnection.connect().execute(boundStatement_cluster_delete.bind(values));
     }
 
     public void insertIntoEvents( Object[] values ) throws Exception
     {
         prepareAll();
-        CassandraConnection.connect().executeAsync(boundStatement_event.bind(values));
+        CassandraConnection.connect().execute(boundStatement_event.bind(values));
     }
 
     public void insertIntoClusterinfo( Object[] values ) throws Exception
     {
         prepareAll();
-        CassandraConnection.connect().executeAsync(boundStatement_clusterinfo.bind(values));
+        CassandraConnection.connect().execute(boundStatement_clusterinfo.bind(values));
     }
 
     public void insertIntoClusterAndTweets( Object[] values ) throws Exception
     {
         prepareAll();
-        CassandraConnection.connect().executeAsync(boundStatement_clusterandtweets.bind(values));
+        CassandraConnection.connect().execute(boundStatement_clusterandtweets.bind(values));
     }
 
     public ResultSet getTweetsByRound( Object... values ) throws Exception
@@ -239,6 +285,30 @@ public class CassandraDao implements Serializable
     {
         prepareAll();
         ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_clusterinfo_id_get.bind(values));
+
+        return resultSet;
+    }
+
+    public ResultSet getProcessed( Object... values ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_processedTweets_get.bind(values));
+
+        return resultSet;
+    }
+
+    public ResultSet getProcessedByCountry( Object... values ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_processedTweets_getCountry.bind(values));
+
+        return resultSet;
+    }
+
+    public ResultSet getAllProcessed( Object... values ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_processedTweets_getAll.bind(values));
 
         return resultSet;
     }

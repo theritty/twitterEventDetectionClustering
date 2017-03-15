@@ -21,19 +21,23 @@ public class BoltBuilder {
         String CLUSTER_TABLE = properties.getProperty("clusters.table");
         String CLUSTERINFO_TABLE = properties.getProperty("clusterinfo.table");
         String CLUSTERANDTWEET_TABLE = properties.getProperty("clusterandtweets.table");
+        String PROCESSEDTWEET_TABLE = properties.getProperty("processed_tweets.table");
         long START_ROUND = Long.parseLong(properties.getProperty("start.round"));
         long END_ROUND = Long.parseLong(properties.getProperty("end.round"));
+
+        int CAN_TASK_NUM= Integer.parseInt(properties.getProperty("can.taskNum"));
+        int USA_TASK_NUM= Integer.parseInt(properties.getProperty("usa.taskNum"));
 
         System.out.println("Count threshold " + COUNT_THRESHOLD);
         TopologyHelper.createFolder(Constants.RESULT_FILE_PATH + FILENUM);
         TopologyHelper.createFolder(Constants.IMAGES_FILE_PATH + FILENUM);
         TopologyHelper.createFolder(Constants.TIMEBREAKDOWN_FILE_PATH + FILENUM);
 
-        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE);
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE);
         System.out.println("Preparing Bolts...");
         TopologyBuilder builder = new TopologyBuilder();
 
-        CassandraSpout cassandraSpout = new CassandraSpout(cassandraDao, FILENUM, START_ROUND, END_ROUND);
+        CassandraSpout cassandraSpout = new CassandraSpout(cassandraDao, FILENUM, START_ROUND, END_ROUND, CAN_TASK_NUM, USA_TASK_NUM);
 
         ClusteringBolt countBoltCAN = new ClusteringBolt( FILENUM, cassandraDao, "CAN");
         ClusteringBolt countBoltUSA = new ClusteringBolt( FILENUM, cassandraDao, "USA");
@@ -41,8 +45,10 @@ public class BoltBuilder {
         EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao, "USA");
 
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpout,1);
-        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,2).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");
-        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,6).shuffleGrouping(Constants.CASS_SPOUT_ID, "USA");
+//        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,5).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");
+//        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,15).shuffleGrouping(Constants.CASS_SPOUT_ID, "USA");
+        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,CAN_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
+        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,USA_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
         builder.setBolt(Constants.COUNTRY2_EVENTDETECTOR_BOLT_ID, eventDetectorBoltCAN,1).shuffleGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
         builder.setBolt(Constants.COUNTRY1_EVENTDETECTOR_BOLT_ID, eventDetectorBoltUSA,1).shuffleGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
 

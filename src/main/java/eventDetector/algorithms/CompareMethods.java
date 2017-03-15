@@ -21,8 +21,9 @@ public class CompareMethods {
         String CLUSTER_TABLE = properties.getProperty("clusters.table");
         String CLUSTERINFO_TABLE = properties.getProperty("clusterinfo.table");
         String CLUSTERANDTWEET_TABLE = properties.getProperty("clusterandtweets.table");
+        String PROCESSEDTWEET_TABLE = properties.getProperty("processed_tweets.table");
 
-        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE);
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE);
         ResultSet resultSetClustering, resultSetWordBased ;
         HashMap<String, Integer> wordNums = new HashMap<>();
 //        Constants.lock.lock();
