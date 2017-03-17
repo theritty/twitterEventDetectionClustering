@@ -49,47 +49,7 @@ public class ClusteringBolt extends BaseRichBolt {
         System.out.println("cluster : " + componentId + " " + country);
     }
 
-    public void cleanupclusters(long round) {
-        System.out.println("Clean up for round " + round);
-        ResultSet resultSet ;
-//        Constants.lock.lock();
-        try {
-            resultSet = cassandraDao.getClusters(country);
-            Iterator<Row> iterator = resultSet.iterator();
-            while (iterator.hasNext()) {
-                Row row = iterator.next();
-                long lastround = row.getLong("lastround");
-                int numberoftweets = row.getInt("numberoftweets");
-                if(round - lastround>= 2 || numberoftweets<30) {
-                    UUID clusterid = row.getUUID("id");
-                    cassandraDao.deleteFromClusters(country, clusterid);
-                }
-                else {
-                    HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
-                    int numTweets = row.getInt("numberoftweets");
-                    Iterator<Map.Entry<String, Double>> it = cosinevector.entrySet().iterator();
-                    while(it.hasNext()) {
-                        Map.Entry<String, Double> entry = it.next();
-                        double value = entry.getValue();
-                        if(value < 0.01) {
-                            it.remove();
-                        }
-                    }
-                    List<Object> values = new ArrayList<>();
-                    values.add(row.getUUID("id"));
-                    values.add(country);
-                    values.add(cosinevector);
-                    values.add(numTweets);
-                    values.add(round);
-                    cassandraDao.insertIntoClusters(values.toArray());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-//            Constants.lock.unlock();
-        }
-//        Constants.lock.unlock();
-    }
+
 
     @Override
     public void execute(Tuple tuple) {
@@ -102,12 +62,11 @@ public class ClusteringBolt extends BaseRichBolt {
         Date nowDate = new Date();
 
         if(streamEnd) {
-            this.collector.emit(new Values( 0L, tuple.getSourceStreamId()));
+            this.collector.emit(new Values( 0L, country));
             return;
         }
         if(blockEnd) {
             System.out.println( new Date() + " round end " + round + " for " + country + " for " + componentId);
-            this.collector.emit(new Values( round, tuple.getSourceStreamId()));
 
             try {
                 Iterator<Row> iteratorProcessed = cassandraDao.getProcessed(round, componentId).iterator();
@@ -122,10 +81,16 @@ public class ClusteringBolt extends BaseRichBolt {
 
                 Iterator<Row> iteratorByCountry = cassandraDao.getProcessedByCountry(round, country).iterator();
                 while (iteratorByCountry.hasNext()){
-                    if(!iteratorByCountry.next().getBool("finished"))
+                    Row r = iteratorByCountry.next();
+                    if(r.getInt("boltId")<22 && !r.getBool("finished")) {
+                        System.out.println("I am " + componentId + ", " +  r.getInt("boltId") + " is not finished.");
                         return;
+                    }
                 }
-                cleanupclusters(round);
+                System.out.println(country + " emitting " + round);
+                this.collector.emit(new Values( round, country));
+                counts.remove(round);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

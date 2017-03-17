@@ -44,11 +44,54 @@ public class EventDetectorBolt extends BaseRichBolt {
         System.out.println("eventdet : " + componentId + " " + country );
     }
 
+    public void cleanupclusters(long round) {
+        System.out.println("Clean up for round " + round);
+        ResultSet resultSet ;
+//        Constants.lock.lock();
+        try {
+            resultSet = cassandraDao.getClusters(country);
+            Iterator<Row> iterator = resultSet.iterator();
+            while (iterator.hasNext()) {
+                Row row = iterator.next();
+                long lastround = row.getLong("lastround");
+                int numberoftweets = row.getInt("numberoftweets");
+                if(round - lastround>= 2 || numberoftweets<30) {
+                    UUID clusterid = row.getUUID("id");
+                    cassandraDao.deleteFromClusters(country, clusterid);
+                }
+                else {
+                    HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
+                    int numTweets = row.getInt("numberoftweets");
+                    Iterator<Map.Entry<String, Double>> it = cosinevector.entrySet().iterator();
+                    while(it.hasNext()) {
+                        Map.Entry<String, Double> entry = it.next();
+                        double value = entry.getValue();
+                        if(value < 0.01) {
+                            it.remove();
+                        }
+                    }
+                    List<Object> values = new ArrayList<>();
+                    values.add(row.getUUID("id"));
+                    values.add(country);
+                    values.add(cosinevector);
+                    values.add(numTweets);
+                    values.add(round);
+                    cassandraDao.insertIntoClusters(values.toArray());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+//            Constants.lock.unlock();
+        }
+//        Constants.lock.unlock();
+    }
+
     @Override
     public void execute(Tuple tuple) {
         long round = tuple.getLongByField("round");
         String country = tuple.getStringByField("country");
 
+        System.out.println(country + " event detection " + round);
         if(round==0L) {
             try {
                 System.out.println("trololo");
@@ -106,6 +149,7 @@ public class EventDetectorBolt extends BaseRichBolt {
                 if(!iterator2.hasNext()) {
                     int numtweetsPrev = 50;
 
+                    System.out.println(clusterid + " " + numtweets + " " + numtweetsPrev);
                     if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
                         addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
                     }
@@ -114,15 +158,30 @@ public class EventDetectorBolt extends BaseRichBolt {
                     Row row2 = iterator2.next();
                     int numtweetsPrev = row2.getInt("numberoftweets");
 
+                    System.out.println(clusterid + " " + numtweets + " " + numtweetsPrev);
                     if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
                         addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
                     }
                 }
             }
+
+            cleanupclusters(round);
+
+            List<Object> values = new ArrayList<>();
+            values.add(round);
+            values.add(componentId);
+            values.add(0L);
+            values.add(0L);
+            values.add(true);
+            values.add(country);
+            cassandraDao.insertIntoProcessed(values.toArray());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         lastDate = new Date();
+
+
 
         System.out.println("round " + round + " put excel");
         ExcelWriter.putData(componentId, nowDate, lastDate, currentRound);

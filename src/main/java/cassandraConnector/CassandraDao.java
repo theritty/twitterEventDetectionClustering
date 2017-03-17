@@ -231,7 +231,7 @@ public class CassandraDao implements Serializable
     public void insertIntoClusters( Object[] values ) throws Exception
     {
         prepareAll();
-        CassandraConnection.connect().execute(boundStatement_cluster.bind(values));
+        CassandraConnection.connect().executeAsync(boundStatement_cluster.bind(values));
     }
     public void deleteFromClusters( Object... values ) throws Exception
     {
@@ -242,19 +242,19 @@ public class CassandraDao implements Serializable
     public void insertIntoEvents( Object[] values ) throws Exception
     {
         prepareAll();
-        CassandraConnection.connect().execute(boundStatement_event.bind(values));
+        CassandraConnection.connect().executeAsync(boundStatement_event.bind(values));
     }
 
     public void insertIntoClusterinfo( Object[] values ) throws Exception
     {
         prepareAll();
-        CassandraConnection.connect().execute(boundStatement_clusterinfo.bind(values));
+        CassandraConnection.connect().executeAsync(boundStatement_clusterinfo.bind(values));
     }
 
     public void insertIntoClusterAndTweets( Object[] values ) throws Exception
     {
         prepareAll();
-        CassandraConnection.connect().execute(boundStatement_clusterandtweets.bind(values));
+        CassandraConnection.connect().executeAsync(boundStatement_clusterandtweets.bind(values));
     }
 
     public ResultSet getTweetsByRound( Object... values ) throws Exception

@@ -149,6 +149,27 @@ public class CassandraSpout extends BaseRichSpout {
                 for(int k=3;k<CANTaskNumber+USATaskNumber+3;k++)
                     collector.emitDirect(k, new Values(new HashMap<>(), 0L, current_round, true, false));
 
+
+                List<Object> values = new ArrayList<>();
+                values.add(current_round);
+                values.add(22);
+                values.add(0L);
+                values.add(0L);
+                values.add(false);
+                values.add("USA");
+                cassandraDao.insertIntoProcessed(values.toArray());
+
+
+                List<Object> values2 = new ArrayList<>();
+                values2.add(current_round);
+                values2.add(23);
+                values2.add(0L);
+                values2.add(0L);
+                values2.add(false);
+                values2.add("CAN");
+                cassandraDao.insertIntoProcessed(values2.toArray());
+
+
                 TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass sleeping " + current_round);
                 while(true) {
                     Iterator<Row> iteratorProcessed = cassandraDao.getAllProcessed(current_round).iterator();
