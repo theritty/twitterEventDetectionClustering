@@ -43,8 +43,8 @@ public class CassandraSpout extends BaseRichSpout {
 
     private HashMap<Integer, Long> counts = new HashMap<>();
 
-    private long startRound = 2033719;
-    private long endRound = 2033719;
+    private long startRound;
+    private long endRound;
     private HashMap<String, Integer> vectorMap;
 
 
@@ -59,7 +59,6 @@ public class CassandraSpout extends BaseRichSpout {
     }
     @Override
     public void ack(Object msgId) {
-        processed++;
     }
     @Override
     public void close() {}
@@ -152,7 +151,7 @@ public class CassandraSpout extends BaseRichSpout {
 
                 List<Object> values = new ArrayList<>();
                 values.add(current_round);
-                values.add(22);
+                values.add(10);
                 values.add(0L);
                 values.add(0L);
                 values.add(false);
@@ -162,7 +161,7 @@ public class CassandraSpout extends BaseRichSpout {
 
                 List<Object> values2 = new ArrayList<>();
                 values2.add(current_round);
-                values2.add(23);
+                values2.add(11);
                 values2.add(0L);
                 values2.add(0L);
                 values2.add(false);

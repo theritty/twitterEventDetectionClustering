@@ -45,12 +45,12 @@ public class BoltBuilder {
         EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao, "USA");
 
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpout,1);
-//        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,5).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");
-//        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,15).shuffleGrouping(Constants.CASS_SPOUT_ID, "USA");
-        builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,CAN_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
-        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,USA_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
-        builder.setBolt(Constants.COUNTRY2_EVENTDETECTOR_BOLT_ID, eventDetectorBoltCAN,1).shuffleGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
-        builder.setBolt(Constants.COUNTRY1_EVENTDETECTOR_BOLT_ID, eventDetectorBoltUSA,1).shuffleGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
+//        builder.setBolt(Constants.COUNTRY2_CLUSTERING_BOLT_ID, countBoltCAN,5).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");
+//        builder.setBolt(Constants.COUNTRY1_CLUSTERING_BOLT_ID, countBoltUSA,15).shuffleGrouping(Constants.CASS_SPOUT_ID, "USA");
+        builder.setBolt(Constants.COUNTRY2_CLUSTERING_BOLT_ID, countBoltCAN,CAN_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
+        builder.setBolt(Constants.COUNTRY1_CLUSTERING_BOLT_ID, countBoltUSA,USA_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
+        builder.setBolt(Constants.COUNTRY2_EVENTDETECTOR_BOLT_ID, eventDetectorBoltCAN,1).shuffleGrouping(Constants.COUNTRY2_CLUSTERING_BOLT_ID);
+        builder.setBolt(Constants.COUNTRY1_EVENTDETECTOR_BOLT_ID, eventDetectorBoltUSA,1).shuffleGrouping(Constants.COUNTRY1_CLUSTERING_BOLT_ID);
 
 
         return builder.createTopology();

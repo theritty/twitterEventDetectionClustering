@@ -43,6 +43,8 @@ CREATE TABLE tweetcollection.processedtweets (
     PRIMARY KEY (round, boltid)
 );
 
+TRUNCATE eventcluster_daily ;TRUNCATE events_daily ;TRUNCATE cluster_daily ;TRUNCATE clusterinfo_daily ;TRUNCATE clusterandtweet_daily ;TRUNCATE processedtweets ;
+
 
 INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 15, 0, 'bolu abant picnic', 1);
 INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 16, 0, 'bolu abant picnic', 1);

@@ -26,7 +26,7 @@ public class ExcelWriter {
     private static int lastInd ;
     private static int rowNum = 216000;
     private static int columnNum = 250;
-    private static int numOfBolts = 23;
+    private static int numOfBolts = 11;
     private static int createChart = 0;
 
     public static void putStartDate(Date date, String filenum, long round) {

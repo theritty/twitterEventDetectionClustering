@@ -4,8 +4,8 @@ package topologyBuilder;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Constants {
-    public static final String COUNTRY1_COUNT_BOLT_ID = "count-bolt1";
-    public static final String COUNTRY2_COUNT_BOLT_ID = "count-bolt2";
+    public static final String COUNTRY1_CLUSTERING_BOLT_ID = "clustering-bolt1";
+    public static final String COUNTRY2_CLUSTERING_BOLT_ID = "clustering-bolt2";
     public static final String COUNTRY1_EVENTDETECTOR_BOLT_ID = "eventdetector-bolt1";
     public static final String COUNTRY2_EVENTDETECTOR_BOLT_ID = "eventdetector-bolt2";
     public static ReentrantLock lock = new ReentrantLock();

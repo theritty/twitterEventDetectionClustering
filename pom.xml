@@ -74,11 +74,6 @@
             <artifactId>poi-ooxml</artifactId>
             <version>3.15</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.storm</groupId>
-            <artifactId>storm-kafka</artifactId>
-            <version>${storm-core.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -103,42 +98,6 @@
             <artifactId>cassandra-driver-core</artifactId>
             <version>${cassandra-driver-core.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>${joda-time.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.twitter4j</groupId>
-            <artifactId>twitter4j-stream</artifactId>
-            <version>3.0.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>edu.stanford.nlp</groupId>
-            <artifactId>stanford-corenlp</artifactId>
-            <version>3.6.0</version>
-        </dependency>
-        <dependency>
-		  <groupId>edu.stanford.nlp</groupId>
-		  <artifactId>stanford-corenlp</artifactId>
-		  <version>3.6.0</version>
-		  <classifier>models</classifier>
-		</dependency>
-		<dependency>
-			<groupId>commons-validator</groupId>
-			<artifactId>commons-validator</artifactId>
-			<version>1.4.0</version>
-		</dependency>
-
-		<!-- http://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-stable -->
-		<dependency>
-		    <groupId>nz.ac.waikato.cms.weka</groupId>
-		    <artifactId>weka-stable</artifactId>
-		    <version>3.8.0</version>
-		</dependency>
-
 
 
     </dependencies>

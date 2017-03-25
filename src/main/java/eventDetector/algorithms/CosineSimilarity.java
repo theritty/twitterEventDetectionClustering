@@ -1,9 +1,10 @@
 package eventDetector.algorithms;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CosineSimilarity {
+public class CosineSimilarity implements Serializable {
 
     /**
      * Method to calculate cosine similarity between two documents.
@@ -11,11 +12,11 @@ public class CosineSimilarity {
      * @param docVector2 : document vector 2 (b)
      * @return
      */
-    public static double cosineSimilarityFromMap(HashMap<String, Double> docVector1, HashMap<String, Double> docVector2) {
+    public double cosineSimilarityFromMap(HashMap<String, Double> docVector1, HashMap<String, Double> docVector2) {
         double dotProduct = 0.0;
         double magnitude1 = 0.0;
         double magnitude2 = 0.0;
-        double cosineSimilarity = 0.0;
+        double cosineSimilarity;
 
         for(Map.Entry<String, Double> entry : docVector1.entrySet()) {
             String key = entry.getKey();
@@ -33,7 +34,7 @@ public class CosineSimilarity {
         magnitude1 = Math.sqrt(magnitude1);//sqrt(a^2)
         magnitude2 = Math.sqrt(magnitude2);//sqrt(b^2)
 
-        if (magnitude1 != 0.0 | magnitude2 != 0.0) {
+        if (magnitude1 != 0 && magnitude2 != 0.0) {
             cosineSimilarity = dotProduct / (magnitude1 * magnitude2);
         } else {
             return 0.0;

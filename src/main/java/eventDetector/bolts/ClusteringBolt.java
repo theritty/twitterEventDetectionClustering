@@ -30,6 +30,14 @@ public class ClusteringBolt extends BaseRichBolt {
     private Date startDate = new Date();
     private String country ;
     private HashMap<Long, Long> counts = new HashMap<>();
+    private CosineSimilarity cosineSimilarity = new CosineSimilarity();
+
+    private double cosine=0;
+    private int cosineSize=0;
+    private int tweetSize=0;
+    private long cosineNum=0L;
+    private double clusterUp=0;
+    private long clusterUpNum=0L;
 
     private CassandraDao cassandraDao;
 
@@ -69,6 +77,14 @@ public class ClusteringBolt extends BaseRichBolt {
             System.out.println( new Date() + " round end " + round + " for " + country + " for " + componentId);
 
             try {
+
+                System.out.println("Cosine size: " + cosineSize + " tweet size: " + tweetSize + ". Cosine: " + cosine + " and total " + cosineNum*cosine + ", clusterUp: " + clusterUp + "and total " + clusterUp*clusterUpNum + " at round " + round);
+                cosine = 0L;
+                cosineSize=0;
+                tweetSize=0;
+                cosineNum = 0L;
+                clusterUp = 0L;
+                clusterUpNum = 0L;
                 Iterator<Row> iteratorProcessed = cassandraDao.getProcessed(round, componentId).iterator();
                 List<Object> values = new ArrayList<>();
                 values.add(round);
@@ -82,7 +98,7 @@ public class ClusteringBolt extends BaseRichBolt {
                 Iterator<Row> iteratorByCountry = cassandraDao.getProcessedByCountry(round, country).iterator();
                 while (iteratorByCountry.hasNext()){
                     Row r = iteratorByCountry.next();
-                    if(r.getInt("boltId")<22 && !r.getBool("finished")) {
+                    if(r.getInt("boltId")<10 && !r.getBool("finished")) {
                         System.out.println("I am " + componentId + ", " +  r.getInt("boltId") + " is not finished.");
                         return;
                     }
@@ -143,10 +159,18 @@ public class ClusteringBolt extends BaseRichBolt {
                     HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
                     if (cosinevector == null) continue;
 
-                    double similarity = CosineSimilarity.cosineSimilarityFromMap(cosinevector, tweetmap);
+                    long n = new Date().getTime();
+                    cosineSize+= cosinevector.size();
+                    tweetSize += tweetmap.size();
+                    double similarity = cosineSimilarity.cosineSimilarityFromMap(cosinevector, tweetmap);
+                    cosine = (cosine*(double)cosineNum + (double) (new Date().getTime()-n)) / (double) ++cosineNum;
+                    cosinevector.clear();
+
                     if(similarity > 0.5) {
                         similarclusterfound = true;
+                        n = new Date().getTime();
                         updateCluster(row, tweetmap, tweetid, round);
+                        clusterUp = (clusterUp*(double)clusterUpNum + (double)(new Date().getTime()-n)) / (double)++clusterUpNum;
                         break;
                     }
                 }
@@ -154,6 +178,7 @@ public class ClusteringBolt extends BaseRichBolt {
                     addNewCluster(round, tweetmap, tweetid);
                 }
             }
+            tweetmap.clear();
 
         } catch (Exception e) {
             e.printStackTrace();
