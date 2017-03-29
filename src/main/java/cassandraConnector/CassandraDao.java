@@ -1,14 +1,13 @@
 package cassandraConnector;
 
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.ResultSetFuture;
+import com.datastax.driver.core.*;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.UUID;
 
 public class CassandraDao implements Serializable
 {
@@ -18,12 +17,12 @@ public class CassandraDao implements Serializable
     private transient PreparedStatement statement_event;
     private transient PreparedStatement statement_event_get;
     private transient PreparedStatement statement_event_wordbased;
-    private transient PreparedStatement statement_clusterinfo;
+//    private transient PreparedStatement statement_clusterinfo;
     private transient PreparedStatement statement_clusterandtweet;
     private transient PreparedStatement statement_cluster_get;
     private transient PreparedStatement statement_cluster_get_by_id;
-    private transient PreparedStatement statement_clusterinfo_get;
-    private transient PreparedStatement statement_clusterinfo_id_get;
+//    private transient PreparedStatement statement_clusterinfo_get;
+//    private transient PreparedStatement statement_clusterinfo_id_get;
     private transient PreparedStatement statement_clusterandtweet_get;
     private transient PreparedStatement statement_tweet_get;
     private transient PreparedStatement statement_round_get;
@@ -43,25 +42,25 @@ public class CassandraDao implements Serializable
     private transient BoundStatement boundStatement_event;
     private transient BoundStatement boundStatement_event_get;
     private transient BoundStatement boundStatement_event_wordBased;
-    private transient BoundStatement boundStatement_clusterinfo;
+//    private transient BoundStatement boundStatement_clusterinfo;
     private transient BoundStatement boundStatement_clusterandtweets;
     private transient BoundStatement boundStatement_cluster_get;
     private transient BoundStatement boundStatement_cluster_get_by_id;
-    private transient BoundStatement boundStatement_clusterinfo_get;
-    private transient BoundStatement boundStatement_clusterinfo_id_get;
+//    private transient BoundStatement boundStatement_clusterinfo_get;
+//    private transient BoundStatement boundStatement_clusterinfo_id_get;
     private transient BoundStatement boundStatement_clusterandtweets_get;
 
-    private static String CLUSTER_FIELDS =   "(id, country, cosinevector, numberoftweets, lastround)";
-    private static String CLUSTER_VALUES = "(?, ?, ?, ?, ?)";
+    private static String CLUSTER_FIELDS =   "(id, country, cosinevector, prevnumtweets, currentnumtweets, lastround)";
+    private static String CLUSTER_VALUES = "(?, ?, ?, ?, ?, ?)";
 
     private static String EVENT_FIELDS =   "(round, clusterid, country, cosinevector, incrementrate, numtweet)";
     private static String EVENT_VALUES = "(?, ?, ?, ?, ?, ?)";
 
-    private static String EVENTS_WORDBASED_FIELDS = "(round, country, word, incrementpercent)";
-    private static String EVENTS_VALUES = "(?, ?, ?, ?)";
-    
-    private static String CLUSTERINFO_FIELDS =   "(round, id, country, numberoftweets)";
-    private static String CLUSTERINFO_VALUES = "(?, ?, ?, ?)";
+//    private static String EVENTS_WORDBASED_FIELDS = "(round, country, word, incrementpercent)";
+//    private static String EVENTS_VALUES = "(?, ?, ?, ?)";
+//
+//    private static String CLUSTERINFO_FIELDS =   "(round, id, country, numberoftweets)";
+//    private static String CLUSTERINFO_VALUES = "(?, ?, ?, ?)";
 
     private static String CLUSTERANDTWEETS_FIELDS =   "(clusterid, tweetid)";
     private static String CLUSTERANDTWEETS_VALUES = "(?, ?)";
@@ -73,14 +72,14 @@ public class CassandraDao implements Serializable
     private String clusterTable;
     private String eventTable;
     private String eventWordBasedTable;
-    private String clusterinfoTable;
+//    private String clusterinfoTable;
     private String clusterandtweetTable;
     private String processedTweetsTable;
 
     public CassandraDao(String tweetsTable, String clusterTable, String clusterinfoTable, String clusterandtweetTable, String eventTable, String eventWordBasedTable, String processedTweetsTable) throws Exception {
         this.tweetsTable = tweetsTable;
         this.clusterTable = clusterTable;
-        this.clusterinfoTable = clusterinfoTable;
+//        this.clusterinfoTable = clusterinfoTable;
         this.clusterandtweetTable = clusterandtweetTable;
         this.eventTable = eventTable;
         this.eventWordBasedTable = eventWordBasedTable;
@@ -112,11 +111,11 @@ public class CassandraDao implements Serializable
                     "DELETE FROM " + clusterTable + " WHERE country=? AND id=?;");
         }
 
-        if(statement_clusterinfo==null) {
-            statement_clusterinfo = CassandraConnection.connect().prepare(
-                    "INSERT INTO " + clusterinfoTable + " " + CLUSTERINFO_FIELDS
-                            + " VALUES " + CLUSTERINFO_VALUES + ";");
-        }
+//        if(statement_clusterinfo==null) {
+//            statement_clusterinfo = CassandraConnection.connect().prepare(
+//                    "INSERT INTO " + clusterinfoTable + " " + CLUSTERINFO_FIELDS
+//                            + " VALUES " + CLUSTERINFO_VALUES + ";");
+//        }
 
         if(statement_clusterandtweet==null) {
             statement_clusterandtweet = CassandraConnection.connect().prepare(
@@ -170,14 +169,14 @@ public class CassandraDao implements Serializable
             statement_cluster_get_by_id = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + clusterTable + " WHERE country=? AND id=?;");
         }
-        if(statement_clusterinfo_get==null) {
-            statement_clusterinfo_get = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + clusterinfoTable + " WHERE round=? AND country=?;");
-        }
-        if(statement_clusterinfo_id_get==null) {
-            statement_clusterinfo_id_get = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + clusterinfoTable + " WHERE round=? AND country=? AND id=?;");
-        }
+//        if(statement_clusterinfo_get==null) {
+//            statement_clusterinfo_get = CassandraConnection.connect().prepare(
+//                    "SELECT * FROM " + clusterinfoTable + " WHERE round=? AND country=?;");
+//        }
+//        if(statement_clusterinfo_id_get==null) {
+//            statement_clusterinfo_id_get = CassandraConnection.connect().prepare(
+//                    "SELECT * FROM " + clusterinfoTable + " WHERE round=? AND country=? AND id=?;");
+//        }
         if(statement_clusterandtweet_get==null) {
             statement_clusterandtweet_get = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + clusterandtweetTable + " WHERE clusterid=?;");
@@ -201,18 +200,18 @@ public class CassandraDao implements Serializable
             boundStatement_cluster_get_with_lastround = new BoundStatement(statement_cluster_get_with_lastround);
         if(boundStatement_cluster_get_by_id == null)
             boundStatement_cluster_get_by_id = new BoundStatement(statement_cluster_get_by_id);
-        if(boundStatement_clusterinfo_get == null)
-            boundStatement_clusterinfo_get = new BoundStatement(statement_clusterinfo_get);
-        if(boundStatement_clusterinfo_id_get == null)
-            boundStatement_clusterinfo_id_get = new BoundStatement(statement_clusterinfo_id_get);
+//        if(boundStatement_clusterinfo_get == null)
+//            boundStatement_clusterinfo_get = new BoundStatement(statement_clusterinfo_get);
+//        if(boundStatement_clusterinfo_id_get == null)
+//            boundStatement_clusterinfo_id_get = new BoundStatement(statement_clusterinfo_id_get);
+//        if(boundStatement_clusterinfo == null)
+//            boundStatement_clusterinfo = new BoundStatement(statement_clusterinfo);
         if(boundStatement_clusterandtweets_get == null)
             boundStatement_clusterandtweets_get = new BoundStatement(statement_clusterandtweet_get);
         if(boundStatement_cluster == null)
             boundStatement_cluster = new BoundStatement(statement_cluster);
         if(boundStatement_cluster_delete == null)
             boundStatement_cluster_delete = new BoundStatement(statement_cluster_delete);
-        if(boundStatement_clusterinfo == null)
-            boundStatement_clusterinfo = new BoundStatement(statement_clusterinfo);
         if(boundStatement_clusterandtweets == null)
             boundStatement_clusterandtweets = new BoundStatement(statement_clusterandtweet);
         if(boundStatement_event == null)
@@ -245,11 +244,11 @@ public class CassandraDao implements Serializable
         CassandraConnection.connect().executeAsync(boundStatement_event.bind(values));
     }
 
-    public void insertIntoClusterinfo( Object[] values ) throws Exception
-    {
-        prepareAll();
-        CassandraConnection.connect().executeAsync(boundStatement_clusterinfo.bind(values));
-    }
+//    public void insertIntoClusterinfo( Object[] values ) throws Exception
+//    {
+//        prepareAll();
+//        CassandraConnection.connect().executeAsync(boundStatement_clusterinfo.bind(values));
+//    }
 
     public void insertIntoClusterAndTweets( Object[] values ) throws Exception
     {
@@ -264,30 +263,30 @@ public class CassandraDao implements Serializable
 
         return resultSet;
     }
-
-    public ResultSet getClusterinfoByRound( Object... values ) throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_clusterinfo_get.bind(values));
-
-        return resultSet;
-    }
-
-    public ResultSet getClusterByLastRound( Object... values ) throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_get_with_lastround.bind(values));
-
-        return resultSet;
-    }
-
-    public ResultSet getClusterinfoByRoundAndId( Object... values ) throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_clusterinfo_id_get.bind(values));
-
-        return resultSet;
-    }
+//
+//    public ResultSet getClusterinfoByRound( Object... values ) throws Exception
+//    {
+//        prepareAll();
+//        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_clusterinfo_get.bind(values));
+//
+//        return resultSet;
+//    }
+//
+//    public ResultSet getClusterByLastRound( Object... values ) throws Exception
+//    {
+//        prepareAll();
+//        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_get_with_lastround.bind(values));
+//
+//        return resultSet;
+//    }
+//
+//    public ResultSet getClusterinfoByRoundAndId( Object... values ) throws Exception
+//    {
+//        prepareAll();
+//        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_clusterinfo_id_get.bind(values));
+//
+//        return resultSet;
+//    }
 
     public ResultSet getProcessed( Object... values ) throws Exception
     {
@@ -376,5 +375,27 @@ public class CassandraDao implements Serializable
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
     }
 
+//    public boolean isClusterEventFinished(long round, String country, UUID clusterid) throws Exception {
+//        int numPrev=0, numCurrent=0;
+//        ResultSet resultSet ;
+//        resultSet = getClusterinfoByRoundAndId(round-2, country, clusterid);
+//        Iterator<Row> iterator = resultSet.iterator();
+//        if(iterator.hasNext()) {
+//            Row row = iterator.next();
+//            numPrev = row.getInt("numberoftweets");
+//        }
+//        ResultSet resultSet2 ;
+//        resultSet2 = getClusterinfoByRoundAndId(round, country, clusterid);
+//        Iterator<Row> iterator2 = resultSet2.iterator();
+//        if(iterator2.hasNext()) {
+//            Row row2 = iterator2.next();
+//            numCurrent = row2.getInt("numberoftweets");
+//        }
+//
+//        if(numCurrent-numPrev>30)
+//            return false;
+//        else
+//            return true;
+//    }
 }
 

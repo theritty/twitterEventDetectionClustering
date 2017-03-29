@@ -1,25 +1,28 @@
 package eventDetector.spout;
 
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichSpout;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
+//import org.apache.storm.spout.SpoutOutputCollector;
+//import org.apache.storm.task.TopologyContext;
+//import org.apache.storm.topology.OutputFieldsDeclarer;
+//import org.apache.storm.topology.base.BaseRichSpout;
+//import org.apache.storm.tuple.Fields;
+//import org.apache.storm.tuple.Values;
+
+
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import cassandraConnector.CassandraDao;
 import eventDetector.drawing.ExcelWriter;
-import jnr.ffi.annotations.In;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichSpout;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Values;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CassandraSpout extends BaseRichSpout {
 
@@ -130,8 +133,9 @@ public class CassandraSpout extends BaseRichSpout {
             numTweetRound ++;
         }
         else {
-            System.out.println("asdasdasdasdasdasdasdasd");
             vectorizeAndEmit(tweet, row.getLong("id"), current_round, country);
+            System.out.println("Round " + current_round + " number of tweets " + ++numTweetRound);
+            numTweetRound=0;
             try {
                 for(int k=3;k<CANTaskNumber+USATaskNumber+3;k++) {
                     List<Object> values = new ArrayList<>();
@@ -151,7 +155,7 @@ public class CassandraSpout extends BaseRichSpout {
 
                 List<Object> values = new ArrayList<>();
                 values.add(current_round);
-                values.add(10);
+                values.add(CANTaskNumber+USATaskNumber+2);
                 values.add(0L);
                 values.add(0L);
                 values.add(false);
@@ -161,7 +165,7 @@ public class CassandraSpout extends BaseRichSpout {
 
                 List<Object> values2 = new ArrayList<>();
                 values2.add(current_round);
-                values2.add(11);
+                values2.add(CANTaskNumber+USATaskNumber+3);
                 values2.add(0L);
                 values2.add(0L);
                 values2.add(false);

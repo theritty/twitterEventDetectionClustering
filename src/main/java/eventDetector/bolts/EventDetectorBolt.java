@@ -1,11 +1,11 @@
 package eventDetector.bolts;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
 import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -42,48 +42,6 @@ public class EventDetectorBolt extends BaseRichBolt {
         this.collector = collector;
         this.componentId = context.getThisTaskId()-1;
         System.out.println("eventdet : " + componentId + " " + country );
-    }
-
-    public void cleanupclusters(long round) {
-        System.out.println("Clean up for round " + round);
-        ResultSet resultSet ;
-//        Constants.lock.lock();
-        try {
-            resultSet = cassandraDao.getClusters(country);
-            Iterator<Row> iterator = resultSet.iterator();
-            while (iterator.hasNext()) {
-                Row row = iterator.next();
-                long lastround = row.getLong("lastround");
-                int numberoftweets = row.getInt("numberoftweets");
-                if(round - lastround>= 2 || numberoftweets<30) {
-                    UUID clusterid = row.getUUID("id");
-                    cassandraDao.deleteFromClusters(country, clusterid);
-                }
-                else {
-                    HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
-                    int numTweets = row.getInt("numberoftweets");
-                    Iterator<Map.Entry<String, Double>> it = cosinevector.entrySet().iterator();
-                    while(it.hasNext()) {
-                        Map.Entry<String, Double> entry = it.next();
-                        double value = entry.getValue();
-                        if(value < 0.01) {
-                            it.remove();
-                        }
-                    }
-                    List<Object> values = new ArrayList<>();
-                    values.add(row.getUUID("id"));
-                    values.add(country);
-                    values.add(cosinevector);
-                    values.add(numTweets);
-                    values.add(round);
-                    cassandraDao.insertIntoClusters(values.toArray());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-//            Constants.lock.unlock();
-        }
-//        Constants.lock.unlock();
     }
 
     @Override
@@ -134,47 +92,62 @@ public class EventDetectorBolt extends BaseRichBolt {
 
         ResultSet resultSet ;
         try {
-            resultSet = cassandraDao.getClusterinfoByRound(round, country);
+            resultSet = cassandraDao.getClusters(country);
             Iterator<Row> iterator = resultSet.iterator();
             while (iterator.hasNext()) {
                 Row row = iterator.next();
                 UUID clusterid = row.getUUID("id");
-                int numtweets = row.getInt("numberoftweets");
+                int prevnumtweets = row.getInt("prevnumtweets");
+                int currentnumtweets = row.getInt("currentnumtweets");
+                int numtweets = prevnumtweets+currentnumtweets;
+                long lastround = row.getLong("lastround");
 
-                if(numtweets<100) continue;
-                ResultSet resultSet2 ;
-                resultSet2 = cassandraDao.getClusterinfoByRoundAndId(round-1, country, clusterid);
-                Iterator<Row> iterator2 = resultSet2.iterator();
 
-                if(!iterator2.hasNext()) {
-                    int numtweetsPrev = 50;
-
-                    System.out.println(clusterid + " " + numtweets + " " + numtweetsPrev);
-                    if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
-                        addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
-                    }
+                //Total number of tweets is below the threshold. Remove cluster.
+                if(currentnumtweets<50) {
+                    cassandraDao.deleteFromClusters(country, clusterid);
+                    continue;
                 }
                 else {
-                    Row row2 = iterator2.next();
-                    int numtweetsPrev = row2.getInt("numberoftweets");
+                    HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
+                    Iterator<Map.Entry<String, Double>> it = cosinevector.entrySet().iterator();
+                    while(it.hasNext()) {
+                        Map.Entry<String, Double> entry = it.next();
+                        double value = entry.getValue();
+                        if(value < 0.01) it.remove();
+                    }
 
-                    System.out.println(clusterid + " " + numtweets + " " + numtweetsPrev);
-                    if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
-                        addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
+                    List<Object> values2 = new ArrayList<>();
+                    values2.add(clusterid);
+                    values2.add(country);
+                    values2.add(cosinevector);
+                    values2.add(numtweets);
+                    values2.add(0);
+                    values2.add(round);
+                    cassandraDao.insertIntoClusters(values2.toArray());
+
+                    if( ((double) currentnumtweets)/((double) numtweets) > 0.5){
+                        //add as event
+                        List<Object> values_event = new ArrayList<>();
+                        values_event.add(round);
+                        values_event.add(clusterid);
+                        values_event.add(country);
+                        values_event.add(cosinevector);
+                        values_event.add(((double) currentnumtweets)/((double) numtweets) );
+                        values_event.add(numtweets );
+                        cassandraDao.insertIntoEvents(values_event.toArray());
                     }
                 }
             }
 
-            cleanupclusters(round);
-
-            List<Object> values = new ArrayList<>();
-            values.add(round);
-            values.add(componentId);
-            values.add(0L);
-            values.add(0L);
-            values.add(true);
-            values.add(country);
-            cassandraDao.insertIntoProcessed(values.toArray());
+            List<Object> values3 = new ArrayList<>();
+            values3.add(round);
+            values3.add(componentId);
+            values3.add(0L);
+            values3.add(0L);
+            values3.add(true);
+            values3.add(country);
+            cassandraDao.insertIntoProcessed(values3.toArray());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -188,6 +161,153 @@ public class EventDetectorBolt extends BaseRichBolt {
 
 
     }
+
+
+//    public void cleanupclusters(long round) {
+//        System.out.println("Clean up for round " + round);
+//        ResultSet resultSet ;
+//        Constants.lock.lock();
+//        try {
+//            resultSet = cassandraDao.getClusters(country);
+//            Iterator<Row> iterator = resultSet.iterator();
+//            while (iterator.hasNext()) {
+//                Row row = iterator.next();
+//                long lastround = row.getLong("lastround");
+//                int numberoftweets = row.getInt("numberoftweets");
+//                if(round - lastround>= 2 || numberoftweets<30) {
+//                    UUID clusterid = row.getUUID("id");
+//                    cassandraDao.deleteFromClusters(country, clusterid);
+//                }
+//                else {
+//                    HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
+//                    int numTweets = row.getInt("numberoftweets");
+//                    Iterator<Map.Entry<String, Double>> it = cosinevector.entrySet().iterator();
+//                    while(it.hasNext()) {
+//                        Map.Entry<String, Double> entry = it.next();
+//                        double value = entry.getValue();
+//                        if(value < 0.01) {
+////                            cosinevector.remove(entry.getKey());
+//                            it.remove();
+//                        }
+//                    }
+//                    List<Object> values = new ArrayList<>();
+//                    values.add(row.getUUID("id"));
+//                    values.add(country);
+//                    values.add(cosinevector);
+//                    values.add(numTweets);
+//                    values.add(round);
+//                    cassandraDao.insertIntoClusters(values.toArray());
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            Constants.lock.unlock();
+//        }
+//
+//        Constants.lock.unlock();
+//    }
+
+//    @Override
+//    public void execute(Tuple tuple) {
+//        long round = tuple.getLongByField("round");
+//        String country = tuple.getStringByField("country");
+//
+//        System.out.println(country + " event detection " + round);
+//        if(round==0L) {
+//            try {
+//                System.out.println("trololo");
+//                ExcelWriter.createTimeChart();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            return;
+//        }
+//        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Event Detector " + componentId + " working "  + round);
+//
+//        Date nowDate = new Date();
+//        if(round > currentRound)
+//        {
+//            TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
+//                    "Event Detector "+ componentId + " end for round " + currentRound + " at " + lastDate);
+//
+//            TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
+//                    "Event Detector "+ componentId + " time taken for round" + currentRound + " is " +
+//                            (lastDate.getTime()-startDate.getTime())/1000);
+//
+//            System.out.println("round " + round + " end of.");
+////            if ( currentRound!=0)
+////                ExcelWriter.putData(componentId,startDate,lastDate, "eventdetector",tuple.getSourceStreamId(), currentRound);
+//
+//
+//            startDate = new Date();
+//            TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
+//                    "Event Detector "+ componentId + " starting for round " + round + " at " + startDate );
+//
+//            currentRound = round;
+//        }
+//        else if(round < currentRound) {
+//            ignoredCount++;
+//            if(ignoredCount%1000==0)
+//                TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + "ignoreCount.txt",
+//                        "Event Detector ignored count " + componentId + ": " + ignoredCount );
+//            return;
+//        }
+//
+//        ResultSet resultSet ;
+//        try {
+//            resultSet = cassandraDao.getClusterinfoByRound(round, country);
+//            Iterator<Row> iterator = resultSet.iterator();
+//            while (iterator.hasNext()) {
+//                Row row = iterator.next();
+//                UUID clusterid = row.getUUID("id");
+//                int numtweets = row.getInt("numberoftweets");
+//
+//                if(numtweets<100) continue;
+//                ResultSet resultSet2 ;
+//                resultSet2 = cassandraDao.getClusterinfoByRoundAndId(round-1, country, clusterid);
+//                Iterator<Row> iterator2 = resultSet2.iterator();
+//
+//                if(!iterator2.hasNext()) {
+//                    int numtweetsPrev = 50;
+//
+//                    if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
+//                        addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
+//                    }
+//                }
+//                else {
+//                    Row row2 = iterator2.next();
+//                    int numtweetsPrev = row2.getInt("numberoftweets");
+//
+//                    System.out.println(clusterid + " " + numtweets + " " + numtweetsPrev);
+//                    if( ((double) numtweets - (double) numtweetsPrev)/((double) numtweets) > 0.5){
+//                        addEvent(clusterid,round, ((double) numtweets - (double) numtweetsPrev)/((double) numtweets),country, numtweets);
+//                    }
+//                }
+//            }
+//
+//            cleanupclusters(round);
+//
+//            List<Object> values = new ArrayList<>();
+//            values.add(round);
+//            values.add(componentId);
+//            values.add(0L);
+//            values.add(0L);
+//            values.add(true);
+//            values.add(country);
+//            cassandraDao.insertIntoProcessed(values.toArray());
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        lastDate = new Date();
+//
+//
+//
+//        System.out.println("round " + round + " put excel");
+//        ExcelWriter.putData(componentId, nowDate, lastDate, currentRound);
+//
+//
+//    }
 
     public  void addEvent(UUID clusterid, long round, double incrementrate, String country, int numtweet) {
         ResultSet resultSet ;

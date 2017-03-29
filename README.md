@@ -1,21 +1,58 @@
 # twitterEventDetectionClustering
 
+
+HOW TO RUN CLUSTER
+------------------------
+http://www.apache.org/dyn/closer.lua/storm/apache-storm-1.0.3/apache-storm-1.0.3.zip
+unzip
+edit storm.yaml
+
+-----
+storm.zookeeper.servers:
+    - "127.0.0.1"
+nimbus.seeds: ["127.0.0.1"]
+storm.local.dir: "/Users/ozlemcerensahin/opt/apache-storm-1.0.3/datadir/storm"
+supervisor.slots.ports:
+    - 6700
+    - 6701
+    - 6702
+    - 6703
+
+------
+
+http://www.apache.org/dyn/closer.cgi/zookeeper/
+unzip
+edit zoo.cfg
+------
+tickTime=2000
+initLimit=10
+syncLimit=5
+dataDir=/Users/ozlemcerensahin/opt/zookeeper-3.4.9/datadir/zookeeper
+clientPort=2181
+------
+
+
+start zk: ./zkServer.sh start
+start storm::
+    ./storm nimbus
+    ./storm supervisor
+    ./storm ui
+
+submit jar:
+    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/storm-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar eventDetector.topologies.EventDetectionWithCassandraTopology
+
+
+
 CREATE TABLE tweetcollection.cluster_daily (
     id timeuuid,
     cosinevector map<text, double>,
-    numberoftweets int,
+    prevnumtweets int,
+    currentnumtweets int,
     lastround bigint,
     country text,
     PRIMARY KEY (country, id)
 );
 
-CREATE TABLE tweetcollection.clusterinfo_daily (
-    round bigint,
-    id timeuuid,
-    numberoftweets int,
-    country text,
-    PRIMARY KEY (round, country, id)
-);
 
 CREATE TABLE tweetcollection.clusterandtweet_daily (
     clusterid timeuuid,
@@ -42,6 +79,7 @@ CREATE TABLE tweetcollection.processedtweets (
     spoutsent bigint,
     PRIMARY KEY (round, boltid)
 );
+
 
 TRUNCATE eventcluster_daily ;TRUNCATE events_daily ;TRUNCATE cluster_daily ;TRUNCATE clusterinfo_daily ;TRUNCATE clusterandtweet_daily ;TRUNCATE processedtweets ;
 

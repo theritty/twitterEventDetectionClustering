@@ -1,12 +1,12 @@
 package eventDetector.bolts;
 
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -40,17 +40,13 @@ public class ClusteringBolt extends BaseRichBolt {
     private long clusterUpNum=0L;
 
     private CassandraDao cassandraDao;
-    private int CANTaskNumber = 0;
-    private int USATaskNumber = 0;
 
 
-    public ClusteringBolt(String filenum, CassandraDao cassandraDao, String country, int canTaskNum, int usaTaskNum)
+    public ClusteringBolt(String filenum, CassandraDao cassandraDao, String country)
     {
         this.fileNum = filenum + "/";
         this.cassandraDao = cassandraDao;
         this.country = country;
-        this.CANTaskNumber = canTaskNum;
-        this.USATaskNumber = usaTaskNum;
     }
     @Override
     public void prepare(Map config, TopologyContext context,
@@ -104,7 +100,7 @@ public class ClusteringBolt extends BaseRichBolt {
                 Iterator<Row> iteratorByCountry = cassandraDao.getProcessedByCountry(round, country).iterator();
                 while (iteratorByCountry.hasNext()){
                     Row r = iteratorByCountry.next();
-                    if(r.getInt("boltId")<CANTaskNumber+USATaskNumber+2 && !r.getBool("finished")) {
+                    if(r.getInt("boltId")<10 && !r.getBool("finished")) {
                         return;
                     }
                 }
@@ -154,26 +150,23 @@ public class ClusteringBolt extends BaseRichBolt {
             resultSet = cassandraDao.getClusters(country);
             Iterator<Row> iterator = resultSet.iterator();
 
-            if(tweetmap==null || tweetmap.size()<3)
-                return;
-
             if(!iterator.hasNext()) {
                 addNewCluster(round, tweetmap, tweetid);
             }
             else {
-                boolean similarclusterfound = false;
+                Row row = iterator.next();
+                HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
+                if (cosinevector == null) return;
 
-                double magnitude2=0.0;
-                for (String key : tweetmap.keySet()) {
-                    magnitude2 += Math.exp(Math.log(tweetmap.get(key))*2) ;
+                boolean similarclusterfound = false;
+                double magnitude2 = 0.0;
+                for(Map.Entry<String, Double> entry : cosinevector.entrySet()) {
+                    double value = entry.getValue();
+                    magnitude2 += Math.exp(Math.log(value)*2) ;
                 }
-                magnitude2 = Math.sqrt(magnitude2);//sqrt(a^2)
+                magnitude2 = Math.sqrt(magnitude2);//sqrt(b^2)
 
                 while (iterator.hasNext()) {
-                    Row row = iterator.next();
-                    HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
-                    if (cosinevector == null ) continue;
-
                     long n = new Date().getTime();
                     cosineSize+= cosinevector.size();
                     tweetSize += tweetmap.size();
@@ -280,4 +273,63 @@ public class ClusteringBolt extends BaseRichBolt {
         declarer.declare(new Fields( "round", "country"));
     }
 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+package eventDetector.algorithms;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+public class CosineSimilarity implements Serializable {
+
+    /**
+     * Method to calculate cosine similarity between two documents.
+     * @param docVector1 : document vector 1 (a)
+     * @param docVector2 : document vector 2 (b)
+     * @return
+     */
+    public double cosineSimilarityFromMap(Map<String, Double> docVector1, Map<String, Double> docVector2, double magnitude2) {
+        double dotProduct = 0.0;
+        double magnitude1 = 0.0;
+        double cosineSimilarity;
+
+        HashSet<String> intersection = new HashSet<>(docVector1.keySet());
+        intersection.retainAll(docVector2.keySet());
+
+        //Calculate dot product
+        for (String item : intersection) {
+            double value = docVector1.get(item);
+            dotProduct += value * docVector2.get(item);
+        }
+        for (String key : docVector1.keySet()) {
+            magnitude1 += Math.exp(Math.log(docVector1.get(key))*2) ;
+        }
+        magnitude1 = Math.sqrt(magnitude1);//sqrt(a^2)
+
+        if (Math.abs(magnitude1) < 0.001 && Math.abs(magnitude2) < 0.001) {
+            return 0.0;
+        } else {
+            cosineSimilarity = dotProduct / (magnitude1 * magnitude2);
+        }
+        return cosineSimilarity;
+    }
 }

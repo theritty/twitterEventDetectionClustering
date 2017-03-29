@@ -1,19 +1,20 @@
 package topologyBuilder;
 
-import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.AuthorizationException;
-import backtype.storm.generated.InvalidTopologyException;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.utils.NimbusClient;
-import backtype.storm.utils.Utils;
+import org.apache.storm.Config;
+import org.apache.storm.LocalCluster;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.AlreadyAliveException;
+import org.apache.storm.generated.AuthorizationException;
+import org.apache.storm.generated.InvalidTopologyException;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.thrift.TException;
+import org.apache.storm.thrift.transport.TTransportException;
+import org.apache.storm.utils.NimbusClient;
+import org.apache.storm.utils.Utils;
 import org.apache.storm.shade.org.json.simple.JSONValue;
-import org.apache.thrift7.TException;
-import org.apache.thrift7.transport.TTransportException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -37,7 +38,7 @@ public class TopologyCreator {
         {
             loadTopologyPropertiesAndSubmit( properties, config, BoltBuilder.prepareBoltsForCassandraSpout(properties) );
         }
-        catch ( TTransportException | InvalidTopologyException | AuthorizationException | AlreadyAliveException | InterruptedException e )
+        catch (  InvalidTopologyException | AuthorizationException | AlreadyAliveException | InterruptedException e )
         {
             e.printStackTrace();
         } catch (Exception e) {
@@ -51,45 +52,50 @@ public class TopologyCreator {
 
         String stormExecutionMode = properties.getProperty( "storm.execution.mode" );
         String topologyName = properties.getProperty( "storm.topology.name" );
-        String nimbusHost = properties.getProperty( "nimbus.host" );
+        String nimbusHosts = properties.getProperty( "nimbus.host" );
         int nimbusPort = Integer.parseInt( properties.getProperty( "nimbus.port" ) );
         String stormZookeeperServers = properties.getProperty( "storm.zookeeper.serverss" );
         String stormPorts = properties.getProperty( "storm.ports" );
 
-//        config.setDebug( true );
-
         switch ( stormExecutionMode )
         {
             case ( "cluster" ):
-                config.put( Config.NIMBUS_HOST, nimbusHost );
+                List<String> nimbusSeeds = TopologyHelper.splitString( nimbusHosts );
+                config.put( Config.NIMBUS_SEEDS, nimbusSeeds );
+                config.setDebug(true);
                 config.put( Config.STORM_ZOOKEEPER_SERVERS, stormZookeeperServers );
                 config.put( Config.SUPERVISOR_SLOTS_PORTS, stormPorts );
                 config.setNumAckers( 3 );
                 //config.setNumWorkers( 3 );
                 Map storm_conf = Utils.readStormConfig();
-                storm_conf.put("nimbus.host", nimbusHost);
+                storm_conf.put("nimbus.seeds", nimbusSeeds);
                 List<String> servers = TopologyHelper.splitString( stormZookeeperServers );
                 storm_conf.put( "storm.zookeeper.servers", servers  );
                 List<Integer> ports = TopologyHelper.splitInteger( stormPorts );
                 storm_conf.put( "supervisor.slots.ports",ports  );
                 String workingDir = System.getProperty("user.dir");
-                String inputJar = workingDir + "/target/Demo-jar-with-dependencies.jar";
-                NimbusClient nimbus = new NimbusClient(storm_conf, nimbusHost, nimbusPort );
+                String inputJar = "/Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/storm-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar";
+                NimbusClient nimbus = new NimbusClient(storm_conf, nimbusHosts, nimbusPort );
                 String uploadedJarLocation = StormSubmitter.submitJar(storm_conf,inputJar );
+
                 try {
                     String jsonConf = JSONValue.toJSONString( storm_conf );
                     nimbus.getClient().submitTopology( topologyName,
                             uploadedJarLocation, jsonConf, stormTopology );
-                } catch ( TException e ) {
+                } catch (TException e) {
                     e.printStackTrace();
                 }
+
                 wait(144000000);
+                nimbus.close();
+                localCluster.killTopology(topologyName);
+                localCluster.shutdown();
                 break;
 
             case ( "local" ):
                 if(localCluster==null) localCluster = new LocalCluster();
                 Config conf = new Config();
-                conf.setDebug(false);
+                conf.setDebug(true);
                 localCluster.submitTopology( topologyName, conf, stormTopology );
 
                 //wait 40 hours
