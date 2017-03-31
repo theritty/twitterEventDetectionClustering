@@ -157,7 +157,7 @@ public class EventDetectorBolt extends BaseRichBolt {
 
 
 
-        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "round " + round + " put excel");
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "round " + round + " put excel " + componentId);
         ExcelWriter.putData(componentId, nowDate, lastDate, currentRound,cassandraDao);
         collector.ack(tuple);
 

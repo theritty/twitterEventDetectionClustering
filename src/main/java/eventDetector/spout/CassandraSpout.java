@@ -175,7 +175,7 @@ public class CassandraSpout extends BaseRichSpout {
                     values.add(counts.get(k));
                     values.add(0L);
                     values.add(false);
-                    if(k<USATaskNumber+3) values.add("USA");
+                    if(k<USATaskNumber+2+numWorkers) values.add("USA");
                     else values.add("CAN");
                     cassandraDao.insertIntoProcessed(values.toArray());
                 }

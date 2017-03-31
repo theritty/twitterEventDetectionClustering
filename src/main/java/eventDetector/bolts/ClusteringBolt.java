@@ -108,6 +108,7 @@ public class ClusteringBolt extends BaseRichBolt {
                 while (iteratorByCountry.hasNext()){
                     Row r = iteratorByCountry.next();
                     if(r.getInt("boltId")<CANTaskNumber+USATaskNumber+1+numWorkers && !r.getBool("finished")) {
+                        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", r.getInt("boltId") + " not finished for " + country + " round " + round);
                         collector.ack(tuple);
                         return;
                     }
