@@ -43,6 +43,7 @@ public class CassandraSpout extends BaseRichSpout {
 
     private int CANTaskNumber = 0;
     private int USATaskNumber = 0;
+    private int numWorkers = 0;
 
     private HashMap<Integer, Long> counts = new HashMap<>();
 
@@ -51,7 +52,7 @@ public class CassandraSpout extends BaseRichSpout {
     private HashMap<String, Integer> vectorMap;
 
 
-    public CassandraSpout(CassandraDao cassandraDao, String filenum, long start, long end, int canTaskNum, int usaTaskNum) throws Exception {
+    public CassandraSpout(CassandraDao cassandraDao, String filenum, long start, long end, int canTaskNum, int usaTaskNum, int numWorkers) throws Exception {
         this.cassandraDao = cassandraDao;
         roundlist = new ArrayList<>();
         this.fileNum = filenum + "/";
@@ -59,6 +60,7 @@ public class CassandraSpout extends BaseRichSpout {
         this.endRound = end;
         this.CANTaskNumber = canTaskNum;
         this.USATaskNumber = usaTaskNum;
+        this.numWorkers = numWorkers;
     }
     @Override
     public void ack(Object msgId) {
@@ -80,8 +82,11 @@ public class CassandraSpout extends BaseRichSpout {
          * we will wait and then return
          */
 
-        USATask = USATask%USATaskNumber+3;
-        CANTask = CANTask%CANTaskNumber+USATaskNumber+3;
+        if( (USATask<2+numWorkers) || (USATask>= USATaskNumber+2+numWorkers))
+            USATask = 2+numWorkers;
+        if( (CANTask < USATaskNumber+2+numWorkers) || (CANTask>=CANTaskNumber+USATaskNumber+2+numWorkers))
+            CANTask = USATaskNumber+2+numWorkers;
+
 
         Date nowDate = new Date();
         if(iterator == null || !iterator.hasNext())
@@ -89,8 +94,8 @@ public class CassandraSpout extends BaseRichSpout {
             if(roundlist.size()==0)
             {
                 try {
-                    for(int k=3;k<CANTaskNumber+USATaskNumber+3;k++)
-                        collector.emitDirect(k, new Values(new HashMap<>(), 0L, current_round+1, true, false));
+                    for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+2+numWorkers;k++)
+                        collector.emitDirect(k, new Values(new ArrayList<>(), 0L, current_round+1, true, false));
 
                     try {
                         Thread.sleep(120000);
@@ -98,12 +103,12 @@ public class CassandraSpout extends BaseRichSpout {
                     catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    for(int k=3;k<CANTaskNumber+USATaskNumber+3;k++)
-                        collector.emitDirect(k, new Values(new HashMap<>(), 0L, current_round+1, true, true));
+                    for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+3;k++)
+                        collector.emitDirect(k, new Values(new ArrayList<>(), 0L, current_round+1, true, true));
 
 //                    ExcelWriter.createTimeChart();
 
-                    System.out.println(new Date() + " Number of tweets: " + count_tweets);
+                    TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " Number of tweets: " + count_tweets);
                     Thread.sleep(10000000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -122,22 +127,48 @@ public class CassandraSpout extends BaseRichSpout {
         }
 
 
-        Row row = iterator.next();
-        String tweet = row.getString("tweet");
-        String country = row.getString("country");
 
-        if(tweet == null || tweet.length() == 0) return;
+        int putHundred=0;
+        ArrayList<HashMap<String,Double>> tweetMapListUSA = new ArrayList<>();
+        ArrayList<HashMap<String,Double>> tweetMapListCAN = new ArrayList<>();
+        while(iterator.hasNext()) {
+            Row row = iterator.next();
+            String tweet = row.getString("tweet");
+            String country = row.getString("country");
+            if(tweet == null || tweet.length() == 0) {
+                continue;
+            }
+
+            List<String> tweets = Arrays.asList(tweet.split(" "));
+            HashMap<String, Double> tweetMap = new HashMap<>();
+            for (String t : tweets) {
+                if(t.length()>=3 && vectorMap.get(t)!=null)
+                    tweetMap.put(t,1.0);
+            }
+            if(tweetMap.size()>2) {
+                if(country.equals("USA"))
+                    tweetMapListUSA.add(tweetMap);
+                else
+                    tweetMapListCAN.add(tweetMap);
+            }
+
+            if(++putHundred>=100) break;
+        }
+
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass goooooo " + current_round);
 
         if(iterator.hasNext()) {
-            vectorizeAndEmit(tweet, row.getLong("id"), current_round, country);
+            vectorizeAndEmit(tweetMapListUSA, 0L, current_round, "USA");
+            vectorizeAndEmit(tweetMapListCAN, 0L, current_round, "CAN");
             numTweetRound ++;
         }
         else {
-            vectorizeAndEmit(tweet, row.getLong("id"), current_round, country);
-            System.out.println("Round " + current_round + " number of tweets " + ++numTweetRound);
+            vectorizeAndEmit(tweetMapListUSA, 0L, current_round, "USA");
+            vectorizeAndEmit(tweetMapListCAN, 0L, current_round, "CAN");
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Round " + current_round + " number of tweets " + ++numTweetRound);
             numTweetRound=0;
             try {
-                for(int k=3;k<CANTaskNumber+USATaskNumber+3;k++) {
+                for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+2+numWorkers;k++) {
                     List<Object> values = new ArrayList<>();
                     values.add(current_round);
                     values.add(k-1);
@@ -149,13 +180,13 @@ public class CassandraSpout extends BaseRichSpout {
                     cassandraDao.insertIntoProcessed(values.toArray());
                 }
                 counts.clear();
-                for(int k=3;k<CANTaskNumber+USATaskNumber+3;k++)
-                    collector.emitDirect(k, new Values(new HashMap<>(), 0L, current_round, true, false));
+                for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+2+numWorkers;k++)
+                    collector.emitDirect(k, new Values(new ArrayList<>(), 0L, current_round, true, false));
 
 
                 List<Object> values = new ArrayList<>();
                 values.add(current_round);
-                values.add(CANTaskNumber+USATaskNumber+2);
+                values.add(CANTaskNumber+USATaskNumber+1+numWorkers);
                 values.add(0L);
                 values.add(0L);
                 values.add(false);
@@ -165,7 +196,7 @@ public class CassandraSpout extends BaseRichSpout {
 
                 List<Object> values2 = new ArrayList<>();
                 values2.add(current_round);
-                values2.add(CANTaskNumber+USATaskNumber+3);
+                values2.add(CANTaskNumber+USATaskNumber+2+numWorkers);
                 values2.add(0L);
                 values2.add(0L);
                 values2.add(false);
@@ -195,40 +226,42 @@ public class CassandraSpout extends BaseRichSpout {
         }
         lastDate = new Date();
         if(!start )
-            ExcelWriter.putData(componentId,nowDate,lastDate, current_round);
+            ExcelWriter.putData(componentId,nowDate,lastDate, current_round, cassandraDao);
 
         count_tweets++;
 
     }
 
-    public void vectorizeAndEmit(String tweetSentence, long id, long round, String country) {
-        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass goooooo " + current_round);
-        List<String> tweets = Arrays.asList(tweetSentence.split(" "));
-        HashMap<String, Double> tweetMap = new HashMap<>();
-        for (String tweet : tweets) {
-//            tweet = tweet.replace("#", "");
-            if(tweet.length()>=3 && vectorMap.get(tweet)!=null)
-                tweetMap.put(tweet,1.0);
-        }
+    public void vectorizeAndEmit(ArrayList<HashMap<String,Double>> tweetMapList, long id, long round, String country) {
+//        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass goooooo " + current_round);
+//        List<String> tweets = Arrays.asList(tweetSentence.split(" "));
+//        HashMap<String, Double> tweetMap = new HashMap<>();
+//        for (String tweet : tweets) {
+////            tweet = tweet.replace("#", "");
+//            if(tweet.length()>=3 && vectorMap.get(tweet)!=null)
+//                tweetMap.put(tweet,1.0);
+//        }
 
-        if(tweetMap.size()>1) {
+//        if(tweetMap.size()>1) {
             if(country.equals("USA")) {
-                collector.emitDirect(USATask, new Values(tweetMap, id, round, false, false));
+                collector.emitDirect(USATask, new Values(tweetMapList, id, round, false, false));
                 if ( counts.get(USATask) != null)
-                    counts.put(USATask, counts.get(USATask)+1);
+                    counts.put(USATask, counts.get(USATask)+tweetMapList.size());
                 else
-                    counts.put(USATask,1L);
+                    counts.put(USATask, (long) tweetMapList.size());
                 USATask++;
+                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " USA emit: " + (USATask-1));
             }
             else {
-                collector.emitDirect(CANTask, new Values(tweetMap, id, round, false, false));
+                collector.emitDirect(CANTask, new Values(tweetMapList, id, round, false, false));
                 if ( counts.get(CANTask) != null)
-                    counts.put(CANTask, counts.get(CANTask)+1);
+                    counts.put(CANTask, counts.get(CANTask)+tweetMapList.size());
                 else
-                    counts.put(CANTask,1L);
+                    counts.put(CANTask, (long) tweetMapList.size());
                 CANTask++;
+                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " CAN emit: " + (CANTask-1));
             }
-        }
+//        }
     }
 
     public void getRoundListFromCassandra(){
@@ -249,14 +282,10 @@ public class CassandraSpout extends BaseRichSpout {
                 }
             });
 
-            System.out.println(roundlist);
-
             while(roundlist.get(0)<startRound)
                 roundlist.remove(0);
             while(roundlist.get(roundlist.size()-1)>endRound)
                 roundlist.remove(roundlist.size()-1);
-
-            System.out.println(roundlist);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -300,7 +329,7 @@ public class CassandraSpout extends BaseRichSpout {
         getRoundListFromCassandra();
         this.collector = collector;
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("cass" + " id: " + componentId);
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "cass" + " id: " + componentId);
         ExcelWriter.putStartDate(new Date(), fileNum, this.startRound);
 
         createWordsMap();

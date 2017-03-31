@@ -14,6 +14,8 @@ public class CassandraDao implements Serializable
     private transient PreparedStatement statement_cluster;
     private transient PreparedStatement statement_cluster_delete;
     private transient PreparedStatement statement_cluster_get_with_lastround;
+    private transient PreparedStatement statement_processtimes;
+    private transient PreparedStatement statement_processtimes_get;
     private transient PreparedStatement statement_event;
     private transient PreparedStatement statement_event_get;
     private transient PreparedStatement statement_event_wordbased;
@@ -41,6 +43,8 @@ public class CassandraDao implements Serializable
     private transient BoundStatement boundStatement_cluster_get_with_lastround;
     private transient BoundStatement boundStatement_event;
     private transient BoundStatement boundStatement_event_get;
+    private transient BoundStatement boundStatement_processtimes;
+    private transient BoundStatement boundStatement_processtimes_get;
     private transient BoundStatement boundStatement_event_wordBased;
 //    private transient BoundStatement boundStatement_clusterinfo;
     private transient BoundStatement boundStatement_clusterandtweets;
@@ -50,8 +54,12 @@ public class CassandraDao implements Serializable
 //    private transient BoundStatement boundStatement_clusterinfo_id_get;
     private transient BoundStatement boundStatement_clusterandtweets_get;
 
+
     private static String CLUSTER_FIELDS =   "(id, country, cosinevector, prevnumtweets, currentnumtweets, lastround)";
     private static String CLUSTER_VALUES = "(?, ?, ?, ?, ?, ?)";
+
+    private static String PROCESSTIMES_FIELDS =   "(row,column,id)";
+    private static String PROCESSTIMES_VALUES = "(?, ?, ?)";
 
     private static String EVENT_FIELDS =   "(round, clusterid, country, cosinevector, incrementrate, numtweet)";
     private static String EVENT_VALUES = "(?, ?, ?, ?, ?, ?)";
@@ -69,6 +77,7 @@ public class CassandraDao implements Serializable
     private static String PROCESSED_VALUES = "(?, ?, ?, ?, ?, ?)";
 
     private String tweetsTable;
+    private String processTimesTable;
     private String clusterTable;
     private String eventTable;
     private String eventWordBasedTable;
@@ -76,7 +85,7 @@ public class CassandraDao implements Serializable
     private String clusterandtweetTable;
     private String processedTweetsTable;
 
-    public CassandraDao(String tweetsTable, String clusterTable, String clusterinfoTable, String clusterandtweetTable, String eventTable, String eventWordBasedTable, String processedTweetsTable) throws Exception {
+    public CassandraDao(String tweetsTable, String clusterTable, String clusterinfoTable, String clusterandtweetTable, String eventTable, String eventWordBasedTable, String processedTweetsTable, String processTimesTable) throws Exception {
         this.tweetsTable = tweetsTable;
         this.clusterTable = clusterTable;
 //        this.clusterinfoTable = clusterinfoTable;
@@ -84,6 +93,7 @@ public class CassandraDao implements Serializable
         this.eventTable = eventTable;
         this.eventWordBasedTable = eventWordBasedTable;
         this.processedTweetsTable = processedTweetsTable;
+        this.processTimesTable = processTimesTable;
 
         prepareAll();
     }
@@ -94,6 +104,11 @@ public class CassandraDao implements Serializable
             statement_event = CassandraConnection.connect().prepare(
                     "INSERT INTO " + eventTable + " " + EVENT_FIELDS
                             + " VALUES " + EVENT_VALUES + ";");
+        }
+        if(statement_processtimes==null) {
+            statement_processtimes = CassandraConnection.connect().prepare(
+                    "INSERT INTO " + processTimesTable + " " + PROCESSTIMES_FIELDS
+                            + " VALUES " + PROCESSTIMES_VALUES + ";");
         }
         if(statement_processedTweets==null) {
             statement_processedTweets = CassandraConnection.connect().prepare(
@@ -126,6 +141,11 @@ public class CassandraDao implements Serializable
         if(statement_event_wordbased==null) {
             statement_event_wordbased = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + eventWordBasedTable );
+        }
+
+        if(statement_processtimes_get==null) {
+            statement_processtimes_get = CassandraConnection.connect().prepare(
+                    "SELECT * FROM " + processTimesTable );
         }
 
         if(statement_processedTweets_get==null) {
@@ -184,6 +204,10 @@ public class CassandraDao implements Serializable
 
         if(boundStatement_tweets_get == null)
             boundStatement_tweets_get = new BoundStatement(statement_tweet_get);
+        if(boundStatement_processtimes_get == null)
+            boundStatement_processtimes_get = new BoundStatement(statement_processtimes_get);
+        if(boundStatement_processtimes == null)
+            boundStatement_processtimes = new BoundStatement(statement_processtimes);
         if(boundStatement_processedTweets_get == null)
             boundStatement_processedTweets_get = new BoundStatement(statement_processedTweets_get);
         if(boundStatement_processedTweets_getCountry == null)
@@ -232,6 +256,11 @@ public class CassandraDao implements Serializable
         prepareAll();
         CassandraConnection.connect().executeAsync(boundStatement_cluster.bind(values));
     }
+    public void insertIntoProcessTimes( Object[] values ) throws Exception
+    {
+        prepareAll();
+        CassandraConnection.connect().executeAsync(boundStatement_processtimes.bind(values));
+    }
     public void deleteFromClusters( Object... values ) throws Exception
     {
         prepareAll();
@@ -260,6 +289,13 @@ public class CassandraDao implements Serializable
     {
         prepareAll();
         ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_tweets_get.bind(values));
+
+        return resultSet;
+    }
+    public ResultSet getProcessTimes(  ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_processtimes_get.bind());
 
         return resultSet;
     }

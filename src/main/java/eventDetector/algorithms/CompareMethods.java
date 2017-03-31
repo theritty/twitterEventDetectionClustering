@@ -22,8 +22,9 @@ public class CompareMethods {
         String CLUSTERINFO_TABLE = properties.getProperty("clusterinfo.table");
         String CLUSTERANDTWEET_TABLE = properties.getProperty("clusterandtweets.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("processed_tweets.table");
+        String PROCESSTIMES_TABLE = properties.getProperty("processtimes.table");
 
-        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE);
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
         ResultSet resultSetClustering, resultSetWordBased ;
         HashMap<String, Integer> wordNums = new HashMap<>();
 //        Constants.lock.lock();
@@ -38,7 +39,7 @@ public class CompareMethods {
                 String country = rowWordBased.getString("country");
                 if(country.equals(c)) wordNums.put(word,0);
             }
-            System.out.println(wordNums);
+
             int clusterNum = 0;
             while (iteratorClustering.hasNext()) {
                 Row row = iteratorClustering.next();

@@ -41,7 +41,7 @@ public class EventDetectorBolt extends BaseRichBolt {
                         OutputCollector collector) {
         this.collector = collector;
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("eventdet : " + componentId + " " + country );
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "eventdet : " + componentId + " " + country );
     }
 
     @Override
@@ -49,14 +49,14 @@ public class EventDetectorBolt extends BaseRichBolt {
         long round = tuple.getLongByField("round");
         String country = tuple.getStringByField("country");
 
-        System.out.println(country + " event detection " + round);
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", country + " event detection " + round);
         if(round==0L) {
             try {
-                System.out.println("trololo");
-                ExcelWriter.createTimeChart();
+                ExcelWriter.createTimeChart(cassandraDao);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            collector.ack(tuple);
             return;
         }
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Event Detector " + componentId + " working "  + round);
@@ -71,7 +71,7 @@ public class EventDetectorBolt extends BaseRichBolt {
                     "Event Detector "+ componentId + " time taken for round" + currentRound + " is " +
                             (lastDate.getTime()-startDate.getTime())/1000);
 
-            System.out.println("round " + round + " end of.");
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "round " + round + " end of.");
 //            if ( currentRound!=0)
 //                ExcelWriter.putData(componentId,startDate,lastDate, "eventdetector",tuple.getSourceStreamId(), currentRound);
 
@@ -87,6 +87,7 @@ public class EventDetectorBolt extends BaseRichBolt {
             if(ignoredCount%1000==0)
                 TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + "ignoreCount.txt",
                         "Event Detector ignored count " + componentId + ": " + ignoredCount );
+            collector.ack(tuple);
             return;
         }
 
@@ -156,8 +157,9 @@ public class EventDetectorBolt extends BaseRichBolt {
 
 
 
-        System.out.println("round " + round + " put excel");
-        ExcelWriter.putData(componentId, nowDate, lastDate, currentRound);
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "round " + round + " put excel");
+        ExcelWriter.putData(componentId, nowDate, lastDate, currentRound,cassandraDao);
+        collector.ack(tuple);
 
 
     }
@@ -316,7 +318,7 @@ public class EventDetectorBolt extends BaseRichBolt {
             Iterator<Row> iterator = resultSet.iterator();
 
             if(!iterator.hasNext()) {
-                System.out.println("Errorrrrrrrr");
+                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Errorrrrrrrr");
             }
             else {
                 while (iterator.hasNext()) {

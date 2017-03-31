@@ -53,6 +53,13 @@ CREATE TABLE tweetcollection.cluster_daily (
     PRIMARY KEY (country, id)
 );
 
+CREATE TABLE tweetcollection.processtimes (
+    row int,
+    column int,
+    id int,
+    PRIMARY KEY (row, column)
+);
+
 
 CREATE TABLE tweetcollection.clusterandtweet_daily (
     clusterid timeuuid,
@@ -81,7 +88,7 @@ CREATE TABLE tweetcollection.processedtweets (
 );
 
 
-TRUNCATE eventcluster_daily ;TRUNCATE events_daily ;TRUNCATE cluster_daily ;TRUNCATE clusterinfo_daily ;TRUNCATE clusterandtweet_daily ;TRUNCATE processedtweets ;
+TRUNCATE eventcluster_daily ;TRUNCATE events_daily ;TRUNCATE cluster_daily ;TRUNCATE clusterinfo_daily ;TRUNCATE clusterandtweet_daily ;TRUNCATE processedtweets ;TRUNCATE processtimes ;
 
 
 INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 15, 0, 'bolu abant picnic', 1);
