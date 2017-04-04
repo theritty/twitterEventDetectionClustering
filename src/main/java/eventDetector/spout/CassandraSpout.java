@@ -50,6 +50,7 @@ public class CassandraSpout extends BaseRichSpout {
     private long startRound;
     private long endRound;
     private HashMap<String, Integer> vectorMap;
+    private boolean finished = false;
 
 
     public CassandraSpout(CassandraDao cassandraDao, String filenum, long start, long end, int canTaskNum, int usaTaskNum, int numWorkers) throws Exception {
@@ -91,6 +92,7 @@ public class CassandraSpout extends BaseRichSpout {
         Date nowDate = new Date();
         if(iterator == null || !iterator.hasNext())
         {
+            if(finished) return;
             if(roundlist.size()==0)
             {
                 try {
@@ -105,6 +107,8 @@ public class CassandraSpout extends BaseRichSpout {
                     }
                     for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+3;k++)
                         collector.emitDirect(k, new Values(new ArrayList<>(), 0L, current_round+1, true, true));
+
+                    finished = true;
 
 //                    ExcelWriter.createTimeChart();
 

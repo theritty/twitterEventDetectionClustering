@@ -6,8 +6,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.UUID;
 
 public class CassandraDao implements Serializable
 {

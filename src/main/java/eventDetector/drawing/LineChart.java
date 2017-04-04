@@ -3,8 +3,14 @@ package eventDetector.drawing;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import topologyBuilder.Constants;
 
 import java.io.File;
@@ -13,6 +19,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 public class LineChart
 {
@@ -34,6 +41,37 @@ public class LineChart
     File lineChart = new File(drawFilePath.replace("/","//") + word.replace("/", "-") + "-" + country + "-" + date +".jpeg" );
     ChartUtilities.saveChartAsJPEG(lineChart ,lineChartObject, width ,height);
   }
+
+  public static void drawScatterChart(XYSeriesCollection result, String drawFilePath ) throws IOException {
+    JFreeChart lineChartObject = ChartFactory.createScatterPlot(
+            "Process Times",
+            "Bolt numbers",
+            "Time",
+            result);
+
+    for(int i = 0; i < result.getSeries().size(); i++){
+
+        lineChartObject.getXYPlot().getRenderer().setSeriesVisibleInLegend(i, Boolean.FALSE);
+
+    }
+
+    NumberAxis domain = (NumberAxis) lineChartObject.getXYPlot().getDomainAxis();
+    domain.setRange(0, 96000);
+    domain.setTickUnit(new NumberTickUnit(1));
+    domain.setVerticalTickLabels(true);
+    NumberAxis range = (NumberAxis) lineChartObject.getXYPlot().getRangeAxis();
+    range.setRange(0.0, 30);
+    range.setTickUnit(new NumberTickUnit(1));
+
+//    XYItemRenderer renderer = lineChartObject.getXYPlot().getRenderer();
+//    renderer.setSeriesItemLabelsVisible(0, false);
+
+    int width = 2560; /* Width of the image */
+    int height = 960; /* Height of the image */
+    File lineChart = new File(drawFilePath.replace("/","//") + ".jpeg" );
+    ChartUtilities.saveChartAsJPEG(lineChart ,lineChartObject, width ,height);
+  }
+
   public static void main( String[ ] args )
   {
     DefaultCategoryDataset vals_test = new DefaultCategoryDataset();

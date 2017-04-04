@@ -11,6 +11,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -25,9 +27,9 @@ public class ExcelWriter {
     private static int[][] times;
     private static Date startTime = new Date();
     private static long startRound = 0;
-    private static String fileNum="12345";
+    private static String fileNum="12345xx";
     private static int lastInd ;
-    private static int rowNum = 216000;
+    private static int rowNum = 300000;
     private static int columnNum = 250;
     private static int numOfBolts = 25;
     private static int createChart = 0;
@@ -70,6 +72,74 @@ public class ExcelWriter {
 
     }
 
+
+
+    public static void cassandraTableToXYSeries(CassandraDao cassandraDao) {
+
+        lastInd = rowNum -1;
+        times = new int[rowNum][columnNum];
+
+        XYSeriesCollection result = new XYSeriesCollection();
+        XYSeries series = new XYSeries("1");
+
+        for(int i = 0; i< rowNum; i++) {
+            times[i][0] = i;
+            for (int j = 1; j < columnNum; j++)
+                times[i][j] = 0;
+        }
+
+
+        try {
+            ResultSet resultSet;
+            resultSet = cassandraDao.getProcessTimes();
+            Iterator<com.datastax.driver.core.Row> iterator = resultSet.iterator();
+            while (iterator.hasNext()) {
+                com.datastax.driver.core.Row row = iterator.next();
+                int process_row = row.getInt("row");
+                int process_col = row.getInt("column");
+                int process_id = row.getInt("id");
+
+                if(process_row<96000)
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    times[process_row][process_col-1]=process_id;
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            }
+            clean();
+            System.out.println("Last index is " + lastInd + " column num " + columnNum);
+            for(int i=0; i< columnNum; i++) {
+//            for(int i=0; i< 15; i++) {
+                System.out.println("Col " + i);
+                boolean added = false;
+//                for(int j=0; j<15; j++) {
+                for(int j=0; j<lastInd; j++) {
+                    if(times[j][i]!=0) {
+                        series.add(j,times[j][i]);
+                        added=true;
+                    }
+                    else if(added){
+                        result.addSeries(series);
+                        series = new XYSeries(Integer.toString(j)+"and"+ Integer.toString(i));
+                        added=false;
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        result.addSeries(series);
+        try {
+            LineChart.drawScatterChart(result, Constants.IMAGES_FILE_PATH+"testxx");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+
+
+
     public static void cassandraTableToList(CassandraDao cassandraDao) {
 
         lastInd = rowNum -1;
@@ -89,27 +159,35 @@ public class ExcelWriter {
             while (iterator.hasNext()) {
                 com.datastax.driver.core.Row row = iterator.next();
                 int process_row = row.getInt("row");
-                int process_col = row.getInt("col");
+                int process_col = row.getInt("column");
                 int process_id = row.getInt("id");
 
-                times[process_row][process_col]=process_id;
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                times[process_row][process_col-1]=process_id;
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+
     public static void createTimeChart (CassandraDao cassandraDao) throws IOException {
         createChart++;
         if(createChart==2) {
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " Excel creation started");
+            System.out.println("Cass to table");
             cassandraTableToList(cassandraDao);
+            System.out.println("writeToExcel");
             writeExcel();
         }
     }
 
 
     public static void clean () {
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        rowNum = 96000;
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!
         for(int i = rowNum -1; i>=0; i--) {
             for(int j = 1; j<columnNum; j++) {
                 if(times[i][j] != 0) {
@@ -125,6 +203,7 @@ public class ExcelWriter {
         Sheet sheet = workbook.createSheet();
         clean();
 
+        System.out.println("here " + lastInd);
         for (int i=0;i<lastInd;i++) {
             Row row = sheet.createRow(i);
             for (int j = 0; j<columnNum; j++) {
@@ -132,18 +211,39 @@ public class ExcelWriter {
                 cell.setCellValue(times[i][j]);
             }
         }
-
+        System.out.println("here 2");
         try (FileOutputStream outputStream = new FileOutputStream(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + "timechart.xlsx")) {
             workbook.write(outputStream);
         }
         workbook.close();
     }
 
-    public static void main(String[] args) throws IOException {
-        times = new int[rowNum][columnNum];
-        times[0][1] = 3;
-        times[9][7] = 3;
-        writeExcel();
+    public static void main(String[] args) throws Exception {
+//        times = new int[rowNum][columnNum];
+//        times[0][1] = 3;
+//        times[9][7] = 3;
+//        writeExcel();
+
+        TopologyHelper topologyHelper = new TopologyHelper();
+        Properties properties = topologyHelper.loadProperties( "config.properties" );
+
+        String TWEETS_TABLE = properties.getProperty("tweets.table");
+        String EVENTS_TABLE = properties.getProperty("events.table");
+        String EVENTS_WORDBASED_TABLE = properties.getProperty("events_wordbased.table");
+        String CLUSTER_TABLE = properties.getProperty("clusters.table");
+        String CLUSTERINFO_TABLE = properties.getProperty("clusterinfo.table");
+        String CLUSTERANDTWEET_TABLE = properties.getProperty("clusterandtweets.table");
+        String PROCESSEDTWEET_TABLE = properties.getProperty("processed_tweets.table");
+        String PROCESSTIMES_TABLE = properties.getProperty("processtimes.table");
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+
+        cassandraTableToXYSeries(cassandraDao);
+//        createChart = 1;
+//        createTimeChart(cassandraDao);
+        System.out.println("DONE");
+        return;
+
+
     }
 
 }

@@ -53,7 +53,7 @@ CREATE TABLE tweetcollection.cluster_daily (
     PRIMARY KEY (country, id)
 );
 
-CREATE TABLE tweetcollection.processtimes (
+CREATE TABLE tweetcollection.processtimes2 (
     row int,
     column int,
     id int,
