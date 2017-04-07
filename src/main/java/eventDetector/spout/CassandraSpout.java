@@ -131,44 +131,77 @@ public class CassandraSpout extends BaseRichSpout {
         }
 
 
+        //____________________________ THIS _________________
 
-        int putHundred=0;
-        ArrayList<HashMap<String,Double>> tweetMapListUSA = new ArrayList<>();
-        ArrayList<HashMap<String,Double>> tweetMapListCAN = new ArrayList<>();
-        while(iterator.hasNext()) {
-            Row row = iterator.next();
-            String tweet = row.getString("tweet");
-            String country = row.getString("country");
-            if(tweet == null || tweet.length() == 0) {
-                continue;
-            }
+//        int putHundred=0;
+//        ArrayList<HashMap<String,Double>> tweetMapListUSA = new ArrayList<>();
+//        ArrayList<HashMap<String,Double>> tweetMapListCAN = new ArrayList<>();
+//        while(iterator.hasNext()) {
+//            Row row = iterator.next();
+//            String tweet = row.getString("tweet");
+//            String country = row.getString("country");
+//            if(tweet == null || tweet.length() == 0) {
+//                continue;
+//            }
+//
+//            List<String> tweets = Arrays.asList(tweet.split(" "));
+//            HashMap<String, Double> tweetMap = new HashMap<>();
+//            for (String t : tweets) {
+//                if(t.length()>=3 && vectorMap.get(t)!=null)
+//                    tweetMap.put(t,1.0);
+//            }
+//            if(tweetMap.size()>2) {
+//                if(country.equals("USA"))
+//                    tweetMapListUSA.add(tweetMap);
+//                else
+//                    tweetMapListCAN.add(tweetMap);
+//            }
+//
+//            if(++putHundred>=100) break;
+//        }
 
-            List<String> tweets = Arrays.asList(tweet.split(" "));
-            HashMap<String, Double> tweetMap = new HashMap<>();
-            for (String t : tweets) {
-                if(t.length()>=3 && vectorMap.get(t)!=null)
-                    tweetMap.put(t,1.0);
-            }
-            if(tweetMap.size()>2) {
-                if(country.equals("USA"))
-                    tweetMapListUSA.add(tweetMap);
-                else
-                    tweetMapListCAN.add(tweetMap);
-            }
+//        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass goooooo " + current_round);
 
-            if(++putHundred>=100) break;
-        }
+
+
+
+//        if(iterator.hasNext()) {
+//            vectorizeAndEmit(tweetMapListUSA, 0L, current_round, "USA");
+//            vectorizeAndEmit(tweetMapListCAN, 0L, current_round, "CAN");
+//            numTweetRound ++;
+//        }
+//        else {
+//            vectorizeAndEmit(tweetMapListUSA, 0L, current_round, "USA");
+//            vectorizeAndEmit(tweetMapListCAN, 0L, current_round, "CAN");
+
+
+
+        //____________________________ OR _________________
+
 
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass goooooo " + current_round);
 
+
+        Row row = iterator.next();
+        String tweet = row.getString("tweet");
+        String country = row.getString("country");
+
         if(iterator.hasNext()) {
-            vectorizeAndEmit(tweetMapListUSA, 0L, current_round, "USA");
-            vectorizeAndEmit(tweetMapListCAN, 0L, current_round, "CAN");
+            vectorizeAndEmit(tweet, 0L, current_round, country);
             numTweetRound ++;
         }
         else {
-            vectorizeAndEmit(tweetMapListUSA, 0L, current_round, "USA");
-            vectorizeAndEmit(tweetMapListCAN, 0L, current_round, "CAN");
+            vectorizeAndEmit(tweet, 0L, current_round, country);
+
+
+            //____________________________THIS _________________
+
+
+
+
+
+
+
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Round " + current_round + " number of tweets " + ++numTweetRound);
             numTweetRound=0;
             try {
@@ -236,6 +269,42 @@ public class CassandraSpout extends BaseRichSpout {
 
     }
 
+    public void vectorizeAndEmit(String tweetSentence, long id, long round, String country) {
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass goooooo " + current_round);
+        List<String> tweets = Arrays.asList(tweetSentence.split(" "));
+        ArrayList<String> tweetMap = new ArrayList<>();
+        for (String tweet : tweets) {
+//            tweet = tweet.replace("#", "");
+            if(tweet.length()>=3 && vectorMap.get(tweet)!=null)
+                tweetMap.add(tweet);
+        }
+
+
+
+        if(tweetMap.size()>1) {
+            if(country.equals("USA")) {
+                collector.emitDirect(USATask, new Values(tweetMap, id, round, false, false));
+                if ( counts.get(USATask) != null)
+                    counts.put(USATask, counts.get(USATask)+1);
+                else
+                    counts.put(USATask, 1L);
+                USATask++;
+//                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " USA emit: " + (USATask-1));
+            }
+            else {
+                collector.emitDirect(CANTask, new Values(tweetMap, id, round, false, false));
+                if ( counts.get(CANTask) != null)
+                    counts.put(CANTask, counts.get(CANTask)+1);
+                else
+                    counts.put(CANTask, 1L);
+                CANTask++;
+//                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " CAN emit: " + (CANTask-1));
+            }
+        }
+    }
+
+
+
     public void vectorizeAndEmit(ArrayList<HashMap<String,Double>> tweetMapList, long id, long round, String country) {
 //        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass goooooo " + current_round);
 //        List<String> tweets = Arrays.asList(tweetSentence.split(" "));
@@ -247,24 +316,24 @@ public class CassandraSpout extends BaseRichSpout {
 //        }
 
 //        if(tweetMap.size()>1) {
-            if(country.equals("USA")) {
-                collector.emitDirect(USATask, new Values(tweetMapList, id, round, false, false));
-                if ( counts.get(USATask) != null)
-                    counts.put(USATask, counts.get(USATask)+tweetMapList.size());
-                else
-                    counts.put(USATask, (long) tweetMapList.size());
-                USATask++;
-                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " USA emit: " + (USATask-1));
-            }
-            else {
-                collector.emitDirect(CANTask, new Values(tweetMapList, id, round, false, false));
-                if ( counts.get(CANTask) != null)
-                    counts.put(CANTask, counts.get(CANTask)+tweetMapList.size());
-                else
-                    counts.put(CANTask, (long) tweetMapList.size());
-                CANTask++;
-                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " CAN emit: " + (CANTask-1));
-            }
+        if(country.equals("USA")) {
+            collector.emitDirect(USATask, new Values(tweetMapList, id, round, false, false));
+            if ( counts.get(USATask) != null)
+                counts.put(USATask, counts.get(USATask)+tweetMapList.size());
+            else
+                counts.put(USATask, (long) tweetMapList.size());
+            USATask++;
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " USA emit: " + (USATask-1));
+        }
+        else {
+            collector.emitDirect(CANTask, new Values(tweetMapList, id, round, false, false));
+            if ( counts.get(CANTask) != null)
+                counts.put(CANTask, counts.get(CANTask)+tweetMapList.size());
+            else
+                counts.put(CANTask, (long) tweetMapList.size());
+            CANTask++;
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " CAN emit: " + (CANTask-1));
+        }
 //        }
     }
 

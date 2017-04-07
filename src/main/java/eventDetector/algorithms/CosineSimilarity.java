@@ -2,6 +2,7 @@
 package eventDetector.algorithms;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -13,18 +14,18 @@ public class CosineSimilarity implements Serializable {
      * @param docVector2 : document vector 2 (b)
      * @return
      */
-    public double cosineSimilarityFromMap(Map<String, Double> docVector1, Map<String, Double> docVector2, double magnitude2) {
+    public double cosineSimilarityFromMap(Map<String, Double> docVector1, ArrayList<String> docVector2, double magnitude2) {
         double dotProduct = 0.0;
         double magnitude1 = 0.0;
         double cosineSimilarity;
 
         HashSet<String> intersection = new HashSet<>(docVector1.keySet());
-        intersection.retainAll(docVector2.keySet());
+        intersection.retainAll(docVector2);
 
         //Calculate dot product
         for (String item : intersection) {
             double value = docVector1.get(item);
-            dotProduct += value * docVector2.get(item);
+            dotProduct += value ;
         }
         for (String key : docVector1.keySet()) {
             magnitude1 += Math.exp(Math.log(docVector1.get(key))*2) ;

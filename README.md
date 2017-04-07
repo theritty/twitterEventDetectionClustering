@@ -43,7 +43,7 @@ submit jar:
 
 
 
-CREATE TABLE tweetcollection.cluster_daily (
+CREATE TABLE tweetcollection.cluster4 (
     id timeuuid,
     cosinevector map<text, double>,
     prevnumtweets int,
@@ -53,7 +53,7 @@ CREATE TABLE tweetcollection.cluster_daily (
     PRIMARY KEY (country, id)
 );
 
-CREATE TABLE tweetcollection.processtimes2 (
+CREATE TABLE tweetcollection.processtimes4 (
     row int,
     column int,
     id int,
@@ -61,13 +61,13 @@ CREATE TABLE tweetcollection.processtimes2 (
 );
 
 
-CREATE TABLE tweetcollection.clusterandtweet_daily (
+CREATE TABLE tweetcollection.clusterandtweet4 (
     clusterid timeuuid,
     tweetid bigint,
     PRIMARY KEY (clusterid, tweetid)
 );
 
-CREATE TABLE tweetcollection.eventcluster_daily (
+CREATE TABLE tweetcollection.eventcluster4 (
     round bigint,
     clusterid timeuuid,
     country text,
@@ -77,7 +77,7 @@ CREATE TABLE tweetcollection.eventcluster_daily (
     PRIMARY KEY (round, clusterid)
 );
 
-CREATE TABLE tweetcollection.processedtweets (
+CREATE TABLE tweetcollection.processedtweets4 (
     round bigint,
     boltid int,
     boltprocessed bigint,
@@ -88,7 +88,16 @@ CREATE TABLE tweetcollection.processedtweets (
 );
 
 
+CREATE TABLE tweetcollection.events4 (
+    round bigint,
+    country text,
+    word text,
+    incrementpercent double,
+    PRIMARY KEY (round, country, word)
+);
+
 TRUNCATE eventcluster_daily ;TRUNCATE events_daily ;TRUNCATE cluster_daily ;TRUNCATE clusterinfo_daily ;TRUNCATE clusterandtweet_daily ;TRUNCATE processedtweets ;TRUNCATE processtimes ;
+TRUNCATE eventcluster4 ;TRUNCATE events4 ;TRUNCATE cluster4 ;TRUNCATE clusterinfo4 ;TRUNCATE clusterandtweet4 ;TRUNCATE processedtweets4 ;TRUNCATE processtimes4 ;
 
 
 INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 15, 0, 'bolu abant picnic', 1);

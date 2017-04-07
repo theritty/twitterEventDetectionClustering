@@ -67,14 +67,15 @@ public class ClusteringBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        ArrayList<HashMap<String, Double>> tweetmaplist = (ArrayList<HashMap<String, Double>>) tuple.getValueByField("tweetmap");
+//        ArrayList<HashMap<String, Double>> tweetmaplist = (ArrayList<HashMap<String, Double>>) tuple.getValueByField("tweetmap");
+        ArrayList<String> tweetmap = (ArrayList<String>) tuple.getValueByField("tweetmap");
         long round = tuple.getLongByField("round");
         long tweetid = tuple.getLongByField("tweetid");
         boolean streamEnd = tuple.getBooleanByField("streamEnd");
         boolean blockEnd = tuple.getBooleanByField("blockEnd");
 
         Date nowDate = new Date();
-
+//
         if(streamEnd) {
             this.collector.emit(new Values( 0L, country));
             collector.ack(tuple);
@@ -153,12 +154,13 @@ public class ClusteringBolt extends BaseRichBolt {
             return;
         }
 
-        for(HashMap<String, Double> tweetmap: tweetmaplist) {
+//        for(HashMap<String, Double> tweetmap: tweetmaplist) {
             ResultSet resultSet;
 //        Constants.lock.lock();
             try {
                 if (tweetmap == null || tweetmap.size() < 3)
-                    continue;
+//                    continue;
+                    return;
 
                 resultSet = cassandraDao.getClusters(country);
                 Iterator<Row> iterator = resultSet.iterator();
@@ -168,10 +170,8 @@ public class ClusteringBolt extends BaseRichBolt {
                 } else {
                     boolean similarclusterfound = false;
 
-                    double magnitude2 = 0.0;
-                    for (String key : tweetmap.keySet()) {
-                        magnitude2 += Math.exp(Math.log(tweetmap.get(key)) * 2);
-                    }
+                    double magnitude2 = (double) tweetmap.size();
+                    System.out.println("mag " + magnitude2 + " size " + tweetmap.size());
                     magnitude2 = Math.sqrt(magnitude2);//sqrt(a^2)
 
                     while (iterator.hasNext()) {
@@ -183,6 +183,8 @@ public class ClusteringBolt extends BaseRichBolt {
                         cosineSize += cosinevector.size();
                         tweetSize += tweetmap.size();
                         double similarity = cosineSimilarity.cosineSimilarityFromMap(cosinevector, tweetmap, magnitude2);
+//                        Random r = new Random();
+//                        double similarity = 0.3 + (0.4) * r.nextDouble();
                         cosine = (cosine * (double) cosineNum + (double) (new Date().getTime() - n)) / (double) ++cosineNum;
                         cosinevector.clear();
 
@@ -205,7 +207,7 @@ public class ClusteringBolt extends BaseRichBolt {
 //            Constants.lock.unlock();
             }
 //        Constants.lock.unlock();
-        }
+//        }
         lastDate = new Date();
 
         ExcelWriter.putData(componentId,nowDate,lastDate, currentRound,cassandraDao);
@@ -213,12 +215,11 @@ public class ClusteringBolt extends BaseRichBolt {
 
     }
 
-    public void updateCluster(Row row, HashMap<String, Double> tweetmap, long tweetid, long round) throws Exception {
+    public void updateCluster(Row row, ArrayList<String> tweetmap, long tweetid, long round) throws Exception {
         HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
         int numTweets = row.getInt("prevnumtweets")+row.getInt("currentnumtweets");
-        for(Map.Entry<String, Double> entry : tweetmap.entrySet()) {
-            String key = entry.getKey();
-            double value = entry.getValue();
+        for(String key : tweetmap) {
+            double value = 1.0;
             if(cosinevector.get(key) != null)
                 cosinevector.put(key, ((cosinevector.get(key)*numTweets ) + value) / numTweets);
             else
@@ -260,7 +261,11 @@ public class ClusteringBolt extends BaseRichBolt {
 
     }
 
-    public void addNewCluster(long round, HashMap<String, Double> tweet, long tweetid) throws Exception {
+    public void addNewCluster(long round, ArrayList<String> tweetmap, long tweetid) throws Exception {
+        HashMap<String, Double> tweet = new HashMap<>();
+        for(String key : tweetmap) {
+            tweet.put(key, 1.0);
+        }
         UUID clusterid = UUIDs.timeBased();
         List<Object> values = new ArrayList<>();
         values.add(clusterid);

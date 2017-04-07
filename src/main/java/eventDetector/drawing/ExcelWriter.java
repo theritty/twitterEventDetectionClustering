@@ -212,10 +212,11 @@ public class ExcelWriter {
             }
         }
         System.out.println("here 2");
-        try (FileOutputStream outputStream = new FileOutputStream(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + "timechart.xlsx")) {
+        try (FileOutputStream outputStream = new FileOutputStream(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + "timechart-processtimes4.xlsx")) {
             workbook.write(outputStream);
         }
         workbook.close();
+        System.out.println("DONE");
     }
 
     public static void main(String[] args) throws Exception {
@@ -237,9 +238,9 @@ public class ExcelWriter {
         String PROCESSTIMES_TABLE = properties.getProperty("processtimes.table");
         CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
 
-        cassandraTableToXYSeries(cassandraDao);
-//        createChart = 1;
-//        createTimeChart(cassandraDao);
+//        cassandraTableToXYSeries(cassandraDao);
+        createChart = 1;
+        createTimeChart(cassandraDao);
         System.out.println("DONE");
         return;
 
