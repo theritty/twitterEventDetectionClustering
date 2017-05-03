@@ -1,7 +1,7 @@
 package topologyBuilder;
 
-import org.apache.storm.generated.StormTopology;
-import org.apache.storm.topology.TopologyBuilder;
+import backtype.storm.generated.StormTopology;
+import backtype.storm.topology.TopologyBuilder;
 import eventDetector.bolts.*;
 import cassandraConnector.CassandraDao;
 import eventDetector.spout.CassandraSpout;
@@ -43,8 +43,8 @@ public class BoltBuilder {
 
         ClusteringBolt countBoltCAN = new ClusteringBolt( FILENUM, cassandraDao, "CAN", CAN_TASK_NUM, USA_TASK_NUM, NUM_WORKERS);
         ClusteringBolt countBoltUSA = new ClusteringBolt( FILENUM, cassandraDao, "USA", CAN_TASK_NUM, USA_TASK_NUM, NUM_WORKERS);
-        EventDetectorBolt eventDetectorBoltCAN = new EventDetectorBolt(FILENUM, cassandraDao, "CAN");
-        EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao, "USA");
+        EventDetectorBolt eventDetectorBoltCAN = new EventDetectorBolt(FILENUM, cassandraDao, "CAN", CAN_TASK_NUM);
+        EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao, "USA", USA_TASK_NUM);
 
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpout,1);
 //        builder.setBolt(Constants.COUNTRY2_CLUSTERING_BOLT_ID, countBoltCAN,5).shuffleGrouping(Constants.CASS_SPOUT_ID, "CAN");

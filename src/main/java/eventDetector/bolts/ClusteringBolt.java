@@ -1,20 +1,18 @@
 package eventDetector.bolts;
 
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import cassandraConnector.CassandraDao;
-import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import eventDetector.algorithms.CosineSimilarity;
 import eventDetector.drawing.ExcelWriter;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
-import com.datastax.driver.core.utils.UUIDs;
 
 import java.util.*;
 
@@ -31,6 +29,7 @@ public class ClusteringBolt extends BaseRichBolt {
     private String country ;
     private HashMap<Long, Long> counts = new HashMap<>();
     private CosineSimilarity cosineSimilarity = new CosineSimilarity();
+    private ArrayList<HashMap<String, Double>> clusters = new ArrayList<>();
 
     private double cosine=0;
     private int cosineSize=0;
@@ -67,10 +66,8 @@ public class ClusteringBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-//        ArrayList<HashMap<String, Double>> tweetmaplist = (ArrayList<HashMap<String, Double>>) tuple.getValueByField("tweetmap");
         ArrayList<String> tweetmap = (ArrayList<String>) tuple.getValueByField("tweetmap");
         long round = tuple.getLongByField("round");
-        long tweetid = tuple.getLongByField("tweetid");
         boolean streamEnd = tuple.getBooleanByField("streamEnd");
         boolean blockEnd = tuple.getBooleanByField("blockEnd");
 
@@ -105,17 +102,16 @@ public class ClusteringBolt extends BaseRichBolt {
                 values.add(country);
                 cassandraDao.insertIntoProcessed(values.toArray());
 
-                Iterator<Row> iteratorByCountry = cassandraDao.getProcessedByCountry(round, country).iterator();
-                while (iteratorByCountry.hasNext()){
-                    Row r = iteratorByCountry.next();
-                    if(r.getInt("boltId")<CANTaskNumber+USATaskNumber+1+numWorkers && !r.getBool("finished")) {
-                        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", r.getInt("boltId") + " not finished for " + country + " round " + round);
-                        collector.ack(tuple);
-                        return;
-                    }
+                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Round finished for " + country + " round " + round + "from bolt " + componentId +  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                for(HashMap<String,Double> m : clusters){
+                    if(m.get("numTweets")>1.0)
+                        System.out.println(m);
                 }
-                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Round finished for " + country + " round " + round);
-                this.collector.emit(new Values( round, country));
+                System.out.println("Emitting " + clusters.size());
+                ArrayList<HashMap<String, Double>> clustersCopy = new ArrayList<>(clusters);
+                this.collector.emit(new Values( round, country, clustersCopy, true));
+                clusters.clear();
                 counts.remove(round);
 
             } catch (Exception e) {
@@ -125,89 +121,44 @@ public class ClusteringBolt extends BaseRichBolt {
 
         if(counts.get(round)==null) counts.put(round,1L);
         else counts.put(round, counts.get(round)+1);
-
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Clustering " + componentId + " working "  + round);
 
-        if(round > currentRound)
-        {
-//            System.out.println("Count " + counts.get(currentRound) + " for round " + currentRound + " and component " + componentId);
-            TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
-                    "Clustering "+ componentId + " end for round " + currentRound + " at " + lastDate);
-
-            TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
-                    "Clustering "+ componentId + " time taken for round" + currentRound + " is " +
-                            (lastDate.getTime()-startDate.getTime())/1000);
-
-            startDate = new Date();
-            TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
-                    "Clustering "+ componentId + " starting for round " + round + " at " + startDate );
-
-            countsForRounds.clear();
-            currentRound = round;
-        }
-        else if(round < currentRound) {
-//            System.out.println("tweet ignored " + tweetid);
-            ignoredCount++;
-            if(ignoredCount%1000==0)
-                TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + "ignoreCount.txt",
-                        "Clustering ignored count " + componentId + ": " + ignoredCount );
-            return;
-        }
-
-//        for(HashMap<String, Double> tweetmap: tweetmaplist) {
-            ResultSet resultSet;
-//        Constants.lock.lock();
             try {
                 if (tweetmap == null || tweetmap.size() < 3)
-//                    continue;
                     return;
 
-                resultSet = cassandraDao.getClusters(country);
-                Iterator<Row> iterator = resultSet.iterator();
-
-                if (!iterator.hasNext()) {
-                    addNewCluster(round, tweetmap, tweetid);
+                if (clusters.size() == 0) {
+                    addNewCluster(tweetmap);
                 } else {
                     boolean similarclusterfound = false;
 
                     double magnitude2 = (double) tweetmap.size();
-                    System.out.println("mag " + magnitude2 + " size " + tweetmap.size());
                     magnitude2 = Math.sqrt(magnitude2);//sqrt(a^2)
 
-                    while (iterator.hasNext()) {
-                        Row row = iterator.next();
-                        HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
-                        if (cosinevector == null) continue;
+                    for(int i=0; i<clusters.size(); i++) {
+                        HashMap<String, Double> clustermap = clusters.get(i);
+                        if (clustermap == null) continue;
 
-                        long n = new Date().getTime();
-                        cosineSize += cosinevector.size();
-                        tweetSize += tweetmap.size();
-                        double similarity = cosineSimilarity.cosineSimilarityFromMap(cosinevector, tweetmap, magnitude2);
-//                        Random r = new Random();
-//                        double similarity = 0.3 + (0.4) * r.nextDouble();
-                        cosine = (cosine * (double) cosineNum + (double) (new Date().getTime() - n)) / (double) ++cosineNum;
-                        cosinevector.clear();
+                        double similarity = cosineSimilarity.cosineSimilarityFromMap(clustermap, tweetmap, magnitude2);
 
                         if (similarity > 0.5) {
                             similarclusterfound = true;
-                            n = new Date().getTime();
-                            updateCluster(row, tweetmap, tweetid, round);
-                            clusterUp = (clusterUp * (double) clusterUpNum + (double) (new Date().getTime() - n)) / (double) ++clusterUpNum;
+                            updateCluster(clustermap, tweetmap, i);
+//                            System.out.println("Similarity " + similarity + " yey !!!!");
                             break;
+                        }
+                        else {
+//                            System.out.println("Similarity " + similarity + " noooooooooooooooooooooo !!!!");
+
                         }
                     }
                     if (!similarclusterfound) {
-                        addNewCluster(round, tweetmap, tweetid);
+                        addNewCluster(tweetmap);
                     }
                 }
-                tweetmap.clear();
-
             } catch (Exception e) {
                 e.printStackTrace();
-//            Constants.lock.unlock();
             }
-//        Constants.lock.unlock();
-//        }
         lastDate = new Date();
 
         ExcelWriter.putData(componentId,nowDate,lastDate, currentRound,cassandraDao);
@@ -215,81 +166,43 @@ public class ClusteringBolt extends BaseRichBolt {
 
     }
 
-    public void updateCluster(Row row, ArrayList<String> tweetmap, long tweetid, long round) throws Exception {
-        HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
-        int numTweets = row.getInt("prevnumtweets")+row.getInt("currentnumtweets");
+    public void updateCluster(HashMap<String, Double> clustermap, ArrayList<String> tweetmap, int index) throws Exception {
+        double numTweets = clustermap.get("numTweets");
         for(String key : tweetmap) {
             double value = 1.0;
-            if(cosinevector.get(key) != null)
-                cosinevector.put(key, ((cosinevector.get(key)*numTweets ) + value) / numTweets);
+            if(clustermap.get(key) != null)
+                clustermap.put(key, ((clustermap.get(key)*numTweets ) + value) / numTweets);
             else
-                cosinevector.put(key, value / numTweets);
+                clustermap.put(key, value / numTweets);
         }
-
-        Iterator<Map.Entry<String, Double>> it = cosinevector.entrySet().iterator();
+        Iterator<Map.Entry<String, Double>> it = clustermap.entrySet().iterator();
         while(it.hasNext()) {
             Map.Entry<String, Double> entry = it.next();
             String key = entry.getKey();
             double value = entry.getValue();
-            double newValue = value * numTweets / (numTweets+1);
-//            if(newValue < 0.001) {
-//                it.remove();
-//            }
-//            else {
-                cosinevector.put(key, newValue);
-//            }
+            double newValue = value * numTweets / (numTweets+1.0);
+            clustermap.put(key, newValue);
         }
 
-        List<Object> values = new ArrayList<>();
-        values.add(row.getUUID("id"));
-        values.add(country);
-        values.add(cosinevector);
-        values.add(row.getInt("prevnumtweets"));
-        values.add(row.getInt("currentnumtweets")+1);
-        values.add(row.getLong("lastround"));
-        cassandraDao.insertIntoClusters(values.toArray());
-//        List<Object> values2 = new ArrayList<>();
-//        values2.add(row.getUUID("id"));
-//        values2.add(tweetid);
-//        cassandraDao.insertIntoClusterAndTweets(values2.toArray());
-//        List<Object> values3 = new ArrayList<>();
-//        values3.add(round);
-//        values3.add(row.getUUID("id"));
-//        values3.add(country);
-//        values3.add(numTweets+1);
-//        cassandraDao.insertIntoClusterinfo(values3.toArray());
+        clustermap.put("numTweets", numTweets+1.0);
+        clusters.remove(index);
+        clusters.add(clustermap);
 
     }
 
-    public void addNewCluster(long round, ArrayList<String> tweetmap, long tweetid) throws Exception {
-        HashMap<String, Double> tweet = new HashMap<>();
+    public void addNewCluster(ArrayList<String> tweetmap) throws Exception {
+        HashMap<String, Double> tweetMap = new HashMap<>();
         for(String key : tweetmap) {
-            tweet.put(key, 1.0);
+            tweetMap.put(key, 1.0);
         }
-        UUID clusterid = UUIDs.timeBased();
-        List<Object> values = new ArrayList<>();
-        values.add(clusterid);
-        values.add(country);
-        values.add(tweet);
-        values.add(0);
-        values.add(1);
-        values.add(0L);
-        cassandraDao.insertIntoClusters(values.toArray());
-//        List<Object> values2 = new ArrayList<>();
-//        values2.add(clusterid);
-//        values2.add(tweetid);
-//        cassandraDao.insertIntoClusterAndTweets(values2.toArray());
-//        List<Object> values3 = new ArrayList<>();
-//        values3.add(round);
-//        values3.add(clusterid);
-//        values3.add(country);
-//        values3.add(1);
-//        cassandraDao.insertIntoClusterinfo(values3.toArray());
+        tweetMap.put("numTweets",1.0);
+
+        clusters.add(tweetMap);
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields( "round", "country"));
+        declarer.declare(new Fields( "round", "country", "clusters", "finished"));
     }
 
 }
