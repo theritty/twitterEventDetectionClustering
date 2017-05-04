@@ -74,7 +74,7 @@ public class ClusteringBolt extends BaseRichBolt {
         Date nowDate = new Date();
 //
         if(streamEnd) {
-            this.collector.emit(new Values( 0L, country));
+            this.collector.emit(new Values( 0L, country, new ArrayList<>()));
             collector.ack(tuple);
             return;
         }
@@ -82,7 +82,6 @@ public class ClusteringBolt extends BaseRichBolt {
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt",  new Date() + " round end " + round + " for " + country + " for " + componentId);
 
             try {
-
                 TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", country + " comp id: "  + componentId + ". Cosine size: " + cosineSize + ", tweet size: " + tweetSize + ". Cosine: " +
                         cosine + " and total " + cosineNum*cosine + ", clusterUp: " + clusterUp + "and total " + clusterUp*clusterUpNum +
                         " and time taken is " + (new Date().getTime()-startDate.getTime()) + " at round " + round);
@@ -104,15 +103,25 @@ public class ClusteringBolt extends BaseRichBolt {
 
                 TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Round finished for " + country + " round " + round + "from bolt " + componentId +  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-                for(HashMap<String,Double> m : clusters){
-                    if(m.get("numTweets")>1.0)
-                        System.out.println(m);
-                }
-                System.out.println("Emitting " + clusters.size());
                 ArrayList<HashMap<String, Double>> clustersCopy = new ArrayList<>(clusters);
-                this.collector.emit(new Values( round, country, clustersCopy, true));
+
+                for(HashMap<String, Double> h : clustersCopy) {
+                    Iterator<Map.Entry<String, Double>> it = h.entrySet().iterator();
+                    if(h.get("numTweets")<50) continue;
+                    System.out.println("HERE");
+                    while (it.hasNext()) {
+                        Map.Entry<String, Double> entry = it.next();
+                        if ( entry.getValue() < 0.06) {
+                            it.remove();
+                        }
+                    }
+                }
+
+
+                this.collector.emit(new Values( round, country, clustersCopy));
                 clusters.clear();
                 counts.remove(round);
+                return;
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -202,7 +211,7 @@ public class ClusteringBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields( "round", "country", "clusters", "finished"));
+        declarer.declare(new Fields( "round", "country", "clusters"));
     }
 
 }
