@@ -41,8 +41,8 @@ public class BoltBuilder {
 
         CassandraSpout cassandraSpout = new CassandraSpout(cassandraDao, FILENUM, START_ROUND, END_ROUND, CAN_TASK_NUM, USA_TASK_NUM, NUM_WORKERS);
 
-        ClusteringBolt countBoltCAN = new ClusteringBolt( FILENUM, cassandraDao, "CAN", CAN_TASK_NUM, USA_TASK_NUM, NUM_WORKERS);
-        ClusteringBolt countBoltUSA = new ClusteringBolt( FILENUM, cassandraDao, "USA", CAN_TASK_NUM, USA_TASK_NUM, NUM_WORKERS);
+        ClusteringBolt countBoltCAN = new ClusteringBolt( FILENUM, cassandraDao, "CAN");
+        ClusteringBolt countBoltUSA = new ClusteringBolt( FILENUM, cassandraDao, "USA");
         EventDetectorBolt eventDetectorBoltCAN = new EventDetectorBolt(FILENUM, cassandraDao, "CAN", CAN_TASK_NUM);
         EventDetectorBolt eventDetectorBoltUSA = new EventDetectorBolt(FILENUM, cassandraDao, "USA", USA_TASK_NUM);
 

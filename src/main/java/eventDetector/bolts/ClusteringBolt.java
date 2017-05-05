@@ -19,9 +19,6 @@ import java.util.*;
 public class ClusteringBolt extends BaseRichBolt {
 
     private OutputCollector collector;
-    private HashMap<String, Long> countsForRounds = null;
-    private long currentRound = 0;
-    private long ignoredCount = 0;
     private int componentId;
     private String fileNum;
     private Date lastDate = new Date();
@@ -39,25 +36,18 @@ public class ClusteringBolt extends BaseRichBolt {
     private long clusterUpNum=0L;
 
     private CassandraDao cassandraDao;
-    private int CANTaskNumber = 0;
-    private int USATaskNumber = 0;
-    private int numWorkers = 0;
 
 
-    public ClusteringBolt(String filenum, CassandraDao cassandraDao, String country, int canTaskNum, int usaTaskNum, int numWorkers)
+    public ClusteringBolt(String filenum, CassandraDao cassandraDao, String country)
     {
         this.fileNum = filenum + "/";
         this.cassandraDao = cassandraDao;
         this.country = country;
-        this.CANTaskNumber = canTaskNum;
-        this.USATaskNumber = usaTaskNum;
-        this.numWorkers = numWorkers;
     }
     @Override
     public void prepare(Map config, TopologyContext context,
                         OutputCollector collector) {
         this.collector = collector;
-        this.countsForRounds = new HashMap<>();
         this.componentId = context.getThisTaskId()-1;
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "cluster : " + componentId + " " + country);
     }

@@ -157,84 +157,82 @@ public class EventDetectorBolt extends BaseRichBolt {
 
             ArrayList<Cluster> cassClusters = new ArrayList<>();
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " Event Detector " + componentId + " evaluates clusters for "  + round + " " + country);
+
+            int updateCount = 0;
+            int deleteCount = 0;
+            int newCount ;
+
             ResultSet resultSetx ;
             try {
                 resultSetx = cassandraDao.getClusters(country);
                 Iterator<Row> iteratorx = resultSetx.iterator();
                 while (iteratorx.hasNext()) {
+                    boolean updated = false;
                     Row row = iteratorx.next();
-                    Cluster c = new Cluster(row.getString("country"), row.getUUID("id"), (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class), row.getInt("currentnumtweets"), row.getLong("lastround"), row.getInt("prevnumtweets"));
-                    cassClusters.add(c);
+                    Cluster cNew = new Cluster(row.getString("country"), row.getUUID("id"), (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class), row.getInt("currentnumtweets"), row.getLong("lastround"), row.getInt("prevnumtweets"));
+
+                    if(clusters.size()<=0) break;
+                    double maxSim = 0;
+                    for(int j=0;j<clusters.size();) {
+                        double similarity = cosineSimilarity.cosineSimilarityFromMap(cNew.cosinevector, clusters.get(j));
+
+                        if(similarity>maxSim) maxSim = similarity;
+                        if(similarity>0.5) {
+                            cNew = updateCluster(cNew, clusters.get(j));
+                            System.out.println("Update clusters between cass and local!!!!!!!");
+                            clusters.remove(j);
+                            updated = true;
+                        }
+                        else j++;
+                    }
+                    System.out.println("max sim " + maxSim);
+
+                    if(updated) {
+                        updateCount++;
+                        Iterator<Map.Entry<String, Double>> it = cNew.cosinevector.entrySet().iterator();
+                        while(it.hasNext()) {
+                            Map.Entry<String, Double> entry = it.next();
+                            double value = entry.getValue();
+                            if(value < 0.06) {
+                                it.remove();
+                            }
+                        }
+
+                        if( ((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > 0.5) && (cNew.currentnumtweets + cNew.prevnumtweets > 100) ) {
+                            System.out.println("updated event again: " + cNew.id);
+                            List<Object> values_event = new ArrayList<>();
+                            values_event.add(round);
+                            values_event.add(cNew.id);
+                            values_event.add(cNew.country);
+                            values_event.add(cNew.cosinevector);
+                            values_event.add((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets));
+                            values_event.add(cNew.currentnumtweets + cNew.prevnumtweets );
+                            cassandraDao.insertIntoEvents(values_event.toArray());
+                        }
+                        else
+                            System.out.println("event rate " + (double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) );
+
+                        List<Object> values2 = new ArrayList<>();
+                        values2.add(cNew.id);
+                        values2.add(country);
+                        values2.add(cNew.cosinevector);
+                        values2.add(cNew.currentnumtweets + cNew.prevnumtweets);
+                        values2.add(0);
+                        values2.add(round);
+                        cassandraDao.insertIntoClusters(values2.toArray());
+
+                    }
+                    else if(round - cNew.lastround >= 2) {
+                        cassandraDao.deleteFromClusters(country, cNew.id);
+                        deleteCount++;
+                    }
+
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            System.out.println("Cass clusters size " + cassClusters.size());
-
-            int updateCount = 0;
-            int deleteCount = 0;
-            int newCount = 0;
-            for(int i=0; i< cassClusters.size();i++) {
-                boolean updated = false;
-                Cluster cNew = cassClusters.get(i);
-                if(clusters.size()<=0) break;
-                double maxSim = 0;
-                for(int j=0;j<clusters.size();) {
-                    double similarity = cosineSimilarity.cosineSimilarityFromMap(cassClusters.get(i).cosinevector, clusters.get(j));
-
-                    if(similarity>maxSim) maxSim = similarity;
-                    if(similarity>0.6) {
-                        cNew = updateCluster(cNew, clusters.get(j));
-                        System.out.println("Uodate clusters between cass and local!!!!!!!");
-                        clusters.remove(j);
-                        updated = true;
-                    }
-                    else j++;
-                }
-                System.out.println("max sim " + maxSim);
-
-                if(updated) {
-                    updateCount++;
-                    Iterator<Map.Entry<String, Double>> it = cNew.cosinevector.entrySet().iterator();
-                    while(it.hasNext()) {
-                        Map.Entry<String, Double> entry = it.next();
-                        double value = entry.getValue();
-                        if(value < 0.06) {
-                            it.remove();
-                        }
-                    }
-
-                    if( (double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > 0.5) {
-                        List<Object> values_event = new ArrayList<>();
-                        values_event.add(round);
-                        values_event.add(cNew.id);
-                        values_event.add(cNew.country);
-                        values_event.add(cNew.cosinevector);
-                        values_event.add((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets));
-                        values_event.add(cNew.currentnumtweets + cNew.prevnumtweets );
-                        cassandraDao.insertIntoEvents(values_event.toArray());
-                    }
-                    else
-                        System.out.println("event rate " + (double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) );
-
-                    List<Object> values2 = new ArrayList<>();
-                    values2.add(cNew.id);
-                    values2.add(country);
-                    values2.add(cNew.cosinevector);
-                    values2.add(cNew.currentnumtweets + cNew.prevnumtweets);
-                    values2.add(0);
-                    values2.add(round);
-                    cassandraDao.insertIntoClusters(values2.toArray());
-
-                }
-                else if(round - cNew.lastround >= 2) {
-                    cassandraDao.deleteFromClusters(country, cNew.id);
-                    deleteCount++;
-                }
-
-            }
 
             System.out.println("start add");
             newCount = clusters.size();
