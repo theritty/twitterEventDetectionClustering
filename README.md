@@ -43,7 +43,7 @@ submit jar:
 
 
 
-CREATE TABLE tweetcollection.cluster4 (
+CREATE TABLE tweetcollection.cluster5 (
     id timeuuid,
     cosinevector map<text, double>,
     prevnumtweets int,
@@ -53,7 +53,7 @@ CREATE TABLE tweetcollection.cluster4 (
     PRIMARY KEY (country, id)
 );
 
-CREATE TABLE tweetcollection.processtimes4 (
+CREATE TABLE tweetcollection.processtimes5 (
     row int,
     column int,
     id int,
@@ -61,13 +61,13 @@ CREATE TABLE tweetcollection.processtimes4 (
 );
 
 
-CREATE TABLE tweetcollection.clusterandtweet4 (
+CREATE TABLE tweetcollection.clusterandtweet5 (
     clusterid timeuuid,
     tweetid bigint,
     PRIMARY KEY (clusterid, tweetid)
 );
 
-CREATE TABLE tweetcollection.eventcluster4 (
+CREATE TABLE tweetcollection.eventcluster5 (
     round bigint,
     clusterid timeuuid,
     country text,
@@ -77,7 +77,7 @@ CREATE TABLE tweetcollection.eventcluster4 (
     PRIMARY KEY (round, clusterid)
 );
 
-CREATE TABLE tweetcollection.processedtweets4 (
+CREATE TABLE tweetcollection.processedtweets5 (
     round bigint,
     boltid int,
     boltprocessed bigint,
@@ -88,7 +88,7 @@ CREATE TABLE tweetcollection.processedtweets4 (
 );
 
 
-CREATE TABLE tweetcollection.events4 (
+CREATE TABLE tweetcollection.events5 (
     round bigint,
     country text,
     word text,

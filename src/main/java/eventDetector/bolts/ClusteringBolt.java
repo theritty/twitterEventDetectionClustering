@@ -1,16 +1,16 @@
 package eventDetector.bolts;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.Row;
 import eventDetector.algorithms.CosineSimilarity;
 import eventDetector.drawing.ExcelWriter;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -94,19 +94,6 @@ public class ClusteringBolt extends BaseRichBolt {
                 TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Round finished for " + country + " round " + round + "from bolt " + componentId +  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
                 ArrayList<HashMap<String, Double>> clustersCopy = new ArrayList<>(clusters);
-//
-//                for(HashMap<String, Double> h : clustersCopy) {
-//                    Iterator<Map.Entry<String, Double>> it = h.entrySet().iterator();
-//                    if(h.get("numTweets")<50) continue;
-//                    while (it.hasNext()) {
-//                        Map.Entry<String, Double> entry = it.next();
-//                        if ( entry.getValue() < 0.06) {
-//                            it.remove();
-//                        }
-//                    }
-//                }
-
-
                 this.collector.emit(new Values( round, country, clustersCopy));
                 clusters.clear();
                 counts.remove(round);

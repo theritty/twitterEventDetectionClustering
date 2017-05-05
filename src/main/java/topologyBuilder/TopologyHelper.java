@@ -1,15 +1,12 @@
 package topologyBuilder;
 
-import backtype.storm.Config;
+import org.apache.storm.Config;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * Created by ceren on 10.05.2016.
- */
 public class TopologyHelper {
 
     public static void writeToFile(String fileName, String tweet)

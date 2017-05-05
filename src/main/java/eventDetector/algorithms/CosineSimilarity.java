@@ -1,4 +1,3 @@
-
 package eventDetector.algorithms;
 
 import java.io.Serializable;

@@ -7,9 +7,6 @@ import topologyBuilder.TopologyHelper;
 
 import java.util.*;
 
-/**
- * Created by ozlemcerensahin on 11/03/2017.
- */
 public class CompareMethods {
     public static void clusterPercentage(String c) throws Exception {
         TopologyHelper topologyHelper = new TopologyHelper();

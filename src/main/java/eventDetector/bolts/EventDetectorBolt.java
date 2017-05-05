@@ -1,17 +1,17 @@
 package eventDetector.bolts;
 
-import com.datastax.driver.core.utils.UUIDs;
-import eventDetector.algorithms.CosineSimilarity;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
 import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.datastax.driver.core.utils.UUIDs;
+import eventDetector.algorithms.CosineSimilarity;
 import eventDetector.drawing.ExcelWriter;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -39,11 +39,9 @@ class Cluster {
 public class EventDetectorBolt extends BaseRichBolt {
 
     private OutputCollector collector;
-    private long currentRound = 0;
     private int componentId;
     private String fileNum;
     private Date lastDate = new Date();
-    private Date startDate = new Date();
     private String country;
     private int count ;
     private int taskNum = 0;
@@ -143,8 +141,10 @@ public class EventDetectorBolt extends BaseRichBolt {
 
         Date nowDate = new Date();
         try {
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", country +  " " + round + " before " + clusters.size());
             System.out.println(country + " before " + componentId + " " + clusters.size());
             mergeClusters();
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", country +  " " + round + " after " + clusters.size());
             System.out.println(country + " after " + componentId + " " + clusters.size());
 
             for(int i=0; i< clusters.size();) {
@@ -155,13 +155,10 @@ public class EventDetectorBolt extends BaseRichBolt {
 
             System.out.println(country + " final " + componentId + " " + clusters.size());
 
-            ArrayList<Cluster> cassClusters = new ArrayList<>();
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " Event Detector " + componentId + " evaluates clusters for "  + round + " " + country);
 
             int updateCount = 0;
             int deleteCount = 0;
-            int newCount ;
-
             ResultSet resultSetx ;
             try {
                 resultSetx = cassandraDao.getClusters(country);
@@ -235,7 +232,6 @@ public class EventDetectorBolt extends BaseRichBolt {
 
 
             System.out.println("start add");
-            newCount = clusters.size();
             for(int i=0; i<clusters.size();i++) {
                 Iterator<Map.Entry<String, Double>> it = clusters.get(i).entrySet().iterator();
                 while(it.hasNext()) {
@@ -249,7 +245,7 @@ public class EventDetectorBolt extends BaseRichBolt {
                 addNewCluster(round, clusters.get(i));
             }
 
-            System.out.println( country + " Update count " + updateCount + " delete count " + deleteCount + " new count " + newCount );
+            System.out.println( country + " Update count " + updateCount + " delete count " + deleteCount + " new count " + clusters.size() );
 
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " Event Detector " + componentId + " finished evaluating clusters for "  + round + " " + country);
 
@@ -347,22 +343,11 @@ public class EventDetectorBolt extends BaseRichBolt {
         c.cosinevector = cosinevectorCluster;
         c.currentnumtweets = c.currentnumtweets + (int) numTweetsLocal;
 
-//        List<Object> values = new ArrayList<>();
-//        values.add(row.getUUID("id"));
-//        values.add(country);
-//        values.add(cosinevectorCluster);
-//        values.add(row.getInt("prevnumtweets"));
-//        values.add(row.getInt("currentnumtweets")+numTweetsLocal);
-//        values.add(row.getLong("lastround"));
-//        cassandraDao.insertIntoClusters(values.toArray());
-
         return c;
-
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields( "round", "country"));
     }
-
 }

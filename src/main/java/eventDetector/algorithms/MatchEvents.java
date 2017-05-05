@@ -2,11 +2,11 @@ package eventDetector.algorithms;
 
 
 import cassandraConnector.CassandraDao;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import topologyBuilder.TopologyHelper;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.UUID;
 
 public class MatchEvents {
 
