@@ -45,6 +45,18 @@ public class CosineSimilarity implements Serializable {
         double magnitude1 = 0.0;
         double magnitude2 = 0.0;
         double cosineSimilarity;
+        double numTweets1 = 0.0;
+        double numTweets2 = 0.0;
+
+        if(docVector1.containsKey("numTweets")) {
+            numTweets1 = docVector1.get("numTweets");
+            docVector1.remove("numTweets");
+        }
+        if(docVector2.containsKey("numTweets")) {
+            numTweets2 = docVector2.get("numTweets");
+            docVector2.remove("numTweets");
+        }
+
 
         HashSet<String> intersection = new HashSet<>(docVector1.keySet());
         intersection.retainAll(docVector2.keySet());
@@ -68,6 +80,10 @@ public class CosineSimilarity implements Serializable {
         } else {
             cosineSimilarity = dotProduct / (magnitude1 * magnitude2);
         }
+
+        docVector1.put("numTweets", numTweets1);
+        docVector2.put("numTweets", numTweets2);
+
         return cosineSimilarity;
     }
 }

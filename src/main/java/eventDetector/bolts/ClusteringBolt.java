@@ -104,18 +104,17 @@ public class ClusteringBolt extends BaseRichBolt {
                 TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Round finished for " + country + " round " + round + "from bolt " + componentId +  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
                 ArrayList<HashMap<String, Double>> clustersCopy = new ArrayList<>(clusters);
-
-                for(HashMap<String, Double> h : clustersCopy) {
-                    Iterator<Map.Entry<String, Double>> it = h.entrySet().iterator();
-                    if(h.get("numTweets")<50) continue;
-                    System.out.println("HERE");
-                    while (it.hasNext()) {
-                        Map.Entry<String, Double> entry = it.next();
-                        if ( entry.getValue() < 0.06) {
-                            it.remove();
-                        }
-                    }
-                }
+//
+//                for(HashMap<String, Double> h : clustersCopy) {
+//                    Iterator<Map.Entry<String, Double>> it = h.entrySet().iterator();
+//                    if(h.get("numTweets")<50) continue;
+//                    while (it.hasNext()) {
+//                        Map.Entry<String, Double> entry = it.next();
+//                        if ( entry.getValue() < 0.06) {
+//                            it.remove();
+//                        }
+//                    }
+//                }
 
 
                 this.collector.emit(new Values( round, country, clustersCopy));
@@ -144,21 +143,17 @@ public class ClusteringBolt extends BaseRichBolt {
                     double magnitude2 = (double) tweetmap.size();
                     magnitude2 = Math.sqrt(magnitude2);//sqrt(a^2)
 
+                    double maxSim = 0.0;
                     for(int i=0; i<clusters.size(); i++) {
                         HashMap<String, Double> clustermap = clusters.get(i);
                         if (clustermap == null) continue;
 
                         double similarity = cosineSimilarity.cosineSimilarityFromMap(clustermap, tweetmap, magnitude2);
-
+                        if(maxSim<similarity) maxSim=similarity;
                         if (similarity > 0.5) {
                             similarclusterfound = true;
                             updateCluster(clustermap, tweetmap, i);
-//                            System.out.println("Similarity " + similarity + " yey !!!!");
                             break;
-                        }
-                        else {
-//                            System.out.println("Similarity " + similarity + " noooooooooooooooooooooo !!!!");
-
                         }
                     }
                     if (!similarclusterfound) {
@@ -170,7 +165,7 @@ public class ClusteringBolt extends BaseRichBolt {
             }
         lastDate = new Date();
 
-        ExcelWriter.putData(componentId,nowDate,lastDate, currentRound,cassandraDao);
+        ExcelWriter.putData(componentId,nowDate,lastDate, round,cassandraDao);
         collector.ack(tuple);
 
     }

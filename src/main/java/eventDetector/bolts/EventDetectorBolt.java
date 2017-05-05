@@ -40,7 +40,6 @@ public class EventDetectorBolt extends BaseRichBolt {
 
     private OutputCollector collector;
     private long currentRound = 0;
-    private long ignoredCount = 0;
     private int componentId;
     private String fileNum;
     private Date lastDate = new Date();
@@ -103,14 +102,12 @@ public class EventDetectorBolt extends BaseRichBolt {
             if(numTweets1+numTweets2<60 || newValue>0.06) {
                 cluster1.put(key, newValue);
             }
-//            cluster2.remove(key);
         }
     }
 
     public void mergeClusters() {
         for(int i=0;i<clusters.size()-1;i++) {
             for(int j=i+1; j< clusters.size();){
-
                 double similarity = cosineSimilarity.cosineSimilarityFromMap(clusters.get(j), clusters.get(i));
                 if(similarity>0.5) {
                     updateCluster(clusters.get(i), clusters.get(j));
@@ -156,7 +153,7 @@ public class EventDetectorBolt extends BaseRichBolt {
                 else i++;
             }
 
-            System.out.println(country + " after after " + componentId + " " + clusters.size());
+            System.out.println(country + " final " + componentId + " " + clusters.size());
 
             ArrayList<Cluster> cassClusters = new ArrayList<>();
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " Event Detector " + componentId + " evaluates clusters for "  + round + " " + country);
@@ -176,7 +173,6 @@ public class EventDetectorBolt extends BaseRichBolt {
 
             System.out.println("Cass clusters size " + cassClusters.size());
 
-            System.out.println("start change");
             int updateCount = 0;
             int deleteCount = 0;
             int newCount = 0;
@@ -191,7 +187,8 @@ public class EventDetectorBolt extends BaseRichBolt {
                     if(similarity>maxSim) maxSim = similarity;
                     if(similarity>0.6) {
                         cNew = updateCluster(cNew, clusters.get(j));
-                        clusters.remove(i);
+                        System.out.println("Uodate clusters between cass and local!!!!!!!");
+                        clusters.remove(j);
                         updated = true;
                     }
                     else j++;
@@ -239,10 +236,6 @@ public class EventDetectorBolt extends BaseRichBolt {
 
             }
 
-//        System.out.println("start update cass clusters");
-//        updateCassClusters(changes, cassClusters);
-//
-//
             System.out.println("start add");
             newCount = clusters.size();
             for(int i=0; i<clusters.size();i++) {
@@ -281,32 +274,13 @@ public class EventDetectorBolt extends BaseRichBolt {
 
 
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "round " + round + " put excel " + componentId);
-        ExcelWriter.putData(componentId, nowDate, lastDate, currentRound,cassandraDao);
+        ExcelWriter.putData(componentId, nowDate, lastDate, round,cassandraDao);
         collector.ack(tuple);
         clusters.clear();
 
 
     }
 
-    private void updateCassClusters(ArrayList<Integer> changes, ArrayList<Cluster> cassClusters) {
-
-        for(int i: changes) {
-            Cluster c = cassClusters.get(i);
-            List<Object> values = new ArrayList<>();
-            values.add(c.id);
-            values.add(country);
-            values.add(c.cosinevector);
-            values.add(c.prevnumtweets);
-            values.add(c.currentnumtweets);
-            values.add(c.lastround);
-            try {
-                cassandraDao.insertIntoClusters(values.toArray());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 
     public void addNewCluster(long round, HashMap<String, Double> newCluster)  {
 //        "(id, country, cosinevector, prevnumtweets, currentnumtweets, lastround)"
@@ -370,13 +344,10 @@ public class EventDetectorBolt extends BaseRichBolt {
             double value = entry.getValue();
             double newValue = (value * numTweetsLocal) / (numTweetsLocal + numTweetsCluster);
             cosinevectorCluster.put(key, newValue);
-            cosinevectorLocal.remove(key);
         }
 
         c.cosinevector = cosinevectorCluster;
         c.currentnumtweets = c.currentnumtweets + (int) numTweetsLocal;
-
-        cosinevectorLocal.put("numTweets", numTweetsLocal);
 
 //        List<Object> values = new ArrayList<>();
 //        values.add(row.getUUID("id"));

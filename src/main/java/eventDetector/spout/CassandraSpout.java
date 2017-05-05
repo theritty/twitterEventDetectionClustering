@@ -97,7 +97,7 @@ public class CassandraSpout extends BaseRichSpout {
             {
                 try {
                     for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+2+numWorkers;k++)
-                        collector.emitDirect(k, new Values(new ArrayList<>(), 0L, current_round+1, true, false));
+                        collector.emitDirect(k, new Values(new ArrayList<>(), 0L, current_round+1, true, true));
 
                     try {
                         Thread.sleep(120000);
@@ -105,8 +105,8 @@ public class CassandraSpout extends BaseRichSpout {
                     catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+3;k++)
-                        collector.emitDirect(k, new Values(new ArrayList<>(), 0L, current_round+1, true, true));
+//                    for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+3;k++)
+//                        collector.emitDirect(k, new Values(new ArrayList<>(), 0L, current_round+1, true, true));
 
                     finished = true;
 
