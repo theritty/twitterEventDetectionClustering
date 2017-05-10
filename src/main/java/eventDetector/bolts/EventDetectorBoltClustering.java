@@ -4,8 +4,8 @@ import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.utils.UUIDs;
-import eventDetector.algorithms.CosineSimilarity;
-import eventDetector.drawing.ExcelWriter;
+import eventDetector.algorithms.CosineSimilarityClustering;
+import eventDetector.drawing.ExcelWriterClustering;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -36,7 +36,7 @@ class Cluster {
     }
 }
 
-public class EventDetectorBolt extends BaseRichBolt {
+public class EventDetectorBoltClustering extends BaseRichBolt {
 
     private OutputCollector collector;
     private int componentId;
@@ -48,11 +48,11 @@ public class EventDetectorBolt extends BaseRichBolt {
 
     private CassandraDao cassandraDao;
 
-    private CosineSimilarity cosineSimilarity = new CosineSimilarity();
+    private CosineSimilarityClustering cosineSimilarityClustering = new CosineSimilarityClustering();
     private ArrayList<HashMap<String, Double>> clusters = new ArrayList<>();
 
 
-    public EventDetectorBolt(String filenum, CassandraDao cassandraDao, String country, int taskNum)
+    public EventDetectorBoltClustering(String filenum, CassandraDao cassandraDao, String country, int taskNum)
     {
         this.fileNum = filenum + "/";
         this.cassandraDao = cassandraDao;
@@ -106,7 +106,7 @@ public class EventDetectorBolt extends BaseRichBolt {
     public void mergeClusters() {
         for(int i=0;i<clusters.size()-1;i++) {
             for(int j=i+1; j< clusters.size();){
-                double similarity = cosineSimilarity.cosineSimilarityFromMap(clusters.get(j), clusters.get(i));
+                double similarity = cosineSimilarityClustering.cosineSimilarityFromMap(clusters.get(j), clusters.get(i));
                 if(similarity>0.5) {
                     updateCluster(clusters.get(i), clusters.get(j));
                     clusters.remove(j);
@@ -131,7 +131,7 @@ public class EventDetectorBolt extends BaseRichBolt {
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", country + " event detection " + round);
         if(round==0L) {
             try {
-                ExcelWriter.createTimeChart(cassandraDao);
+                ExcelWriterClustering.createTimeChart(cassandraDao);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -171,7 +171,7 @@ public class EventDetectorBolt extends BaseRichBolt {
                     if(clusters.size()<=0) break;
                     double maxSim = 0;
                     for(int j=0;j<clusters.size();) {
-                        double similarity = cosineSimilarity.cosineSimilarityFromMap(cNew.cosinevector, clusters.get(j));
+                        double similarity = cosineSimilarityClustering.cosineSimilarityFromMap(cNew.cosinevector, clusters.get(j));
 
                         if(similarity>maxSim) maxSim = similarity;
                         if(similarity>0.5) {
@@ -268,7 +268,7 @@ public class EventDetectorBolt extends BaseRichBolt {
 
 
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "round " + round + " put excel " + componentId);
-        ExcelWriter.putData(componentId, nowDate, lastDate, round,cassandraDao);
+        ExcelWriterClustering.putData(componentId, nowDate, lastDate, round,cassandraDao);
         collector.ack(tuple);
         clusters.clear();
 

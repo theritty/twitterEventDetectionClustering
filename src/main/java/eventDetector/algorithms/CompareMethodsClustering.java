@@ -7,7 +7,7 @@ import topologyBuilder.TopologyHelper;
 
 import java.util.*;
 
-public class CompareMethods {
+public class CompareMethodsClustering {
     public static void clusterPercentage(String c) throws Exception {
         TopologyHelper topologyHelper = new TopologyHelper();
         Properties properties = topologyHelper.loadProperties( "config.properties" );

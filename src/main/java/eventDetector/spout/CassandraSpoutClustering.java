@@ -3,7 +3,7 @@ package eventDetector.spout;
 import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import eventDetector.drawing.ExcelWriter;
+import eventDetector.drawing.ExcelWriterClustering;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
-public class CassandraSpout extends BaseRichSpout {
+public class CassandraSpoutClustering extends BaseRichSpout {
 
     private SpoutOutputCollector collector;
     private CassandraDao cassandraDao;
@@ -47,7 +47,7 @@ public class CassandraSpout extends BaseRichSpout {
     private boolean finished = false;
 
 
-    public CassandraSpout(CassandraDao cassandraDao, String filenum, long start, long end, int canTaskNum, int usaTaskNum, int numWorkers) throws Exception {
+    public CassandraSpoutClustering(CassandraDao cassandraDao, String filenum, long start, long end, int canTaskNum, int usaTaskNum, int numWorkers) throws Exception {
         this.cassandraDao = cassandraDao;
         roundlist = new ArrayList<>();
         this.fileNum = filenum + "/";
@@ -205,7 +205,7 @@ public class CassandraSpout extends BaseRichSpout {
         }
         lastDate = new Date();
         if(!start )
-            ExcelWriter.putData(componentId,nowDate,lastDate, current_round, cassandraDao);
+            ExcelWriterClustering.putData(componentId,nowDate,lastDate, current_round, cassandraDao);
 
         count_tweets++;
 
@@ -311,7 +311,7 @@ public class CassandraSpout extends BaseRichSpout {
         this.collector = collector;
         this.componentId = context.getThisTaskId()-1;
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "cass" + " id: " + componentId);
-        ExcelWriter.putStartDate(new Date(), fileNum, this.startRound);
+        ExcelWriterClustering.putStartDate(new Date(), fileNum, this.startRound);
 
         createWordsMap();
     }

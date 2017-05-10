@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
 
-public class MatchEvents {
+public class MatchEventsClustering {
 
   public static class Cluster {
     long round;
@@ -27,7 +27,7 @@ public class MatchEvents {
   private static long end ;
 
   private static CassandraDao cassandraDao;
-  public MatchEvents() throws Exception {
+  public MatchEventsClustering() throws Exception {
     TopologyHelper topologyHelper = new TopologyHelper();
     Properties properties = topologyHelper.loadProperties( "config.properties" );
     String TWEETS_TABLE = properties.getProperty("tweets.table");
@@ -46,7 +46,7 @@ public class MatchEvents {
 //    public static void main(String[] args) throws Exception {
 //
 //        String country = "CAN";
-//        MatchEvents m = new MatchEvents();
+//        MatchEventsClustering m = new MatchEventsClustering();
 //        for (long i=m.start; i <= m.end; i++) {
 //
 //            ResultSet resultSet = m.cassandraDao.getClusters(country);
@@ -84,7 +84,7 @@ public class MatchEvents {
 
 //  public static void main(String[] args) throws Exception {
 //
-//    MatchEvents m = new MatchEvents();
+//    MatchEventsClustering m = new MatchEventsClustering();
 //    for (long i=m.start; i <= m.end; i++) {
 //      ResultSet resultSet = m.cassandraDao.getClusters();
 //      Iterator<Row> iterator = resultSet.iterator();

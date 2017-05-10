@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 
-public class CosineSimilarity implements Serializable {
+public class CosineSimilarityClustering implements Serializable {
 
     /**
      * Method to calculate cosine similarity between two documents.

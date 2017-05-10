@@ -39,7 +39,7 @@ start storm::
     ./storm ui
 
 submit jar:
-    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/storm-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar eventDetector.topologies.EventDetectionWithCassandraTopology
+    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/storm-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar eventDetector.topologies.EventDetectionClustering
 
 
 

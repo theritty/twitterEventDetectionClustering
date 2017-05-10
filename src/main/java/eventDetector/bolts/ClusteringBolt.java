@@ -2,8 +2,8 @@ package eventDetector.bolts;
 
 import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.Row;
-import eventDetector.algorithms.CosineSimilarity;
-import eventDetector.drawing.ExcelWriter;
+import eventDetector.algorithms.CosineSimilarityClustering;
+import eventDetector.drawing.ExcelWriterClustering;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -25,7 +25,7 @@ public class ClusteringBolt extends BaseRichBolt {
     private Date startDate = new Date();
     private String country ;
     private HashMap<Long, Long> counts = new HashMap<>();
-    private CosineSimilarity cosineSimilarity = new CosineSimilarity();
+    private CosineSimilarityClustering cosineSimilarityClustering = new CosineSimilarityClustering();
     private ArrayList<HashMap<String, Double>> clusters = new ArrayList<>();
 
     private double cosine=0;
@@ -125,7 +125,7 @@ public class ClusteringBolt extends BaseRichBolt {
                         HashMap<String, Double> clustermap = clusters.get(i);
                         if (clustermap == null) continue;
 
-                        double similarity = cosineSimilarity.cosineSimilarityFromMap(clustermap, tweetmap, magnitude2);
+                        double similarity = cosineSimilarityClustering.cosineSimilarityFromMap(clustermap, tweetmap, magnitude2);
                         if(maxSim<similarity) maxSim=similarity;
                         if (similarity > 0.5) {
                             similarclusterfound = true;
@@ -142,7 +142,7 @@ public class ClusteringBolt extends BaseRichBolt {
             }
         lastDate = new Date();
 
-        ExcelWriter.putData(componentId,nowDate,lastDate, round,cassandraDao);
+        ExcelWriterClustering.putData(componentId,nowDate,lastDate, round,cassandraDao);
         collector.ack(tuple);
 
     }

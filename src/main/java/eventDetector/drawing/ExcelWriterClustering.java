@@ -19,12 +19,12 @@ import java.util.*;
  * @author www.codejava.net
  *
  */
-public class ExcelWriter {
+public class ExcelWriterClustering {
 
     private static int[][] times;
     private static Date startTime = new Date();
     private static long startRound = 0;
-    private static String fileNum="12345xx000000000000000";
+    private static String fileNum="clusteringtest2";
     private static int lastInd ;
     private static int rowNum = 300000;
     private static int columnNum = 250;
