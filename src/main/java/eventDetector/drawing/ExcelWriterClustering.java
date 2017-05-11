@@ -24,9 +24,9 @@ public class ExcelWriterClustering {
     private static int[][] times;
     private static Date startTime = new Date();
     private static long startRound = 0;
-    private static String fileNum="clusteringtest2";
+    private static String fileNum="clusteringCassResults";
     private static int lastInd ;
-    private static int rowNum = 300000;
+    private static int rowNum = 3000000;
     private static int columnNum = 250;
     private static int numOfBolts = 25;
     private static int createChart = 0;

@@ -40,6 +40,7 @@ start storm::
 
 submit jar:
     ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/storm-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar eventDetector.topologies.EventDetectionClustering
+    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/storm-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar eventDetector.topologies.EventDetectionKeyBased
 
 
 
@@ -98,6 +99,7 @@ CREATE TABLE tweetcollection.events5 (
 
 TRUNCATE eventcluster_daily ;TRUNCATE events_daily ;TRUNCATE cluster_daily ;TRUNCATE clusterinfo_daily ;TRUNCATE clusterandtweet_daily ;TRUNCATE processedtweets ;TRUNCATE processtimes ;
 TRUNCATE eventcluster4 ;TRUNCATE events4 ;TRUNCATE cluster4 ;TRUNCATE clusterinfo4 ;TRUNCATE clusterandtweet4 ;TRUNCATE processedtweets4 ;TRUNCATE processtimes4 ;
+TRUNCATE eventcluster3 ;TRUNCATE events3 ;TRUNCATE cluster3 ;TRUNCATE clusterinfo3 ;TRUNCATE clusterandtweet3 ;TRUNCATE processedtweets3 ;TRUNCATE processtimes3 ;
 
 
 INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 15, 0, 'bolu abant picnic', 1);
