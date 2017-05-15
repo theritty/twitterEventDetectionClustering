@@ -24,7 +24,7 @@ public class ExcelWriterClustering {
     private static int[][] times;
     private static Date startTime = new Date();
     private static long startRound = 0;
-    private static String fileNum="clusteringCassResults";
+    private static String fileNum="clusteringMergeResults";
     private static int lastInd ;
     private static int rowNum = 3000000;
     private static int columnNum = 250;
@@ -129,7 +129,7 @@ public class ExcelWriterClustering {
             }
         }
         System.out.println("here 2");
-        try (FileOutputStream outputStream = new FileOutputStream(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + "timechart-processtimes4.xlsx")) {
+        try (FileOutputStream outputStream = new FileOutputStream(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + "timechart.xlsx")) {
             workbook.write(outputStream);
         }
         workbook.close();
@@ -145,15 +145,14 @@ public class ExcelWriterClustering {
         TopologyHelper topologyHelper = new TopologyHelper();
         Properties properties = topologyHelper.loadProperties( "config.properties" );
 
-        String TWEETS_TABLE = properties.getProperty("tweets.table");
-        String EVENTS_TABLE = properties.getProperty("events.table");
-        String EVENTS_WORDBASED_TABLE = properties.getProperty("events_wordbased.table");
-        String CLUSTER_TABLE = properties.getProperty("clusters.table");
-        String CLUSTERINFO_TABLE = properties.getProperty("clusterinfo.table");
-        String CLUSTERANDTWEET_TABLE = properties.getProperty("clusterandtweets.table");
-        String PROCESSEDTWEET_TABLE = properties.getProperty("processed_tweets.table");
-        String PROCESSTIMES_TABLE = properties.getProperty("processtimes.table");
-        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERINFO_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+        String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
+        String EVENTS_TABLE = properties.getProperty("clustering.events.table");
+        String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
+        String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
+        String CLUSTERANDTWEET_TABLE = properties.getProperty("clustering.clusterandtweets.table");
+        String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
+        String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
 
         createChart = 1;
         createTimeChart(cassandraDao);

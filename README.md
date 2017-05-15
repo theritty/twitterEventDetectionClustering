@@ -39,12 +39,13 @@ start storm::
     ./storm ui
 
 submit jar:
-    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/storm-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar eventDetector.topologies.EventDetectionClustering
-    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/storm-twitter-1.0-SNAPSHOT-jar-with-dependencies.jar eventDetector.topologies.EventDetectionKeyBased
+    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar eventDetector.topologies.EventDetectionClustering
+    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar eventDetector.topologies.EventDetectionKeyBased
+    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar eventDetector.topologies.EventDetectionKeyBasedWithSleep
 
 
 
-CREATE TABLE tweetcollection.cluster5 (
+CREATE TABLE tweetcollection.clusterForExperiment (
     id timeuuid,
     cosinevector map<text, double>,
     prevnumtweets int,
@@ -54,7 +55,7 @@ CREATE TABLE tweetcollection.cluster5 (
     PRIMARY KEY (country, id)
 );
 
-CREATE TABLE tweetcollection.processtimes5 (
+CREATE TABLE tweetcollection.processtimesForExperiment (
     row int,
     column int,
     id int,
@@ -62,13 +63,13 @@ CREATE TABLE tweetcollection.processtimes5 (
 );
 
 
-CREATE TABLE tweetcollection.clusterandtweet5 (
+CREATE TABLE tweetcollection.clusterandtweetForExperiment (
     clusterid timeuuid,
     tweetid bigint,
     PRIMARY KEY (clusterid, tweetid)
 );
 
-CREATE TABLE tweetcollection.eventcluster5 (
+CREATE TABLE tweetcollection.eventclusterForExperiment (
     round bigint,
     clusterid timeuuid,
     country text,
@@ -78,7 +79,7 @@ CREATE TABLE tweetcollection.eventcluster5 (
     PRIMARY KEY (round, clusterid)
 );
 
-CREATE TABLE tweetcollection.processedtweets5 (
+CREATE TABLE tweetcollection.processedtweetsForExperiment (
     round bigint,
     boltid int,
     boltprocessed bigint,
@@ -89,7 +90,7 @@ CREATE TABLE tweetcollection.processedtweets5 (
 );
 
 
-CREATE TABLE tweetcollection.events5 (
+CREATE TABLE tweetcollection.eventsForExperiment (
     round bigint,
     country text,
     word text,
@@ -97,9 +98,45 @@ CREATE TABLE tweetcollection.events5 (
     PRIMARY KEY (round, country, word)
 );
 
-TRUNCATE eventcluster_daily ;TRUNCATE events_daily ;TRUNCATE cluster_daily ;TRUNCATE clusterinfo_daily ;TRUNCATE clusterandtweet_daily ;TRUNCATE processedtweets ;TRUNCATE processtimes ;
-TRUNCATE eventcluster4 ;TRUNCATE events4 ;TRUNCATE cluster4 ;TRUNCATE clusterinfo4 ;TRUNCATE clusterandtweet4 ;TRUNCATE processedtweets4 ;TRUNCATE processtimes4 ;
-TRUNCATE eventcluster3 ;TRUNCATE events3 ;TRUNCATE cluster3 ;TRUNCATE clusterinfo3 ;TRUNCATE clusterandtweet3 ;TRUNCATE processedtweets3 ;TRUNCATE processtimes3 ;
+
+
+
+TRUNCATE eventcluster_daily ;TRUNCATE events_daily ;TRUNCATE cluster_daily ;TRUNCATE clusterandtweet_daily ;TRUNCATE processedtweets ;TRUNCATE processtimes ;
+TRUNCATE eventcluster4 ;TRUNCATE events4 ;TRUNCATE cluster4 ;TRUNCATE clusterandtweet4 ;TRUNCATE processedtweets4 ;TRUNCATE processtimes4 ;
+TRUNCATE eventcluster3 ;TRUNCATE events3 ;TRUNCATE cluster3 ;TRUNCATE clusterandtweet3 ;TRUNCATE processedtweets3 ;TRUNCATE processtimes3 ;
+TRUNCATE eventcluster ;TRUNCATE events ;TRUNCATE cluster ;TRUNCATE clusterandtweet ;TRUNCATE processedtweets ;TRUNCATE processtimes ;
+
+
+
+
+
+CREATE TABLE tweetcollection.countsForExperimentSleep  (
+    round bigint,
+    word text,
+    country text,
+    count bigint,
+    totalnumofwords bigint,
+    PRIMARY KEY (round, word, country)
+);
+
+
+CREATE TABLE tweetcollection.eventsForExperimentSleep  (
+    round bigint,
+    country text,
+    word text,
+    incrementpercent double,
+    PRIMARY KEY (round, country, word)
+);
+
+
+CREATE TABLE tweetcollection.processedForExperimentSleep  (
+    round bigint,
+    boltid int,
+    finished boolean,
+    PRIMARY KEY (round, boltid)
+);
+
+
 
 
 INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 15, 0, 'bolu abant picnic', 1);

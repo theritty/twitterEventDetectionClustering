@@ -44,7 +44,7 @@ public class ExcelWriterKeyBased {
     public static void putData(int id, Date boltStartTime, Date boltEndTime, long round) {
 
         long timeStart = (boltStartTime.getTime()-startTime.getTime())/1000;
-        long duration = (boltEndTime.getTime()-boltStartTime.getTime())/1000;
+        long duration = ((boltEndTime.getTime()-boltStartTime.getTime())/1000)+1;
 
         while (duration-->0)
             times[(int) timeStart++][id + parallelismNum * ((int) ((round - startRound)/2) % 10) ] = id;

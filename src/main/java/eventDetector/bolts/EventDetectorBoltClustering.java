@@ -190,12 +190,12 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                         while(it.hasNext()) {
                             Map.Entry<String, Double> entry = it.next();
                             double value = entry.getValue();
-                            if(value < 0.06) {
+                            if(value < 0.01) {
                                 it.remove();
                             }
                         }
 
-                        if( ((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > 0.5) && (cNew.currentnumtweets + cNew.prevnumtweets > 100) ) {
+                        if( ((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > 0.5) ) {
                             System.out.println("updated event again: " + cNew.id);
                             List<Object> values_event = new ArrayList<>();
                             values_event.add(round);

@@ -83,10 +83,9 @@ public class CassandraDao implements Serializable
     private String clusterandtweetTable;
     private String processedTweetsTable;
 
-    public CassandraDao(String tweetsTable, String clusterTable, String clusterinfoTable, String clusterandtweetTable, String eventTable, String eventWordBasedTable, String processedTweetsTable, String processTimesTable) throws Exception {
+    public CassandraDao(String tweetsTable, String clusterTable, String clusterandtweetTable, String eventTable, String eventWordBasedTable, String processedTweetsTable, String processTimesTable) throws Exception {
         this.tweetsTable = tweetsTable;
         this.clusterTable = clusterTable;
-//        this.clusterinfoTable = clusterinfoTable;
         this.clusterandtweetTable = clusterandtweetTable;
         this.eventTable = eventTable;
         this.eventWordBasedTable = eventWordBasedTable;
