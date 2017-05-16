@@ -3,6 +3,7 @@ package topologyBuilder;
 import cassandraConnector.CassandraDao;
 import cassandraConnector.CassandraDaoKeyBased;
 import eventDetector.bolts.*;
+import eventDetector.drawing.ExcelWriterClustering;
 import eventDetector.spout.CassandraSpoutClustering;
 import eventDetector.spout.CassandraSpoutKeyBased;
 import eventDetector.spout.CassandraSpoutKeyBasedWithSleep;
@@ -23,6 +24,7 @@ public class BoltBuilder {
         String COUNTS_TABLE = properties.getProperty("keybasedsleep.counts.table");
         String EVENTS_TABLE = properties.getProperty("keybasedsleep.events.table");
         String PROCESSED_TABLE = properties.getProperty("keybasedsleep.processed.table");
+        String PROCESSTIMES_TABLE = properties.getProperty("keybasedsleep.processtimes.table");
 
         int CAN_TASK_NUM= Integer.parseInt(properties.getProperty("keybasedsleep.can.taskNum"));
         int USA_TASK_NUM= Integer.parseInt(properties.getProperty("keybasedsleep.usa.taskNum"));
@@ -38,11 +40,12 @@ public class BoltBuilder {
         System.out.println("Preparing Bolts...");
         TopologyBuilder builder = new TopologyBuilder();
 
-        CassandraDaoKeyBased cassandraDao = new CassandraDaoKeyBased(TWEETS_TABLE, COUNTS_TABLE, EVENTS_TABLE, PROCESSED_TABLE);
+
+        CassandraDaoKeyBased cassandraDao = new CassandraDaoKeyBased(TWEETS_TABLE, COUNTS_TABLE, EVENTS_TABLE, PROCESSED_TABLE, PROCESSTIMES_TABLE);
         CassandraSpoutKeyBasedWithSleep cassandraSpout = new CassandraSpoutKeyBasedWithSleep(cassandraDao,
-                Integer.parseInt(properties.getProperty("keybasedsleep.compare.size")), FILENUM);
-        WordCountBoltKeyBasedWithSleep countBoltCAN = new WordCountBoltKeyBasedWithSleep(COUNT_THRESHOLD, FILENUM);
-        WordCountBoltKeyBasedWithSleep countBoltUSA = new WordCountBoltKeyBasedWithSleep(COUNT_THRESHOLD, FILENUM);
+                Integer.parseInt(properties.getProperty("keybasedsleep.compare.size")), FILENUM,CAN_TASK_NUM+USA_TASK_NUM+NUM_DETECTORS*2+2);
+        WordCountBoltKeyBasedWithSleep countBoltCAN = new WordCountBoltKeyBasedWithSleep(COUNT_THRESHOLD, FILENUM, cassandraDao);
+        WordCountBoltKeyBasedWithSleep countBoltUSA = new WordCountBoltKeyBasedWithSleep(COUNT_THRESHOLD, FILENUM, cassandraDao);
         EventDetectorWithCassandraBoltKeyBasedWithSleep eventDetectorBolt1 = new EventDetectorWithCassandraBoltKeyBasedWithSleep(cassandraDao,
                 Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE);
         EventDetectorWithCassandraBoltKeyBasedWithSleep eventDetectorBolt2 = new EventDetectorWithCassandraBoltKeyBasedWithSleep(cassandraDao,
@@ -78,6 +81,7 @@ public class BoltBuilder {
         String COUNTS_TABLE = properties.getProperty("keybased.counts.table");
         String EVENTS_TABLE = properties.getProperty("keybased.events.table");
         String PROCESSED_TABLE = properties.getProperty("keybased.processed.table");
+        String PROCESSTIMES_TABLE = properties.getProperty("keybased.processtimes.table");
 
         int CAN_TASK_NUM= Integer.parseInt(properties.getProperty("keybased.can.taskNum"));
         int USA_TASK_NUM= Integer.parseInt(properties.getProperty("keybased.usa.taskNum"));
@@ -94,14 +98,14 @@ public class BoltBuilder {
         System.out.println("Preparing Bolts...");
         TopologyBuilder builder = new TopologyBuilder();
 
-        CassandraDaoKeyBased cassandraDao = new CassandraDaoKeyBased(TWEETS_TABLE, COUNTS_TABLE, EVENTS_TABLE, PROCESSED_TABLE);
-        CassandraSpoutKeyBased cassandraSpout = new CassandraSpoutKeyBased(cassandraDao, FILENUM, USA_TASK_NUM, CAN_TASK_NUM, NUM_WORKERS, NUM_DETECTORS*NUM_COUNTRIES);
+        CassandraDaoKeyBased cassandraDao = new CassandraDaoKeyBased(TWEETS_TABLE, COUNTS_TABLE, EVENTS_TABLE, PROCESSED_TABLE, PROCESSTIMES_TABLE);
+        CassandraSpoutKeyBased cassandraSpout = new CassandraSpoutKeyBased(cassandraDao, FILENUM, USA_TASK_NUM, CAN_TASK_NUM, NUM_WORKERS, NUM_DETECTORS*NUM_COUNTRIES,CAN_TASK_NUM+USA_TASK_NUM+NUM_DETECTORS*2+2);
         WordCountBoltKeyBased countBoltUSA = new WordCountBoltKeyBased(COUNT_THRESHOLD, FILENUM, "USA", cassandraDao, NUM_DETECTORS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+3);
         WordCountBoltKeyBased countBoltCAN = new WordCountBoltKeyBased(COUNT_THRESHOLD, FILENUM, "CAN", cassandraDao, NUM_DETECTORS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+3+NUM_DETECTORS);
         EventDetectorWithCassandraBoltKeyBased eventDetectorBoltUSA = new EventDetectorWithCassandraBoltKeyBased(cassandraDao,
-                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("keybased.compare.size")), "USA");
+                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("keybased.compare.size")), "USA",USA_TASK_NUM);
         EventDetectorWithCassandraBoltKeyBased eventDetectorBoltCAN = new EventDetectorWithCassandraBoltKeyBased(cassandraDao,
-                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("keybased.compare.size")), "CAN");
+                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("keybased.compare.size")), "CAN",CAN_TASK_NUM);
 
         EventCompareBoltKeyBased eventCompareBolt = new EventCompareBoltKeyBased(cassandraDao, FILENUM);
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpout,1);
@@ -146,7 +150,7 @@ public class BoltBuilder {
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + FILENUM + "/" + "sout.txt", "Preparing Bolts...");
         TopologyBuilder builder = new TopologyBuilder();
 
-        CassandraSpoutClustering cassandraSpoutClustering = new CassandraSpoutClustering(cassandraDao, FILENUM, START_ROUND, END_ROUND, CAN_TASK_NUM, USA_TASK_NUM, NUM_WORKERS);
+        CassandraSpoutClustering cassandraSpoutClustering = new CassandraSpoutClustering(cassandraDao, FILENUM, START_ROUND, END_ROUND, CAN_TASK_NUM, USA_TASK_NUM, NUM_WORKERS,CAN_TASK_NUM+USA_TASK_NUM+3);
 
         ClusteringBolt countBoltCAN = new ClusteringBolt( FILENUM, cassandraDao, "CAN");
         ClusteringBolt countBoltUSA = new ClusteringBolt( FILENUM, cassandraDao, "USA");

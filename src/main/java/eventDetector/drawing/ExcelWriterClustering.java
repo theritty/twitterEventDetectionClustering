@@ -1,6 +1,7 @@
 package eventDetector.drawing;
 
 import cassandraConnector.CassandraDao;
+import cassandraConnector.CassandraDaoKeyBased;
 import com.datastax.driver.core.ResultSet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,12 +25,16 @@ public class ExcelWriterClustering {
     private static int[][] times;
     private static Date startTime = new Date();
     private static long startRound = 0;
-    private static String fileNum="clusteringMergeResults";
+    private static String fileNum="clusteringWeekData";
     private static int lastInd ;
     private static int rowNum = 3000000;
     private static int columnNum = 250;
     private static int numOfBolts = 25;
     private static int createChart = 0;
+
+    public static void setNumOfBolts(int numOfBoltsX){
+        numOfBolts = numOfBoltsX;
+    }
 
     public static void putStartDate(Date date, String filenum, long round) {
         startTime = date;
@@ -45,9 +50,35 @@ public class ExcelWriterClustering {
         if(duration==0) duration = 1;
 
         while (duration-->0) {
+            int col = (id + numOfBolts * ((int) ((round - startRound)) % 10));
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "HEEEEEEELPXXXXXXXX : " + timeStart + " " + col + " " + id);
             List<Object> values = new ArrayList<>();
             values.add((int) timeStart++);
-            values.add(id + numOfBolts * ((int) ((round - startRound)) % 10));
+            values.add(col);
+            values.add(id);
+            try {
+                cassandraDao.insertIntoProcessTimes(values.toArray());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void putData(int id, Date boltStartTime, Date boltEndTime, long round, CassandraDaoKeyBased cassandraDao) {
+
+        long timeStart = (boltStartTime.getTime()-startTime.getTime())/1000;
+        long duration = (boltEndTime.getTime()-boltStartTime.getTime())/1000;
+
+        if(duration==0) duration = 1;
+
+        while (duration-->0) {
+            int col = (id + numOfBolts * ((int) ((round - startRound)) % 10));
+            int row = (int) timeStart++;
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "HEEEEEEELP : " + row + " " + col + " " + id);
+            List<Object> values = new ArrayList<>();
+            if(row < 0 ) TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "vadaaaa");
+            values.add(row);
+            values.add(col);
             values.add(id);
             try {
                 cassandraDao.insertIntoProcessTimes(values.toArray());

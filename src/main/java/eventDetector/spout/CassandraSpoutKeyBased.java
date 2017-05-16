@@ -1,7 +1,7 @@
 package eventDetector.spout;
 
 import cassandraConnector.CassandraDaoKeyBased;
-import eventDetector.drawing.ExcelWriterKeyBased;
+import eventDetector.drawing.ExcelWriterClustering;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -39,13 +39,15 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
     private int USATask = 0;
     private int CANTask = 0;
 
+    private int numOfBolts;
+
     private boolean chartCreated= false;
 
     private HashMap<String, Integer> USAwordMap = new HashMap<>();
     private HashMap<String, Integer> CANwordMap = new HashMap<>();
 
 
-    public CassandraSpoutKeyBased(CassandraDaoKeyBased cassandraDao, String filenum, int USATaskNumber, int CANTaskNumber, int numWorkers, int numDetectors) throws Exception {
+    public CassandraSpoutKeyBased(CassandraDaoKeyBased cassandraDao, String filenum, int USATaskNumber, int CANTaskNumber, int numWorkers, int numDetectors, int numOfBolts) throws Exception {
         this.cassandraDao = cassandraDao;
         this.roundlist = new ArrayList<>();
         this.fileNum = filenum + "/";
@@ -53,6 +55,8 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
         this.CANTaskNumber = CANTaskNumber;
         this.numWorkers = numWorkers;
         this.numDetectors = numDetectors;
+        this.current_round=0;
+        this.numOfBolts = numOfBolts;
 
     }
     @Override
@@ -74,6 +78,7 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
          * we will wait and then return
          */
 
+        Date nowDate = new Date();
         if(iterator == null || !iterator.hasNext())
         {
             if(roundlist.size()==0)
@@ -104,6 +109,7 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " Cass wake up " + current_round);
         }
         lastDate = new Date();
+        ExcelWriterClustering.putData(componentId,nowDate,lastDate, current_round, cassandraDao);
     }
 
 
@@ -114,19 +120,18 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
             System.out.println("sleeeeeeeep");
             Thread.sleep(120000);
             if(!chartCreated) {
-                ExcelWriterKeyBased.createTimeChart();
+//                ExcelWriterClustering.createTimeChart(cassandraDao);
                 chartCreated = true;
             }
         }
         catch (InterruptedException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
     private void streamNewRound( ) {
-        ExcelWriterKeyBased.putData(componentId,startDate,lastDate, current_round);
+        if(current_round!=0)
+            ExcelWriterClustering.putData(componentId,startDate,lastDate, current_round, cassandraDao);
 
         current_round = roundlist.remove(0);
         TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + current_round + ".txt",
@@ -155,8 +160,10 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
 
     private void sendBlockEndInfoAndWait() {
         System.out.println("Sending blockend for " + current_round);
-        for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+2+numWorkers;k++)
+        for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+2+numWorkers;k++) {
+            System.out.println("blockend for " + k + " round " + current_round);
             collector.emitDirect(k, new Values("BLOCKEND", current_round, true));
+        }
 
         TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + current_round + ".txt",
                 new Date() + ": Round end from cass spout =>" + current_round );
@@ -276,7 +283,8 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
         this.componentId = context.getThisTaskId()-1;
         System.out.println("cass: " + componentId);
         this.startRound = roundlist.get(0);
-        ExcelWriterKeyBased.putStartDate(new Date(), fileNum, this.startRound);
+        ExcelWriterClustering.setNumOfBolts(numOfBolts);
+        ExcelWriterClustering.putStartDate(new Date(), fileNum, this.startRound);
     }
 
     /**

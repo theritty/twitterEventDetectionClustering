@@ -1,7 +1,7 @@
 package eventDetector.spout;
 
 import cassandraConnector.CassandraDaoKeyBased;
-import eventDetector.drawing.ExcelWriterKeyBased;
+import eventDetector.drawing.ExcelWriterClustering;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -34,14 +34,17 @@ public class CassandraSpoutKeyBasedWithSleep extends BaseRichSpout {
     private long startRound = 0;
     private boolean sent=false;
 
+    private int numOfBolts;
 
 
-    public CassandraSpoutKeyBasedWithSleep(CassandraDaoKeyBased cassandraDao, int compareSize, String filenum) throws Exception {
+
+    public CassandraSpoutKeyBasedWithSleep(CassandraDaoKeyBased cassandraDao, int compareSize, String filenum, int numOfBolts) throws Exception {
         this.cassandraDao = cassandraDao;
         this.compareSize = compareSize;
         roundlist = new ArrayList<>();
         readRoundlist = new ArrayList<>();
         this.fileNum = filenum + "/";
+        this.numOfBolts = numOfBolts;
     }
     @Override
     public void ack(Object msgId) {}
@@ -62,6 +65,7 @@ public class CassandraSpoutKeyBasedWithSleep extends BaseRichSpout {
          * we will wait and then return
          */
 
+        Date nowDate = new Date();
         if(iterator == null || !iterator.hasNext())
         {
             if(roundlist.size()==0)
@@ -102,7 +106,7 @@ public class CassandraSpoutKeyBasedWithSleep extends BaseRichSpout {
                     TopologyHelper.writeToFile(Constants.WORKHISTORY_FILE + fileNum+ "workhistory.txt", new Date() + " Cass sleeping " + current_round);
                     Thread.sleep(10000);
                     TopologyHelper.writeToFile(Constants.WORKHISTORY_FILE + fileNum+ "workhistory.txt", new Date() + " Cass wake up " + current_round);
-                    ExcelWriterKeyBased.putData(componentId,startDate,lastDate, current_round);
+                    ExcelWriterClustering.putData(componentId,startDate,lastDate, current_round, cassandraDao);
                 }
                 else start = false;
             }
@@ -134,6 +138,7 @@ public class CassandraSpoutKeyBasedWithSleep extends BaseRichSpout {
 
         }
         lastDate = new Date();
+        ExcelWriterClustering.putData(componentId,nowDate,lastDate, current_round, cassandraDao);
     }
 
     public void splitAndEmit(String tweetSentence, long round, ArrayList<Long> roundlist, String country) {
@@ -201,7 +206,8 @@ public class CassandraSpoutKeyBasedWithSleep extends BaseRichSpout {
         this.componentId = context.getThisTaskId()-1;
         System.out.println("cass: " + componentId);
         this.startRound = roundlist.get(0);
-        ExcelWriterKeyBased.putStartDate(new Date(), fileNum, this.startRound);
+        ExcelWriterClustering.setNumOfBolts(numOfBolts);
+        ExcelWriterClustering.putStartDate(new Date(), fileNum, this.startRound);
     }
 
     /**

@@ -1,5 +1,7 @@
 package eventDetector.bolts;
 
+import cassandraConnector.CassandraDao;
+import cassandraConnector.CassandraDaoKeyBased;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -7,7 +9,7 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import eventDetector.drawing.ExcelWriterKeyBased;
+import eventDetector.drawing.ExcelWriterClustering;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -27,12 +29,14 @@ public class WordCountBoltKeyBasedWithSleep extends BaseRichBolt {
     private String fileNum;
     private Date lastDate = new Date();
     private Date startDate = new Date();
+    private CassandraDaoKeyBased cassandraDao;
 
 
-    public WordCountBoltKeyBasedWithSleep(int threshold, String filenum)
+    public WordCountBoltKeyBasedWithSleep(int threshold, String filenum, CassandraDaoKeyBased cassandraDao)
     {
         this.threshold = threshold;
         this.fileNum = filenum + "/";
+        this.cassandraDao = cassandraDao;
     }
     @Override
     public void prepare(Map config, TopologyContext context,
@@ -61,8 +65,8 @@ public class WordCountBoltKeyBasedWithSleep extends BaseRichBolt {
             if(diff==0.0) diff=1.0;
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
                     "Word count "+ componentId + " time taken for round" + currentRound + " is " + diff );
-            if ( currentRound!=0)
-                ExcelWriterKeyBased.putData(componentId,startDate,lastDate, currentRound);
+//            if ( currentRound!=0)
+//                ExcelWriterClustering.putData(componentId,startDate,lastDate, currentRound, cassandraDao);
 
             startDate = new Date();
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
@@ -78,6 +82,7 @@ public class WordCountBoltKeyBasedWithSleep extends BaseRichBolt {
                         "Word count ignored count " + componentId + ": " + ignoredCount );
             return;
         }
+        Date nowDate = new Date();
         Long count = countsForRounds.get(word);
 
         if (count == null) count = 1L;
@@ -89,6 +94,7 @@ public class WordCountBoltKeyBasedWithSleep extends BaseRichBolt {
             this.collector.emit(new Values(word, round, false, tuple.getValueByField("dates"), tuple.getSourceStreamId()));
         }
         lastDate = new Date();
+        ExcelWriterClustering.putData(componentId,nowDate,lastDate, currentRound, cassandraDao);
 
     }
 

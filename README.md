@@ -79,6 +79,7 @@ CREATE TABLE tweetcollection.eventclusterForExperiment (
     PRIMARY KEY (round, clusterid)
 );
 
+
 CREATE TABLE tweetcollection.processedtweetsForExperiment (
     round bigint,
     boltid int,
@@ -100,11 +101,27 @@ CREATE TABLE tweetcollection.eventsForExperiment (
 
 
 
+CREATE TABLE tweetcollection.processtimesKeyBasedForExperimentSleep (
+    row int,
+    column int,
+    id int,
+    PRIMARY KEY (row, column)
+);
+
+CREATE TABLE tweetcollection.processtimesKeyBasedForExperiment (
+    row int,
+    column int,
+    id int,
+    PRIMARY KEY (row, column)
+);
 
 TRUNCATE eventcluster_daily ;TRUNCATE events_daily ;TRUNCATE cluster_daily ;TRUNCATE clusterandtweet_daily ;TRUNCATE processedtweets ;TRUNCATE processtimes ;
 TRUNCATE eventcluster4 ;TRUNCATE events4 ;TRUNCATE cluster4 ;TRUNCATE clusterandtweet4 ;TRUNCATE processedtweets4 ;TRUNCATE processtimes4 ;
 TRUNCATE eventcluster3 ;TRUNCATE events3 ;TRUNCATE cluster3 ;TRUNCATE clusterandtweet3 ;TRUNCATE processedtweets3 ;TRUNCATE processtimes3 ;
 TRUNCATE eventcluster ;TRUNCATE events ;TRUNCATE cluster ;TRUNCATE clusterandtweet ;TRUNCATE processedtweets ;TRUNCATE processtimes ;
+TRUNCATE eventclusterForExperiment ;TRUNCATE clusterForExperiment ;TRUNCATE clusterandtweetForExperiment ;TRUNCATE processedtweetsForExperiment ;TRUNCATE processtimesForExperiment ;
+TRUNCATE countsForExperiment ;TRUNCATE eventsForExperiment ;TRUNCATE processedForExperiment ; TRUNCATE processtimesKeyBasedForExperiment;
+TRUNCATE countsForExperimentSleep ;TRUNCATE eventsForExperimentSleep ;TRUNCATE processedForExperimentSleep ; TRUNCATE processtimesKeyBasedForExperimentSleep;
 
 
 

@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 public class MatchEventsKeyBased {
     public static HashMap<String,ArrayList<Integer>> prepareEventVectors(ArrayList<String> events, long round) throws Exception {
-        CassandraDaoKeyBased cassandraDao = new CassandraDaoKeyBased("tweets", "counts8", "events8", "processed");
+        CassandraDaoKeyBased cassandraDao = new CassandraDaoKeyBased("tweets", "counts8", "events8", "processed", "processtimes");
         HashMap<String,ArrayList<Integer>> eventGroups = new HashMap<>();
 
         for(String event:events) {

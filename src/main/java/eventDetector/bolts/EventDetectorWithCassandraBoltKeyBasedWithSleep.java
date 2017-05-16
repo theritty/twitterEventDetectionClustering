@@ -10,7 +10,7 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import eventDetector.algorithms.TFIDFCalculatorWithCassandraKeyBased;
 import cassandraConnector.CassandraDao;
-import eventDetector.drawing.ExcelWriterKeyBased;
+import eventDetector.drawing.ExcelWriterClustering;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -70,8 +70,8 @@ import java.util.*;
                 if(diff==0.0) diff=1.0;
                 TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
                         "Word count "+ componentId + " time taken for round" + currentRound + " is " + diff);
-                if ( currentRound!=0)
-                    ExcelWriterKeyBased.putData(componentId,startDate,lastDate, currentRound);
+//                if ( currentRound!=0)
+//                    ExcelWriterClustering.putData(componentId,startDate,lastDate, currentRound, cassandraDao);
 
                 startDate = new Date();
                 TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
@@ -98,6 +98,8 @@ import java.util.*;
                         "---------------------------------------------------------------------------------");
                 return;
             }
+
+            Date nowDate = new Date();
 
             for (long roundNum: rounds)
             {
@@ -137,6 +139,7 @@ import java.util.*;
                         "Key: " + key );
             }
             lastDate = new Date();
+            ExcelWriterClustering.putData(componentId,nowDate,lastDate, currentRound, cassandraDao);
 
         }
 

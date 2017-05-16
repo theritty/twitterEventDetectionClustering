@@ -46,8 +46,10 @@ public class CassandraSpoutClustering extends BaseRichSpout {
     private HashMap<String, Integer> vectorMap;
     private boolean finished = false;
 
+    private int numOfBolts;
 
-    public CassandraSpoutClustering(CassandraDao cassandraDao, String filenum, long start, long end, int canTaskNum, int usaTaskNum, int numWorkers) throws Exception {
+
+    public CassandraSpoutClustering(CassandraDao cassandraDao, String filenum, long start, long end, int canTaskNum, int usaTaskNum, int numWorkers, int numOfBolts) throws Exception {
         this.cassandraDao = cassandraDao;
         roundlist = new ArrayList<>();
         this.fileNum = filenum + "/";
@@ -56,6 +58,7 @@ public class CassandraSpoutClustering extends BaseRichSpout {
         this.CANTaskNumber = canTaskNum;
         this.USATaskNumber = usaTaskNum;
         this.numWorkers = numWorkers;
+        this.numOfBolts = numOfBolts;
     }
     @Override
     public void ack(Object msgId) {
@@ -311,6 +314,7 @@ public class CassandraSpoutClustering extends BaseRichSpout {
         this.collector = collector;
         this.componentId = context.getThisTaskId()-1;
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "cass" + " id: " + componentId);
+        ExcelWriterClustering.setNumOfBolts(numOfBolts);
         ExcelWriterClustering.putStartDate(new Date(), fileNum, this.startRound);
 
         createWordsMap();

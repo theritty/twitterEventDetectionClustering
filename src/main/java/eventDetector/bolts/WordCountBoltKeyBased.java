@@ -1,7 +1,7 @@
 package eventDetector.bolts;
 
 import cassandraConnector.CassandraDaoKeyBased;
-import eventDetector.drawing.ExcelWriterKeyBased;
+import eventDetector.drawing.ExcelWriterClustering;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -18,13 +18,9 @@ public class WordCountBoltKeyBased extends BaseRichBolt {
 
     private OutputCollector collector;
     private HashMap<String, Long> countsForRounds = null;
-    private long currentRound = 0;
     private int threshold;
-    private long ignoredCount = 0;
     private int componentId;
     private String fileNum;
-    private Date lastDate = new Date();
-    private Date startDate = new Date();
     private CassandraDaoKeyBased cassandraDao;
     private int numDetector;
     private int firstDetectorId;
@@ -57,23 +53,15 @@ public class WordCountBoltKeyBased extends BaseRichBolt {
         boolean blockend = tuple.getBooleanByField("blockEnd");
 
         TopologyHelper.writeToFile(Constants.WORKHISTORY_FILE + fileNum+ "workhistory.txt", new Date() + " Word count " + componentId + " working "  + round);
+        Date nowDate = new Date();
         if(blockend)
         {
-            blockEndProcess(round);
+            markComponentAsFinishedInCassaandra(round);
             collector.ack(tuple);
 
             countsForRounds.clear();
             lastRoundEnd = round;
-            currentRound = round;
-
-            return;
-        }
-        else if(round < currentRound) {
-            ignoredCount++;
-            if(ignoredCount%1000==0)
-                TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + "ignoreCount.txt",
-                        "Word count ignored count " + componentId + ": " + ignoredCount );
-            collector.ack(tuple);
+            ExcelWriterClustering.putData(componentId,nowDate,new Date(), round, cassandraDao);
             return;
         }
 
@@ -81,18 +69,18 @@ public class WordCountBoltKeyBased extends BaseRichBolt {
         if (count == null) count = 0L;
         if(count>=threshold) {
             collector.ack(tuple);
+            ExcelWriterClustering.putData(componentId,nowDate,new Date(), round, cassandraDao);
             return;
         }
         else {
             processNewWord(word, ++count, round);
         }
 
-        lastDate = new Date();
         collector.ack(tuple);
+        ExcelWriterClustering.putData(componentId,nowDate,new Date(), round, cassandraDao);
     }
 
-
-    private void blockEndProcess(long round) {
+    private void markComponentAsFinishedInCassaandra(long round) {
         System.out.println("Receive blockend for " + round + ", bolt id " + componentId);
         try {
             List<Object> values = new ArrayList<>();
@@ -103,33 +91,19 @@ public class WordCountBoltKeyBased extends BaseRichBolt {
 
             if(lastRoundEnd<round)
                 for(int i=firstDetectorId;i<firstDetectorId+numDetector;i++)
-                    this.collector.emitDirect(i, new Values("BLOCKEND", round, true));
+                    this.collector.emitDirect(i, new Values("BLOCKEND", round, true, componentId));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
-                "Word count "+ componentId + " end for round " + currentRound + " at " + lastDate);
-
-        double diff = (lastDate.getTime()-startDate.getTime())/1000;
-        if(diff==0.0) diff=1.0;
-        TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
-                "Word count "+ componentId + " time taken for round" + currentRound + " is " + diff );
-        if ( currentRound!=0)
-            ExcelWriterKeyBased.putData(componentId,startDate,lastDate, currentRound);
-
-        startDate = new Date();
-        TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
-                "Word count "+ componentId + " starting for round " + round + " at " + startDate );
-
-
     }
+
 
     private void processNewWord(String word, long count, long round) {
 
         if(count==threshold) {
-            this.collector.emitDirect(detectorTask++, new Values(word, round, false));
+            this.collector.emitDirect(detectorTask++, new Values(word, round, false, componentId));
             if(detectorTask==firstDetectorId+numDetector)
                 detectorTask=firstDetectorId;
         }
@@ -139,7 +113,7 @@ public class WordCountBoltKeyBased extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("key", "round", "blockEnd"));
+        declarer.declare(new Fields("key", "round", "blockEnd", "compId"));
     }
 
 }

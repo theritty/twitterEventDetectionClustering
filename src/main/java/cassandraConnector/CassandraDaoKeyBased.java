@@ -24,7 +24,11 @@ public class CassandraDaoKeyBased implements Serializable
     private transient PreparedStatement statement_processed2Tweets_get;
     private transient PreparedStatement statement_processed2Tweets_getAll;
     private transient PreparedStatement statement_processed2Tweets;
+    private transient PreparedStatement statement_processtimes;
+    private transient PreparedStatement statement_processtimes_get;
 
+    private transient BoundStatement boundStatement_processtimes;
+    private transient BoundStatement boundStatement_processtimes_get;
     private transient BoundStatement boundStatement_processed2Tweets_get;
     private transient BoundStatement boundStatement_processed2Tweets_getAll;
     private transient BoundStatement boundStatement_processed2Tweets;
@@ -48,6 +52,8 @@ public class CassandraDaoKeyBased implements Serializable
     private static String COUNTS_FIELDS = "(round, word, country, count, totalnumofwords)";
     private static String COUNTS_VALUES = "(?, ?, ?, ?, ?)";
 
+    private static String PROCESSTIMES_FIELDS =   "(row,column,id)";
+    private static String PROCESSTIMES_VALUES = "(?, ?, ?)";
 
     private static String PROCESSED2_FIELDS =   "(round, boltid, finished)";
     private static String PROCESSED2_VALUES = "(?, ?, ?)";
@@ -56,18 +62,32 @@ public class CassandraDaoKeyBased implements Serializable
     private String countsTable;
     private String eventsTable;
     private String processed2TweetsTable;
+    private String processTimesTable;
 
-    public CassandraDaoKeyBased(String tweetsTable, String countsTable, String eventsTable, String processed2TweetsTable) throws Exception {
+    public CassandraDaoKeyBased(String tweetsTable, String countsTable, String eventsTable, String processed2TweetsTable, String processTimesTable) throws Exception {
         this.tweetsTable = tweetsTable;
         this.countsTable = countsTable;
         this.eventsTable = eventsTable;
         this.processed2TweetsTable = processed2TweetsTable;
+        this.processTimesTable = processTimesTable;
 
         prepareAll();
     }
 
     private void prepareAll()
     {
+
+
+        if(statement_processtimes_get==null) {
+            statement_processtimes_get = CassandraConnection.connect().prepare(
+                    "SELECT * FROM " + processTimesTable);
+        }
+        if(statement_processtimes==null) {
+            statement_processtimes = CassandraConnection.connect().prepare(
+                    "INSERT INTO " + processTimesTable + " " + PROCESSTIMES_FIELDS
+                            + " VALUES " + PROCESSTIMES_VALUES + ";");
+        }
+
         if(statement_tweets==null) {
             statement_tweets = CassandraConnection.connect().prepare(
                     "INSERT INTO " + tweetsTable + " " + TWEETS_FIELDS
@@ -146,6 +166,22 @@ public class CassandraDaoKeyBased implements Serializable
             boundStatement_processed2Tweets_getAll = new BoundStatement(statement_processed2Tweets_getAll);
         if(boundStatement_processed2Tweets == null)
             boundStatement_processed2Tweets = new BoundStatement(statement_processed2Tweets);
+        if(boundStatement_processtimes_get == null)
+        boundStatement_processtimes_get = new BoundStatement(statement_processtimes_get);
+        if(boundStatement_processtimes == null)
+            boundStatement_processtimes = new BoundStatement(statement_processtimes);
+    }
+    public void insertIntoProcessTimes( Object[] values ) throws Exception
+    {
+        prepareAll();
+        CassandraConnection.connect().executeAsync(boundStatement_processtimes.bind(values));
+    }
+    public ResultSet getProcessTimes(  ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_processtimes_get.bind());
+
+        return resultSet;
     }
     public void insertIntoProcessed( Object[] values ) throws Exception
     {

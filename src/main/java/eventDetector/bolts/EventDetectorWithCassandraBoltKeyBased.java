@@ -2,7 +2,7 @@ package eventDetector.bolts;
 
 import cassandraConnector.CassandraDaoKeyBased;
 import eventDetector.algorithms.TFIDFCalculatorWithCassandraKeyBased;
-import eventDetector.drawing.ExcelWriterKeyBased;
+import eventDetector.drawing.ExcelWriterClustering;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -26,13 +26,14 @@ public class EventDetectorWithCassandraBoltKeyBased extends BaseRichBolt {
     private CassandraDaoKeyBased cassandraDao;
     private int componentId;
     private String fileNum;
-    private Date lastDate = new Date();
-    private Date startDate = new Date();
     private ArrayList<String> words;
     private int compareSize;
+    private int numWordCountBolts;
+    private ArrayList<Integer> numWordCountBoltsForRound;
     private String country;
+    private long finalRound = 0;
 
-    public EventDetectorWithCassandraBoltKeyBased(CassandraDaoKeyBased cassandraDao, String filePath, String fileNum, double tfidfEventRate, int compareSize, String country )
+    public EventDetectorWithCassandraBoltKeyBased(CassandraDaoKeyBased cassandraDao, String filePath, String fileNum, double tfidfEventRate, int compareSize, String country, int numWordCountBolts )
     {
         this.tfidfEventRate = tfidfEventRate;
         this.filePath = filePath + fileNum;
@@ -41,6 +42,8 @@ public class EventDetectorWithCassandraBoltKeyBased extends BaseRichBolt {
         this.words = new ArrayList<>();
         this.compareSize = compareSize;
         this.country = country;
+        this.numWordCountBolts = numWordCountBolts;
+        this.numWordCountBoltsForRound = new ArrayList<>();
     }
 
     @Override
@@ -57,39 +60,40 @@ public class EventDetectorWithCassandraBoltKeyBased extends BaseRichBolt {
         String wrd = tuple.getStringByField("key");
         long round = tuple.getLongByField("round");
         boolean blockend = tuple.getBooleanByField("blockEnd");
+        int comingCompId = tuple.getIntegerByField("compId");
 
+        Date nowDate = new Date();
         if(!blockend) {
             words.add(wrd);
             collector.ack(tuple);
+
+            ExcelWriterClustering.putData(componentId,nowDate,new Date(), round, cassandraDao);
             return;
         }
 
-        TopologyHelper.writeToFile(Constants.WORKHISTORY_FILE + fileNum+ "workhistory.txt", new Date() +  " Detector " + componentId + " working " + round);
+        if(!numWordCountBoltsForRound.contains(comingCompId) && finalRound<round) numWordCountBoltsForRound.add(comingCompId);
+        System.out.println("Detector " + componentId + " num: " + numWordCountBoltsForRound + " " + numWordCountBolts);
+        if(numWordCountBolts == numWordCountBoltsForRound.size()) {
 
-        TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
-                "Detector bolt " + componentId + " end of round " + round + " at " + lastDate);
+            for (String key : words) {
+                isEventCandidate(key, round);
+            }
 
-        double diff = (lastDate.getTime()-startDate.getTime())/1000;
-        if(diff==0.0) diff=1.0;
-        TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
-                "Word count "+ componentId + " time taken for round" + round + " is " + diff);
-        if ( round!=0)
-            ExcelWriterKeyBased.putData(componentId,startDate,lastDate, round);
+            markComponentAsFinishedInCassaandra(round);
+            endOfRoundOperations(round);
 
-        startDate = new Date();
-        TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
-                "Detector bolt " + componentId + " start of round " + round + " at " + new Date());
-
-        for(String key : words) {
-            isEventCandidate(key, round);
+            collector.ack(tuple);
+            words.clear();
+            numWordCountBoltsForRound.clear();
         }
+        ExcelWriterClustering.putData(componentId,nowDate,new Date(), round, cassandraDao);
 
-        markComponentAsFinishedInCassaandra(round);
-        lastDate = new Date();
+    }
 
-        collector.ack(tuple);
-        words.clear();
-
+    private void endOfRoundOperations(long round) {
+        TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
+                "Detector bolt " + componentId + " end of round " + round + " at " + new Date());
+        finalRound = round;
     }
 
     private void markComponentAsFinishedInCassaandra(long round) {

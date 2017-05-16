@@ -2,7 +2,7 @@ package eventDetector.bolts;
 
 import cassandraConnector.CassandraDaoKeyBased;
 import eventDetector.algorithms.CountCalculatorKeyBased;
-import eventDetector.drawing.ExcelWriterKeyBased;
+import eventDetector.drawing.ExcelWriterClustering;
 import eventDetector.drawing.LineChartKeyBased;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -26,9 +26,6 @@ public class EventCompareBoltKeyBased extends BaseRichBolt {
     private CassandraDaoKeyBased cassandraDao;
     private int componentId;
     private String fileNum;
-    private long currentRound = 0;
-    private Date lastDate = new Date();
-    private Date startDate = new Date();
 
     HashMap<Long, ArrayList<HashMap<String, Object>>> wordList;
 
@@ -56,25 +53,8 @@ public class EventCompareBoltKeyBased extends BaseRichBolt {
         long round = tuple.getLongByField("round");
         String country = tuple.getStringByField("country");
 
-
+        Date nowDate = new Date();
         TopologyHelper.writeToFile(Constants.WORKHISTORY_FILE + fileNum+ "workhistory.txt", new Date() + " Compare " + componentId + " working " + round);
-        if(currentRound < round) {
-
-            TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
-                    "Compare bolt " + componentId + " end of round " + currentRound + " at " + lastDate);
-
-            double diff = (lastDate.getTime()-startDate.getTime())/1000;
-            if(diff==0.0) diff=1.0;
-            TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + currentRound + ".txt",
-                    "Word count "+ componentId + " time taken for round" + currentRound + " is " + diff);
-            if ( currentRound!=0)
-                ExcelWriterKeyBased.putData(componentId,startDate,lastDate, currentRound);
-            startDate = new Date();
-            TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
-                    "Compare bolt " + componentId + " start of round " + round + " at " + startDate);
-            currentRound = round;
-        }
-
 
         System.out.println(new Date() + ": Event found => " + key + " at round " + round  + " for " + country + " ");
         if(tfidfs.get(tfidfs.size()-2)==0) tfidfs.set(tfidfs.size()-2, 0.0001);
@@ -86,7 +66,8 @@ public class EventCompareBoltKeyBased extends BaseRichBolt {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        lastDate = new Date();
+
+        ExcelWriterClustering.putData(componentId,nowDate,new Date(), round, cassandraDao);
         collector.ack(tuple);
 
     }
@@ -104,7 +85,6 @@ public class EventCompareBoltKeyBased extends BaseRichBolt {
                 countsList.addValue(row.getLong("count"), "counts", df.format(new Date(new Long(roundPast) * 6*60*1000)));
             }
             else {
-//                countsList.addValue(0L, "counts", df.format(new Date(new Long(roundPast) * 12*60*1000)));
                 CountCalculatorKeyBased c = new CountCalculatorKeyBased();
                 long ct = c.addNewEntryToCassCounts(cassandraDao, roundPast, key, country).get("count");
                 countsList.addValue(ct, "counts", df.format(new Date(new Long(roundPast) * 6 * 60 * 1000)));
