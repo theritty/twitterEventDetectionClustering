@@ -276,11 +276,11 @@ public class CassandraDao implements Serializable
 //        CassandraConnection.connect().executeAsync(boundStatement_clusterinfo.bind(values));
 //    }
 
-    public void insertIntoClusterAndTweets( Object[] values ) throws Exception
-    {
-        prepareAll();
-        CassandraConnection.connect().executeAsync(boundStatement_clusterandtweets.bind(values));
-    }
+//    public void insertIntoClusterAndTweets( Object[] values ) throws Exception
+//    {
+//        prepareAll();
+//        CassandraConnection.connect().executeAsync(boundStatement_clusterandtweets.bind(values));
+//    }
 
     public ResultSet getTweetsByRound( Object... values ) throws Exception
     {

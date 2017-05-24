@@ -39,13 +39,13 @@ start storm::
     ./storm ui
 
 submit jar:
-    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar eventDetector.topologies.EventDetectionClustering
-    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar eventDetector.topologies.EventDetectionKeyBased
-    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar eventDetector.topologies.EventDetectionKeyBasedWithSleep
+    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar topologies.EventDetectionClustering
+    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar topologies.EventDetectionKeyBased
+    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar topologies.EventDetectionKeyBasedWithSleep
+    ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar topologies.EventDetectionHybrid
 
 
-
-CREATE TABLE tweetcollection.clusterForExperiment (
+CREATE TABLE tweetcollection.clustersHybridForExperiment (
     id timeuuid,
     cosinevector map<text, double>,
     prevnumtweets int,
@@ -55,7 +55,7 @@ CREATE TABLE tweetcollection.clusterForExperiment (
     PRIMARY KEY (country, id)
 );
 
-CREATE TABLE tweetcollection.processtimesForExperiment (
+CREATE TABLE tweetcollection.processtimesHybridForExperiment (
     row int,
     column int,
     id int,
@@ -63,13 +63,7 @@ CREATE TABLE tweetcollection.processtimesForExperiment (
 );
 
 
-CREATE TABLE tweetcollection.clusterandtweetForExperiment (
-    clusterid timeuuid,
-    tweetid bigint,
-    PRIMARY KEY (clusterid, tweetid)
-);
-
-CREATE TABLE tweetcollection.eventclusterForExperiment (
+CREATE TABLE tweetcollection.eventsHybridForExperiment (
     round bigint,
     clusterid timeuuid,
     country text,
@@ -77,6 +71,33 @@ CREATE TABLE tweetcollection.eventclusterForExperiment (
     incrementrate double,
     numtweet int,
     PRIMARY KEY (round, clusterid)
+);
+
+
+CREATE TABLE tweetcollection.countsHybridForExperiment  (
+    round bigint,
+    word text,
+    country text,
+    count bigint,
+    totalnumofwords bigint,
+    PRIMARY KEY (round, word, country)
+);
+
+
+CREATE TABLE tweetcollection.processedHybridForExperiment  (
+    round bigint,
+    boltid int,
+    finished boolean,
+    PRIMARY KEY (round, boltid)
+);
+
+
+
+
+CREATE TABLE tweetcollection.clusterandtweetForExperiment (
+    clusterid timeuuid,
+    tweetid bigint,
+    PRIMARY KEY (clusterid, tweetid)
 );
 
 
@@ -127,14 +148,6 @@ TRUNCATE countsForExperimentSleep ;TRUNCATE eventsForExperimentSleep ;TRUNCATE p
 
 
 
-CREATE TABLE tweetcollection.countsForExperimentSleep  (
-    round bigint,
-    word text,
-    country text,
-    count bigint,
-    totalnumofwords bigint,
-    PRIMARY KEY (round, word, country)
-);
 
 
 CREATE TABLE tweetcollection.eventsForExperimentSleep  (

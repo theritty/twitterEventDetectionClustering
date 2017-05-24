@@ -1,0 +1,233 @@
+package eventDetectionHybrid;
+
+import algorithms.*;
+import cassandraConnector.CassandraDaoHybrid;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import drawing.*;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
+import topologyBuilder.Constants;
+import topologyBuilder.TopologyHelper;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
+
+public class ClusteringBoltHybrid extends BaseRichBolt {
+
+    private OutputCollector collector;
+    private CassandraDaoHybrid cassandraDao;
+    private int componentId;
+    private String fileNum;
+    private ArrayList<String> words;
+    private int numWordCountBolts;
+    private ArrayList<Integer> numWordCountBoltsForRound;
+    private HashMap<String, Integer> vectorMap;
+    private String country;
+    private long finalRound = 0;
+    private CosineSimilarity cosineSimilarity = new CosineSimilarity();
+    private ArrayList<HashMap<String, Double>> clusters = new ArrayList<>();
+
+    public ClusteringBoltHybrid(CassandraDaoHybrid cassandraDao, String filePath, String fileNum, double tfidfEventRate, int compareSize, String country, int numWordCountBolts )
+    {
+        this.cassandraDao = cassandraDao;
+        this.fileNum = fileNum + "/";
+        this.words = new ArrayList<>();
+        this.country = country;
+        this.numWordCountBolts = numWordCountBolts;
+        this.numWordCountBoltsForRound = new ArrayList<>();
+        createWordsMap();
+    }
+
+    @Override
+    public void prepare(Map config, TopologyContext context,
+                        OutputCollector collector) {
+        this.collector = collector;
+
+        this.componentId = context.getThisTaskId()-1;
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "clustering : " + componentId  );
+    }
+
+    @Override
+    public void execute(Tuple tuple) {
+        String wrd = tuple.getStringByField("key");
+        long round = tuple.getLongByField("round");
+        boolean blockend = tuple.getBooleanByField("blockEnd");
+        int comingCompId = tuple.getIntegerByField("compId");
+
+        Date nowDate = new Date();
+        if(!blockend) {
+            if(!words.contains(wrd))
+                words.add(wrd);
+            collector.ack(tuple);
+
+            ExcelWriter.putData(componentId,nowDate,new Date(), round, cassandraDao);
+            return;
+        }
+
+        if(!numWordCountBoltsForRound.contains(comingCompId) && finalRound<round)
+            numWordCountBoltsForRound.add(comingCompId);
+
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Detector " + componentId + " num: " + numWordCountBoltsForRound + " " + numWordCountBolts);
+        if(numWordCountBolts == numWordCountBoltsForRound.size()) {
+            clusterAssignment(round,country, words);
+            markComponentAsFinishedInCassandra(round);
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "clustering end : " + componentId + " num of words: " + words.size() + " number of clusters: " + clusters.size() );
+
+            endOfRoundOperations(round);
+
+            collector.ack(tuple);
+            words.clear();
+            numWordCountBoltsForRound.clear();
+        }
+        else{
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "clustering not end : " + componentId + " " + numWordCountBolts + " " +numWordCountBoltsForRound.size()  );
+        }
+        ExcelWriter.putData(componentId,nowDate,new Date(), round, cassandraDao);
+
+    }
+
+    private void clusterAssignment(long round, String country, ArrayList<String> eventCandidates) {
+
+        ResultSet resultSet ;
+        try {
+            resultSet = cassandraDao.getTweetsByRoundAndCountry(round, country);
+            Iterator<Row> iterator = resultSet.iterator();
+
+            while(iterator.hasNext()) {
+                Row row = iterator.next();
+                String tweet = row.getString("tweet");
+                if (eventCandidates.parallelStream().anyMatch(tweet::contains)) {
+                    List<String> tweets = Arrays.asList(tweet.split(" "));
+                    ArrayList<String> tweetmap = new ArrayList<>();
+                    for (String t : tweets) {
+                        if (t.length() >= 3 && vectorMap.get(t) != null)
+                            tweetmap.add(t);
+                    }
+                    if ( tweetmap.size() < 3 ) return;
+                    if ( clusters.size() == 0 ) {
+                        addNewCluster(tweetmap);
+                    } else {
+                        int indexOfSimilarCluster = getIndexOfSimilarCluster(tweetmap);
+                        if(indexOfSimilarCluster == -1) addNewCluster(tweetmap);
+                        else updateCluster(clusters.get(indexOfSimilarCluster), tweetmap, indexOfSimilarCluster);
+                    }
+                }
+            }
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "clustering end putting :::: " + componentId  );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private int getIndexOfSimilarCluster(ArrayList<String> tweetmap) {
+        double magnitude2 = (double) tweetmap.size();
+        magnitude2 = Math.sqrt(magnitude2);//sqrt(a^2)
+
+        double maxSim = 0.0;
+        for (int i = 0; i < clusters.size(); i++) {
+            HashMap<String, Double> clustermap = clusters.get(i);
+            if (clustermap == null) continue;
+
+            double similarity = cosineSimilarity.cosineSimilarityFromMap(clustermap, tweetmap, magnitude2);
+            if (maxSim < similarity) maxSim = similarity;
+            if (similarity > 0.5) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void endOfRoundOperations(long round) {
+
+        ArrayList<HashMap<String, Double>> clustersCopy = new ArrayList<>(clusters);
+        this.collector.emit(new Values( round, country, clustersCopy));
+        clusters.clear();
+
+        TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + round + ".txt",
+                "Detector bolt " + componentId + " end of round " + round + " at " + new Date());
+        finalRound = round;
+    }
+
+    private void markComponentAsFinishedInCassandra(long round) {
+
+        try {
+            List<Object> values = new ArrayList<>();
+            values.add(round);
+            values.add(componentId);
+            values.add(true);
+            cassandraDao.insertIntoProcessed(values.toArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createWordsMap() {
+        vectorMap = new HashMap<>();
+        try {
+            int index = 0;
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            InputStream is = classloader.getResourceAsStream("wordList.txt");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                vectorMap.put(line.replace("#",""),index++);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void updateCluster(HashMap<String, Double> clustermap, ArrayList<String> tweetmap, int index) throws Exception {
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Updaating cluster..........."  );
+
+        double numTweets = clustermap.get("numTweets");
+        for(String key : tweetmap) {
+            double value = 1.0;
+            if(clustermap.get(key) != null)
+                clustermap.put(key, ((clustermap.get(key)*numTweets ) + value) / numTweets);
+            else
+                clustermap.put(key, value / numTweets);
+        }
+        Iterator<Map.Entry<String, Double>> it = clustermap.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry<String, Double> entry = it.next();
+            String key = entry.getKey();
+            double value = entry.getValue();
+            double newValue = value * numTweets / (numTweets+1.0);
+            clustermap.put(key, newValue);
+        }
+
+        clustermap.put("numTweets", numTweets+1.0);
+        clusters.remove(index);
+        clusters.add(clustermap);
+
+    }
+
+    public void addNewCluster(ArrayList<String> tweetmap) throws Exception {
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "New cluster..........."  );
+        HashMap<String, Double> tweetMap = new HashMap<>();
+        for(String key : tweetmap) {
+            tweetMap.put(key, 1.0);
+        }
+        tweetMap.put("numTweets",1.0);
+
+        clusters.add(tweetMap);
+    }
+
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer)
+    {
+        declarer.declare(new Fields( "round", "country", "clusters"));
+    }
+}

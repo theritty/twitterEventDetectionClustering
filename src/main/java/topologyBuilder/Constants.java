@@ -19,6 +19,7 @@ public class Constants {
     public static final String RESULT_FILE_PATH = "/Users/ozlemcerensahin/Desktop/thesis/results/";
     public static final String TIMEBREAKDOWN_FILE_PATH = "/Users/ozlemcerensahin/Desktop/thesis/results/timebreakdown/";
     public static final String WORKHISTORY_FILE = "/Users/ozlemcerensahin/Desktop/thesis/results/";
+    public static final String EXPERIMENT_FILE = "/Users/ozlemcerensahin/Desktop/";
 
     public static final String CASS_SPOUT_ID = "cassandraSpout";
 
