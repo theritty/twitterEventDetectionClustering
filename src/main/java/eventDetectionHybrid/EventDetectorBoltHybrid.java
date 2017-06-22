@@ -6,11 +6,11 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.utils.UUIDs;
 import algorithms.*;
 import drawing.*;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Tuple;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Tuple;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -57,6 +57,7 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
         this.collector = collector;
         this.componentId = context.getThisTaskId()-1;
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "eventdet : " + componentId  );
+        System.out.println( "eventdet : " + componentId  );
     }
 
 

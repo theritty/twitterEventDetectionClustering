@@ -15,9 +15,9 @@ import eventDetectionWithClustering.EventDetectorBoltClustering;
 import eventDetectionWithClustering.CassandraSpoutClustering;
 import eventDetectionKeybased.CassandraSpoutKeyBased;
 import eventDetectionKeybasedWithSleep.CassandraSpoutKeyBasedWithSleep;
-import org.apache.storm.generated.StormTopology;
-import org.apache.storm.topology.TopologyBuilder;
-import org.apache.storm.tuple.Fields;
+import backtype.storm.generated.StormTopology;
+import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
 
 import java.util.Properties;
 
@@ -204,8 +204,8 @@ public class BoltBuilder {
         TopologyBuilder builder = new TopologyBuilder();
 
         CassandraSpoutHybrid cassandraSpoutClustering = new CassandraSpoutHybrid(cassandraDao, FILENUM, USA_TASK_NUM, CAN_TASK_NUM, NUM_WORKERS, NUM_FINDERS, CAN_TASK_NUM+USA_TASK_NUM+4+NUM_FINDERS*2);
-        WordCountBoltHybrid countBoltUSA = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, "USA", cassandraDao, NUM_FINDERS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+3);
-        WordCountBoltHybrid countBoltCAN = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, "CAN", cassandraDao, NUM_FINDERS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+3);
+        WordCountBoltHybrid countBoltUSA = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, "USA", cassandraDao, NUM_FINDERS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+5);
+        WordCountBoltHybrid countBoltCAN = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, "CAN", cassandraDao, NUM_FINDERS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+5+NUM_FINDERS);
 
         EventCandidateFinderHybrid eventCandidateFinderHybridUSA = new EventCandidateFinderHybrid(cassandraDao,
                 Constants.RESULT_FILE_PATH,FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "USA", USA_TASK_NUM);
