@@ -78,10 +78,11 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
 
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Detector " + componentId + " num: " + numWordCountBoltsForRound + " " + numWordCountBolts);
         if(numWordCountBolts == numWordCountBoltsForRound.size()) {
+
             clusterAssignment(round,country, words);
             mergeClusters();
             markComponentAsFinishedInCassandra(round);
-            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "clustering end : " + componentId + " num of words: " + words.size() + " number of clusters: " + clusters.size() );
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "clustering end for round " + round + ": " + componentId + " num of words: " + words.size() + " number of clusters: " + clusters.size() );
             System.out.println("clustering end : " + componentId + " num of words: " + words.size() + " number of clusters: " + clusters.size() );
             System.out.println(clusters);
 

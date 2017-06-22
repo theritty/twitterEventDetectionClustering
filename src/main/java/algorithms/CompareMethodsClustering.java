@@ -89,7 +89,7 @@ public class CompareMethodsClustering {
                     System.out.println("Cluster: " + cosinevector);
                 }
                 else {
-                    System.out.println("Wtf Cluster: " + cosinevector);
+                    System.out.println(roundClustering + " Wtf Cluster: " + cosinevector);
                 }
             }
 

@@ -22,16 +22,20 @@ public class WordCountBoltHybrid extends BaseRichBolt {
     private int componentId;
     private String fileNum;
     private CassandraDaoHybrid cassandraDao;
+    private int numDetector;
+    private int firstDetectorId;
+    private int detectorTask;
     private long lastRoundEnd = 0;
-    private String country;
 
 
-    public WordCountBoltHybrid(int threshold, String filenum, CassandraDaoHybrid cassandraDao, String country)
+    public WordCountBoltHybrid(int threshold, String filenum, String country, CassandraDaoHybrid cassandraDao, int numDetector, int firstDetectorNum)
     {
         this.threshold = threshold;
         this.fileNum = filenum + "/";
         this.cassandraDao = cassandraDao;
-        this.country = country;
+        this.numDetector = numDetector;
+        this.firstDetectorId = firstDetectorNum;
+        this.detectorTask = firstDetectorNum;
     }
     @Override
     public void prepare(Map config, TopologyContext context,
@@ -39,7 +43,7 @@ public class WordCountBoltHybrid extends BaseRichBolt {
         this.collector = collector;
         this.countsForRounds = new HashMap<>();
         this.componentId = context.getThisTaskId()-1;
-        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "wc : " + componentId  );
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "wc : " + componentId );
     }
 
     @Override
@@ -85,13 +89,9 @@ public class WordCountBoltHybrid extends BaseRichBolt {
             values.add(true);
             cassandraDao.insertIntoProcessed(values.toArray());
 
-            if(lastRoundEnd<round) {
-                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "wc blockEnd : " + componentId  );
-                this.collector.emit(new Values("BLOCKEND", round, true, componentId));
-            }
-            else
-                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "wc lastround<round: " + componentId  );
-
+            if(lastRoundEnd<round)
+                for(int i=firstDetectorId;i<firstDetectorId+numDetector;i++)
+                    this.collector.emitDirect(i, new Values("BLOCKEND", round, true, componentId));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,19 +103,9 @@ public class WordCountBoltHybrid extends BaseRichBolt {
     private void processNewWord(String word, long count, long round) {
 
         if(count==threshold) {
-            try {
-                List<Object> values = new ArrayList<>();
-                values.add(round);
-                values.add(word);
-                values.add(country);
-                values.add(count);
-                values.add(0L);
-                cassandraDao.insertIntoCounts(values.toArray());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            this.collector.emit(new Values(word, round, false, componentId));
+            this.collector.emitDirect(detectorTask++, new Values(word, round, false, componentId));
+            if(detectorTask==firstDetectorId+numDetector)
+                detectorTask=firstDetectorId;
         }
 
         countsForRounds.put(word, count);

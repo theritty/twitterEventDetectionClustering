@@ -27,10 +27,12 @@ public class Constants {
 
     public static final String COUNTRY1_COUNT_BOLT_ID = "count-bolt1";
     public static final String COUNTRY1_EVENT_DETECTOR_BOLT = "event-detector-bolt1";
+    public static final String COUNTRY1_EVENT_FINDER_BOLT = "event-finder-bolt1";
 
 
     public static final String COUNTRY2_COUNT_BOLT_ID = "count-bolt2";
     public static final String COUNTRY2_EVENT_DETECTOR_BOLT = "event-detector-bolt2";
+    public static final String COUNTRY2_EVENT_FINDER_BOLT = "event-finder-bolt2";
 
     public static final String EVENT_COMPARE_BOLT = "event-compare-bolt2";
 

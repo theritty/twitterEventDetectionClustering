@@ -84,7 +84,13 @@ incrementrate double,
 numtweet int,
 PRIMARY KEY (round, clusterid)
 );
-
+CREATE TABLE tweetcollection.eventskeybasedhybridforexperiment5 (
+round bigint,
+country text,
+word text,
+incrementpercent double,
+PRIMARY KEY (round, country, word)
+);
 CREATE TABLE tweetcollection.processedhybridforexperiment5 (
 round bigint,
 boltid int,
@@ -209,7 +215,7 @@ PRIMARY KEY (row, column)
 );
 
 
-TRUNCATE clustershybridforexperiment4; TRUNCATE countshybridforexperiment4; TRUNCATE eventshybridforexperiment4; TRUNCATE processedhybridforexperiment4; TRUNCATE processtimeshybridforexperiment4;
+TRUNCATE clustershybridforexperiment5; TRUNCATE countshybridforexperiment5; TRUNCATE eventskeybasedhybridforexperiment5; TRUNCATE eventshybridforexperiment5; TRUNCATE processedhybridforexperiment5; TRUNCATE processtimeshybridforexperiment5;
 TRUNCATE clusterforexperiment4; TRUNCATE eventclusterforexperiment4; TRUNCATE eventsforexperiment4; TRUNCATE processedtweetsforexperiment4; TRUNCATE processtimesforexperiment4;
 TRUNCATE countsforexperiment4; TRUNCATE eventsforexperiment4; TRUNCATE processedforexperiment4; TRUNCATE processtimeskeybasedforexperiment4;
 TRUNCATE countsforexperimentSleep4; TRUNCATE eventsforexperimentSleep4; TRUNCATE processedforexperimentSleep4; TRUNCATE processtimeskeybasedforexperimentSleep4;

@@ -3,10 +3,7 @@ package topologyBuilder;
 import cassandraConnector.CassandraDao;
 import cassandraConnector.CassandraDaoHybrid;
 import cassandraConnector.CassandraDaoKeyBased;
-import eventDetectionHybrid.CassandraSpoutHybrid;
-import eventDetectionHybrid.ClusteringBoltHybrid;
-import eventDetectionHybrid.EventDetectorBoltHybrid;
-import eventDetectionHybrid.WordCountBoltHybrid;
+import eventDetectionHybrid.*;
 import eventDetectionKeybased.EventCompareBoltKeyBased;
 import eventDetectionKeybased.EventDetectorWithCassandraBoltKeyBased;
 import eventDetectionKeybased.WordCountBoltKeyBased;
@@ -185,6 +182,7 @@ public class BoltBuilder {
         String TWEETS_TABLE = properties.getProperty("hybrid.tweets.table");
         String COUNTS_TABLE = properties.getProperty("hybrid.counts.table");
         String EVENTS_TABLE = properties.getProperty("hybrid.events.table");
+        String EVENTS_KEYBASED_TABLE = properties.getProperty("hybrid.eventskeybased.table");
         String CLUSTER_TABLE = properties.getProperty("hybrid.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("hybrid.processed.table");
         String PROCESSTIMES_TABLE = properties.getProperty("hybrid.processtimes.table");
@@ -193,20 +191,26 @@ public class BoltBuilder {
         int CAN_TASK_NUM= Integer.parseInt(properties.getProperty("hybrid.can.taskNum"));
         int USA_TASK_NUM= Integer.parseInt(properties.getProperty("hybrid.usa.taskNum"));
         int NUM_WORKERS= Integer.parseInt(properties.getProperty("hybrid.num.workers"));
+        int NUM_FINDERS= Integer.parseInt(properties.getProperty("hybrid.num.detectors.per.country"));
 
         System.out.println("Count threshold " + COUNT_THRESHOLD);
         TopologyHelper.createFolder(Constants.RESULT_FILE_PATH + FILENUM);
         TopologyHelper.createFolder(Constants.IMAGES_FILE_PATH + FILENUM);
         TopologyHelper.createFolder(Constants.TIMEBREAKDOWN_FILE_PATH + FILENUM);
 
-        CassandraDaoHybrid cassandraDao = new CassandraDaoHybrid(TWEETS_TABLE, COUNTS_TABLE, EVENTS_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE, CLUSTER_TABLE);
+        CassandraDaoHybrid cassandraDao = new CassandraDaoHybrid(TWEETS_TABLE, COUNTS_TABLE, EVENTS_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE, CLUSTER_TABLE, EVENTS_KEYBASED_TABLE);
 
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + FILENUM + "/" + "sout.txt", "Preparing Bolts...");
         TopologyBuilder builder = new TopologyBuilder();
 
-        CassandraSpoutHybrid cassandraSpoutClustering = new CassandraSpoutHybrid(cassandraDao, FILENUM, USA_TASK_NUM, CAN_TASK_NUM, NUM_WORKERS,CAN_TASK_NUM+USA_TASK_NUM+4);
-        WordCountBoltHybrid countBoltUSA = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, cassandraDao, "USA");
-        WordCountBoltHybrid countBoltCAN = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, cassandraDao, "CAN");
+        CassandraSpoutHybrid cassandraSpoutClustering = new CassandraSpoutHybrid(cassandraDao, FILENUM, USA_TASK_NUM, CAN_TASK_NUM, NUM_WORKERS, NUM_FINDERS, CAN_TASK_NUM+USA_TASK_NUM+4+NUM_FINDERS*2);
+        WordCountBoltHybrid countBoltUSA = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, "USA", cassandraDao, NUM_FINDERS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+3);
+        WordCountBoltHybrid countBoltCAN = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, "CAN", cassandraDao, NUM_FINDERS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+3);
+
+        EventCandidateFinderHybrid eventCandidateFinderHybridUSA = new EventCandidateFinderHybrid(cassandraDao,
+                Constants.RESULT_FILE_PATH,FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "USA", USA_TASK_NUM);
+        EventCandidateFinderHybrid eventCandidateFinderHybridCAN = new EventCandidateFinderHybrid(cassandraDao,
+                Constants.RESULT_FILE_PATH,FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "CAN", CAN_TASK_NUM);
 
         ClusteringBoltHybrid clusteringBoltUSA = new ClusteringBoltHybrid(cassandraDao,
                 Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "USA",USA_TASK_NUM);
@@ -218,8 +222,12 @@ public class BoltBuilder {
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpoutClustering,1);
         builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,CAN_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
         builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,USA_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
-        builder.setBolt(Constants.COUNTRY2_CLUSTERING_BOLT_ID, clusteringBoltCAN, 1).shuffleGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
-        builder.setBolt(Constants.COUNTRY1_CLUSTERING_BOLT_ID, clusteringBoltUSA, 1).shuffleGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
+
+        builder.setBolt( Constants.COUNTRY1_EVENT_FINDER_BOLT, eventCandidateFinderHybridUSA,NUM_FINDERS).directGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
+        builder.setBolt( Constants.COUNTRY2_EVENT_FINDER_BOLT, eventCandidateFinderHybridCAN,NUM_FINDERS).directGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
+
+        builder.setBolt(Constants.COUNTRY2_CLUSTERING_BOLT_ID, clusteringBoltCAN, 1).shuffleGrouping(Constants.COUNTRY2_EVENT_FINDER_BOLT);
+        builder.setBolt(Constants.COUNTRY1_CLUSTERING_BOLT_ID, clusteringBoltUSA, 1).shuffleGrouping(Constants.COUNTRY1_EVENT_FINDER_BOLT);
         builder.setBolt( Constants.COUNTRY1_EVENT_DETECTOR_BOLT, eventDetectorBolt,1).
                 globalGrouping(Constants.COUNTRY1_CLUSTERING_BOLT_ID).
                 globalGrouping(Constants.COUNTRY2_CLUSTERING_BOLT_ID);

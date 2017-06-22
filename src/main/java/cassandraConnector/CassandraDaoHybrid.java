@@ -15,6 +15,7 @@ public class CassandraDaoHybrid implements Serializable
     private transient PreparedStatement statement_tweets;
     private transient PreparedStatement statement_counts;
     private transient PreparedStatement statement_events;
+    private transient PreparedStatement statement_events_keybased;
     private transient PreparedStatement statement_where;
     private transient PreparedStatement statement_tweet_get;
     private transient PreparedStatement statement_tweet_by_country_get;
@@ -37,6 +38,7 @@ public class CassandraDaoHybrid implements Serializable
     private transient BoundStatement boundStatement_processed2Tweets_getAll;
     private transient BoundStatement boundStatement_processed2Tweets;
     private transient BoundStatement boundStatement_events;
+    private transient BoundStatement boundStatement_events_keybased;
     private transient BoundStatement boundStatement_events_get;
     private transient BoundStatement boundStatement_tweets;
     private transient BoundStatement boundStatement_tweets_by_country_get;
@@ -57,6 +59,11 @@ public class CassandraDaoHybrid implements Serializable
     private static String EVENTS_FIELDS =   "(round, clusterid, country, cosinevector, incrementrate, numtweet)";
     private static String EVENTS_VALUES = "(?, ?, ?, ?, ?, ?)";
 
+
+    private static String EVENTS_KEYBASED_FIELDS = "(round, country, word, incrementpercent)";
+    private static String EVENTS_KEYBASED_VALUES = "(?, ?, ?, ?)";
+
+
     private static String COUNTS_FIELDS = "(round, word, country, count, totalnumofwords)";
     private static String COUNTS_VALUES = "(?, ?, ?, ?, ?)";
 
@@ -72,17 +79,19 @@ public class CassandraDaoHybrid implements Serializable
     private String tweetsTable;
     private String countsTable;
     private String eventsTable;
+    private String eventsKeybasedTable;
     private String processedTable;
     private String processTimesTable;
     private String clusterTable;
 
-    public CassandraDaoHybrid(String tweetsTable, String countsTable, String eventsTable, String processedTable, String processTimesTable, String clusterTable) throws Exception {
+    public CassandraDaoHybrid(String tweetsTable, String countsTable, String eventsTable, String processedTable, String processTimesTable, String clusterTable, String eventsKeybasedTable) throws Exception {
         this.tweetsTable = tweetsTable;
         this.countsTable = countsTable;
         this.eventsTable = eventsTable;
         this.processedTable = processedTable;
         this.processTimesTable = processTimesTable;
         this.clusterTable = clusterTable;
+        this.eventsKeybasedTable = eventsKeybasedTable;
 
         prepareAll();
     }
@@ -101,6 +110,11 @@ public class CassandraDaoHybrid implements Serializable
                             + " VALUES " + PROCESSTIMES_VALUES + ";");
         }
 
+        if(statement_events_keybased==null) {
+            statement_events_keybased = CassandraConnection.connect().prepare(
+                    "INSERT INTO " + eventsKeybasedTable + " " + EVENTS_KEYBASED_FIELDS
+                            + " VALUES " + EVENTS_KEYBASED_VALUES + ";");
+        }
         if(statement_tweets==null) {
             statement_tweets = CassandraConnection.connect().prepare(
                     "INSERT INTO " + tweetsTable + " " + TWEETS_FIELDS
@@ -134,6 +148,7 @@ public class CassandraDaoHybrid implements Serializable
             statement_events_get = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + eventsTable + " WHERE country=? ALLOW FILTERING;");
         }
+
         if(statement_where==null) {
             statement_where = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + countsTable + " WHERE round=? AND word=? AND country=?;");
@@ -185,6 +200,8 @@ public class CassandraDaoHybrid implements Serializable
             boundStatement_where = new BoundStatement(statement_where);
         if(boundStatement_events_get == null)
             boundStatement_events_get = new BoundStatement(statement_events_get);
+        if(boundStatement_events_keybased == null)
+            boundStatement_events_keybased = new BoundStatement(statement_events_keybased);
         if(boundStatement_tweets_get == null)
             boundStatement_tweets_get = new BoundStatement(statement_tweet_get);
         if(boundStatement_tweets_by_country_get == null)
@@ -212,6 +229,22 @@ public class CassandraDaoHybrid implements Serializable
         if(boundStatement_cluster_delete == null)
             boundStatement_cluster_delete = new BoundStatement(statement_cluster_delete);
     }
+
+
+    public ResultSet getFromCounts( Object... values ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_where.bind(values));
+
+        return resultSet;
+    }
+
+    public void insertIntoEventsKeybased( Object... values ) throws Exception
+    {
+        prepareAll();
+        CassandraConnection.connect().executeAsync(boundStatement_events_keybased.bind(values));
+    }
+
     public void insertIntoProcessTimes( Object[] values ) throws Exception
     {
         prepareAll();

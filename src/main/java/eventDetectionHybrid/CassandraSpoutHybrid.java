@@ -33,6 +33,7 @@ public class CassandraSpoutHybrid extends BaseRichSpout {
     private int CANTaskNumber ;
 
     private int numWorkers ;
+    private int numFinder ;
 
     private int USATask = 0;
     private int CANTask = 0;
@@ -44,7 +45,7 @@ public class CassandraSpoutHybrid extends BaseRichSpout {
     private HashMap<String, Integer> CANwordMap = new HashMap<>();
 
 
-    public CassandraSpoutHybrid(CassandraDaoHybrid cassandraDao, String filenum, int USATaskNumber, int CANTaskNumber, int numWorkers, int numOfBolts) throws Exception {
+    public CassandraSpoutHybrid(CassandraDaoHybrid cassandraDao, String filenum, int USATaskNumber, int CANTaskNumber, int numWorkers, int numFinder, int numOfBolts) throws Exception {
         this.cassandraDao = cassandraDao;
         this.roundlist = new ArrayList<>();
         this.fileNum = filenum + "/";
@@ -53,6 +54,7 @@ public class CassandraSpoutHybrid extends BaseRichSpout {
         this.numWorkers = numWorkers;
         this.current_round=0;
         this.numOfBolts = numOfBolts;
+        this.numFinder = numFinder;
 
     }
     @Override
@@ -140,7 +142,7 @@ public class CassandraSpoutHybrid extends BaseRichSpout {
     }
 
     private void putProcessedBoltInfoToCassandra() {
-        for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+2+numWorkers+3;k++) {
+        for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+2+numWorkers+3+numFinder;k++) {
             try {
                 List<Object> values = new ArrayList<>();
                 values.add(current_round);
