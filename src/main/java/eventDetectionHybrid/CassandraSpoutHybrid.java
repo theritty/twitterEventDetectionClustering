@@ -234,7 +234,11 @@ public class CassandraSpoutHybrid extends BaseRichSpout {
                     return m1.compareTo(m2);
                 }
             });
-            while (roundlist.get(0)<4068478)
+
+
+
+            while (roundlist.get(0)<4068480)
+//            while (roundlist.get(0)<4069540)
                 roundlist.remove(0);
             while (roundlist.get(roundlist.size()-1)>=4070160)
                 roundlist.remove(roundlist.size()-1);

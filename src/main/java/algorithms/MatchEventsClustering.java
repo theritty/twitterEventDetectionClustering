@@ -32,14 +32,13 @@ public class MatchEventsClustering {
     Properties properties = topologyHelper.loadProperties( "config.properties" );
     String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
     String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
-    String CLUSTERANDTWEET_TABLE = properties.getProperty("clustering.clusterandtweets.table");
     String EVENTS_TABLE = properties.getProperty("clustering.events.table");
     String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
     String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
     String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
     start = Long.parseLong(properties.getProperty("clustering.start.round"));
     end = Long.parseLong(properties.getProperty("clustering.end.round"));
-    cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+    cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
   }
 
 //    public static void main(String[] args) throws Exception {

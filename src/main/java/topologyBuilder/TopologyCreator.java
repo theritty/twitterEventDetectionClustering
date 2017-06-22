@@ -37,7 +37,7 @@ public class TopologyCreator {
         {
             loadTopologyPropertiesAndSubmit( properties, config, BoltBuilder.prepareBoltsForCassandraSpoutKeyBased(properties), "keybased" );
         }
-        catch ( TTransportException | InvalidTopologyException | AuthorizationException | AlreadyAliveException | InterruptedException e )
+        catch (  InvalidTopologyException | AuthorizationException | AlreadyAliveException | InterruptedException e )
         {
             e.printStackTrace();
         } catch (Exception e) {
@@ -52,7 +52,7 @@ public class TopologyCreator {
         {
             loadTopologyPropertiesAndSubmit( properties, config, BoltBuilder.prepareBoltsForCassandraSpoutKeyBasedWithSleep(properties), "keybasedsleep" );
         }
-        catch ( TTransportException | InvalidTopologyException | AuthorizationException | AlreadyAliveException | InterruptedException e )
+        catch ( InvalidTopologyException | AuthorizationException | AlreadyAliveException | InterruptedException e )
         {
             e.printStackTrace();
         } catch (Exception e) {
@@ -88,7 +88,7 @@ public class TopologyCreator {
 
 
     protected synchronized void loadTopologyPropertiesAndSubmit(Properties properties, Config config, StormTopology stormTopology, String methodName )
-            throws InvalidTopologyException, AuthorizationException, AlreadyAliveException, InterruptedException, TTransportException {
+            throws Exception {
 
         String stormExecutionMode = properties.getProperty("storm.execution.mode");
         String topologyName = properties.getProperty(methodName + ".topology.name");

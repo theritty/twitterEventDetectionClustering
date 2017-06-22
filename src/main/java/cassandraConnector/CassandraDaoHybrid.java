@@ -38,7 +38,6 @@ public class CassandraDaoHybrid implements Serializable
     private transient BoundStatement boundStatement_processed2Tweets;
     private transient BoundStatement boundStatement_events;
     private transient BoundStatement boundStatement_events_get;
-    private transient BoundStatement boundStatement_events_get_from_event;
     private transient BoundStatement boundStatement_tweets;
     private transient BoundStatement boundStatement_tweets_by_country_get;
     private transient BoundStatement boundStatement_tweets_get;
@@ -218,24 +217,11 @@ public class CassandraDaoHybrid implements Serializable
         prepareAll();
         CassandraConnection.connect().executeAsync(boundStatement_processtimes.bind(values));
     }
-    public ResultSet getProcessTimes(  ) throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_processtimes_get.bind());
 
-        return resultSet;
-    }
     public void insertIntoProcessed( Object[] values ) throws Exception
     {
         prepareAll();
         CassandraConnection.connect().execute(boundStatement_processed2Tweets.bind(values));
-    }
-    public ResultSet getProcessed( Object... values ) throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_processed2Tweets_get.bind(values));
-
-        return resultSet;
     }
 
     public ResultSet getAllProcessed( Object... values ) throws Exception
@@ -246,39 +232,10 @@ public class CassandraDaoHybrid implements Serializable
         return resultSet;
     }
 
-    public void insertIntoTweets( Object[] values ) throws Exception
-    {
-        prepareAll();
-        CassandraConnection.connect().executeAsync(boundStatement_tweets.bind(values));
-    }
-
     public void insertIntoEvents( Object... values ) throws Exception
     {
         prepareAll();
         CassandraConnection.connect().executeAsync(boundStatement_events.bind(values));
-    }
-
-    public void insertIntoCounts( Object[] values ) throws Exception
-    {
-        prepareAll();
-        ResultSetFuture rsf = CassandraConnection.connect().executeAsync(boundStatement_counts.bind(values));
-        checkError(rsf);
-    }
-
-    public ResultSet getFromCounts( Object... values ) throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_where.bind(values));
-
-        return resultSet;
-    }
-
-    public ResultSet getFromEvents( Object... values ) throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_events_get.bind(values));
-
-        return resultSet;
     }
 
     public ResultSet getTweetsByRound( Object... values ) throws Exception
@@ -304,13 +261,6 @@ public class CassandraDaoHybrid implements Serializable
         return resultSet;
     }
 
-    public ResultSet getRoundsFromEvents() throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_events_get_from_event.bind());
-
-        return resultSet;
-    }
     public void insertIntoClusters( Object[] values ) throws Exception
     {
         prepareAll();
@@ -328,14 +278,13 @@ public class CassandraDaoHybrid implements Serializable
 
         return resultSet;
     }
-    public ResultSet getClustersById(Object... values) throws Exception
+
+    public void insertIntoCounts( Object[] values ) throws Exception
     {
         prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_cluster_get_by_id.bind(values));
-
-        return resultSet;
+        ResultSetFuture rsf = CassandraConnection.connect().executeAsync(boundStatement_counts.bind(values));
+        checkError(rsf);
     }
-
 
     static FutureCallback<ResultSet> callback =  new FutureCallback<ResultSet>() {
         @Override public void onSuccess(ResultSet result) {

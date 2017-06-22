@@ -13,14 +13,13 @@ public class CompareMethodsClustering {
         Properties properties = topologyHelper.loadProperties( "config.properties" );
 
         String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
-        String EVENTS_TABLE = properties.getProperty("clustering.events.table");
+        String EVENTS_TABLE = properties.getProperty("hybrid.events.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("keybased.events.table");
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
-        String CLUSTERANDTWEET_TABLE = properties.getProperty("clustering.clusterandtweets.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
 
-        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
         ResultSet resultSetClustering, resultSetWordBased ;
         HashMap<Long, HashMap<String, Integer>> wordNums = new HashMap<>();
 //        Constants.lock.lock();
@@ -82,11 +81,16 @@ public class CompareMethodsClustering {
                         }
                     }
                 }
-                System.out.println("Round " + roundClustering + " cluster " + clusterid + " has " + total + " keys and " + intersection + " of them are also detected as event. Percentage: " + (double)intersection/(double)total);
-                if((double)intersection/(double)total > 0.0) {
-                    clusterNumIntersection++;
+                if(intersection > 0) {
+                    System.out.println("Round " + roundClustering + " cluster " + clusterid + " has " + total + " keys and " + intersection + " of them are also detected as event. Percentage: " + (double) intersection / (double) total);
+                    if ((double) intersection / (double) total > 0.0) {
+                        clusterNumIntersection++;
+                    }
+                    System.out.println("Cluster: " + cosinevector);
                 }
-                System.out.println("Cluster: " + cosinevector);
+                else {
+                    System.out.println("Wtf Cluster: " + cosinevector);
+                }
             }
 
 
@@ -94,8 +98,9 @@ public class CompareMethodsClustering {
             ResultSet resultSetWordBasedX = cassandraDao.getEventsWordBased();
             Iterator<Row> iteratorWordBased = resultSetWordBasedX.iterator();
             while (iteratorWordBased.hasNext()) {
-                iteratorWordBased.next();
-                wordNum++;
+                Row rowWordBased = iteratorWordBased.next();
+                String country = rowWordBased.getString("country");
+                if(country.equals(c)) wordNum++;
             }
             int wordNumIntersection = 0;
             Iterator itF = wordNums.entrySet().iterator();

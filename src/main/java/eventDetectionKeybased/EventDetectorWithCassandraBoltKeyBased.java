@@ -52,7 +52,7 @@ public class EventDetectorWithCassandraBoltKeyBased extends BaseRichBolt {
         this.collector = collector;
 
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("detector: " + componentId );
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "detector: " + componentId );
     }
 
     @Override

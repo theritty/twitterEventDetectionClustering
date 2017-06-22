@@ -23,13 +23,15 @@ public class WordCountBoltHybrid extends BaseRichBolt {
     private String fileNum;
     private CassandraDaoHybrid cassandraDao;
     private long lastRoundEnd = 0;
+    private String country;
 
 
-    public WordCountBoltHybrid(int threshold, String filenum, CassandraDaoHybrid cassandraDao)
+    public WordCountBoltHybrid(int threshold, String filenum, CassandraDaoHybrid cassandraDao, String country)
     {
         this.threshold = threshold;
         this.fileNum = filenum + "/";
         this.cassandraDao = cassandraDao;
+        this.country = country;
     }
     @Override
     public void prepare(Map config, TopologyContext context,
@@ -101,6 +103,18 @@ public class WordCountBoltHybrid extends BaseRichBolt {
     private void processNewWord(String word, long count, long round) {
 
         if(count==threshold) {
+            try {
+                List<Object> values = new ArrayList<>();
+                values.add(round);
+                values.add(word);
+                values.add(country);
+                values.add(count);
+                values.add(0L);
+                cassandraDao.insertIntoCounts(values.toArray());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             this.collector.emit(new Values(word, round, false, componentId));
         }
 

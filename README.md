@@ -45,96 +45,6 @@ submit jar:
     ./storm jar /Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar topologies.EventDetectionHybrid
 
 
-CREATE TABLE tweetcollection.clustersHybridForExperiment (
-    id timeuuid,
-    cosinevector map<text, double>,
-    prevnumtweets int,
-    currentnumtweets int,
-    lastround bigint,
-    country text,
-    PRIMARY KEY (country, id)
-);
-
-CREATE TABLE tweetcollection.processtimesHybridForExperiment (
-    row int,
-    column int,
-    id int,
-    PRIMARY KEY (row, column)
-);
-
-
-CREATE TABLE tweetcollection.eventsHybridForExperiment (
-    round bigint,
-    clusterid timeuuid,
-    country text,
-    cosinevector map<text, double>,
-    incrementrate double,
-    numtweet int,
-    PRIMARY KEY (round, clusterid)
-);
-
-
-CREATE TABLE tweetcollection.countsHybridForExperiment  (
-    round bigint,
-    word text,
-    country text,
-    count bigint,
-    totalnumofwords bigint,
-    PRIMARY KEY (round, word, country)
-);
-
-
-CREATE TABLE tweetcollection.processedHybridForExperiment  (
-    round bigint,
-    boltid int,
-    finished boolean,
-    PRIMARY KEY (round, boltid)
-);
-
-
-
-
-CREATE TABLE tweetcollection.clusterandtweetForExperiment (
-    clusterid timeuuid,
-    tweetid bigint,
-    PRIMARY KEY (clusterid, tweetid)
-);
-
-
-CREATE TABLE tweetcollection.processedtweetsForExperiment (
-    round bigint,
-    boltid int,
-    boltprocessed bigint,
-    country text,
-    finished boolean,
-    spoutsent bigint,
-    PRIMARY KEY (round, boltid)
-);
-
-
-CREATE TABLE tweetcollection.eventsForExperiment (
-    round bigint,
-    country text,
-    word text,
-    incrementpercent double,
-    PRIMARY KEY (round, country, word)
-);
-
-
-
-CREATE TABLE tweetcollection.processtimesKeyBasedForExperimentSleep (
-    row int,
-    column int,
-    id int,
-    PRIMARY KEY (row, column)
-);
-
-CREATE TABLE tweetcollection.processtimesKeyBasedForExperiment (
-    row int,
-    column int,
-    id int,
-    PRIMARY KEY (row, column)
-);
 
 TRUNCATE eventcluster_daily ;TRUNCATE events_daily ;TRUNCATE cluster_daily ;TRUNCATE clusterandtweet_daily ;TRUNCATE processedtweets ;TRUNCATE processtimes ;
 TRUNCATE eventcluster4 ;TRUNCATE events4 ;TRUNCATE cluster4 ;TRUNCATE clusterandtweet4 ;TRUNCATE processedtweets4 ;TRUNCATE processtimes4 ;
@@ -146,42 +56,161 @@ TRUNCATE countsForExperimentSleep ;TRUNCATE eventsForExperimentSleep ;TRUNCATE p
 
 
 
+CREATE TABLE tweetcollection.clustershybridforexperiment5 (
+country text,
+id timeuuid,
+cosinevector map<text, double>,
+currentnumtweets int,
+lastround bigint,
+prevnumtweets int,
+PRIMARY KEY (country, id)
+);
 
+CREATE TABLE tweetcollection.countshybridforexperiment5 (
+round bigint,
+word text,
+country text,
+count bigint,
+totalnumofwords bigint,
+PRIMARY KEY (round, word, country)
+);
 
+CREATE TABLE tweetcollection.eventshybridforexperiment5 (
+round bigint,
+clusterid timeuuid,
+cosinevector map<text, double>,
+country text,
+incrementrate double,
+numtweet int,
+PRIMARY KEY (round, clusterid)
+);
 
+CREATE TABLE tweetcollection.processedhybridforexperiment5 (
+round bigint,
+boltid int,
+finished boolean,
+PRIMARY KEY (round, boltid)
+);
 
-CREATE TABLE tweetcollection.eventsForExperimentSleep  (
-    round bigint,
-    country text,
-    word text,
-    incrementpercent double,
-    PRIMARY KEY (round, country, word)
+CREATE TABLE tweetcollection.processtimeshybridforexperiment5 (
+row int,
+column int,
+id int,
+PRIMARY KEY (row, column)
 );
 
 
-CREATE TABLE tweetcollection.processedForExperimentSleep  (
-    round bigint,
-    boltid int,
-    finished boolean,
-    PRIMARY KEY (round, boltid)
+
+
+
+
+
+
+CREATE TABLE tweetcollection.clusterforexperiment5 (
+country text,
+id timeuuid,
+cosinevector map<text, double>,
+currentnumtweets int,
+lastround bigint,
+prevnumtweets int,
+PRIMARY KEY (country, id)
+);
+CREATE TABLE tweetcollection.eventclusterforexperiment5 (
+round bigint,
+clusterid timeuuid,
+cosinevector map<text, double>,
+country text,
+incrementrate double,
+numtweet int,
+PRIMARY KEY (round, clusterid)
+);
+CREATE TABLE tweetcollection.processedtweetsforexperiment5 (
+round bigint,
+boltid int,
+boltprocessed bigint,
+country text,
+finished boolean,
+spoutsent bigint,
+PRIMARY KEY (round, boltid)
+);
+CREATE TABLE tweetcollection.processtimesforexperiment5 (
+row int,
+column int,
+id int,
+PRIMARY KEY (row, column)
 );
 
 
 
 
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 15, 0, 'bolu abant picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 16, 0, 'bolu abant picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 17, 0, 'bolu abant picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 18, 0, 'bolu abant picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 19, 0, 'ece abant picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 20, 0, 'bolu giresun picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 21, 0, 'bolu abant picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 22, 0, 'adl abant picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033721, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 23, 0, 'bolu ccc picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033723, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 24, 0, ' abant picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033725, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 25, 0, 'bolu  picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033727, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 26, 0, 'bolu abant ', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033727, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 27, 0, ' picnic', 1);
-INSERT INTO tweetsmini (round , country , class_music , class_sports , class_politics , tweettime , id , retweetcount , tweet , userid ) VALUES ( 2033727, 'CAN', True, True, True, '1970-01-01 00:20:34+0000', 28, 0, 'ece ceren picnic', 1);
 
+
+
+
+CREATE TABLE tweetcollection.countsforexperiment5 (
+round bigint,
+word text,
+country text,
+count bigint,
+totalnumofwords bigint,
+PRIMARY KEY (round, word, country)
+);
+CREATE TABLE tweetcollection.eventsforexperiment5 (
+round bigint,
+country text,
+word text,
+incrementpercent double,
+PRIMARY KEY (round, country, word)
+);
+CREATE TABLE tweetcollection.processedforexperiment5 (
+round bigint,
+boltid int,
+finished boolean,
+PRIMARY KEY (round, boltid)
+);
+CREATE TABLE tweetcollection.processtimeskeybasedforexperiment5 (
+row int,
+column int,
+id int,
+PRIMARY KEY (row, column)
+);
+
+
+
+
+
+
+CREATE TABLE tweetcollection.countsforexperimentSleep5 (
+round bigint,
+word text,
+country text,
+count bigint,
+totalnumofwords bigint,
+PRIMARY KEY (round, word, country)
+);
+CREATE TABLE tweetcollection.eventsforexperimentSleep5 (
+round bigint,
+country text,
+word text,
+incrementpercent double,
+PRIMARY KEY (round, country, word)
+);
+CREATE TABLE tweetcollection.processedforexperimentSleep5 (
+round bigint,
+boltid int,
+finished boolean,
+PRIMARY KEY (round, boltid)
+);
+CREATE TABLE tweetcollection.processtimeskeybasedforexperimentSleep5 (
+row int,
+column int,
+id int,
+PRIMARY KEY (row, column)
+);
+
+
+TRUNCATE clustershybridforexperiment4; TRUNCATE countshybridforexperiment4; TRUNCATE eventshybridforexperiment4; TRUNCATE processedhybridforexperiment4; TRUNCATE processtimeshybridforexperiment4;
+TRUNCATE clusterforexperiment4; TRUNCATE eventclusterforexperiment4; TRUNCATE eventsforexperiment4; TRUNCATE processedtweetsforexperiment4; TRUNCATE processtimesforexperiment4;
+TRUNCATE countsforexperiment4; TRUNCATE eventsforexperiment4; TRUNCATE processedforexperiment4; TRUNCATE processtimeskeybasedforexperiment4;
+TRUNCATE countsforexperimentSleep4; TRUNCATE eventsforexperimentSleep4; TRUNCATE processedforexperimentSleep4; TRUNCATE processtimeskeybasedforexperimentSleep4;
 

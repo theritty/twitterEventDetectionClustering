@@ -43,7 +43,7 @@ public class WordCountBoltKeyBased extends BaseRichBolt {
         this.collector = collector;
         this.countsForRounds = new HashMap<>();
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("wc : " + componentId );
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "wc : " + componentId );
     }
 
     @Override

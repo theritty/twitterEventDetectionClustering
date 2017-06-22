@@ -39,7 +39,7 @@ public class EventCompareBoltKeyBasedWithSleep extends BaseRichBolt {
     public void prepare(Map config, TopologyContext context,
                         OutputCollector collector) {
         this.componentId = context.getThisTaskId()-1;
-        System.out.println("compare: " + componentId );
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "compare: " + componentId );
     }
 
     @Override

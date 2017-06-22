@@ -142,7 +142,6 @@ public class BoltBuilder {
         String EVENTS_TABLE = properties.getProperty("clustering.events.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
-        String CLUSTERANDTWEET_TABLE = properties.getProperty("clustering.clusterandtweets.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
         long START_ROUND = Long.parseLong(properties.getProperty("clustering.start.round"));
@@ -157,7 +156,7 @@ public class BoltBuilder {
         TopologyHelper.createFolder(Constants.IMAGES_FILE_PATH + FILENUM);
         TopologyHelper.createFolder(Constants.TIMEBREAKDOWN_FILE_PATH + FILENUM);
 
-        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + FILENUM + "/" + "sout.txt", "Preparing Bolts...");
         TopologyBuilder builder = new TopologyBuilder();
 
@@ -206,8 +205,8 @@ public class BoltBuilder {
         TopologyBuilder builder = new TopologyBuilder();
 
         CassandraSpoutHybrid cassandraSpoutClustering = new CassandraSpoutHybrid(cassandraDao, FILENUM, USA_TASK_NUM, CAN_TASK_NUM, NUM_WORKERS,CAN_TASK_NUM+USA_TASK_NUM+4);
-        WordCountBoltHybrid countBoltUSA = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, cassandraDao);
-        WordCountBoltHybrid countBoltCAN = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, cassandraDao);
+        WordCountBoltHybrid countBoltUSA = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, cassandraDao, "USA");
+        WordCountBoltHybrid countBoltCAN = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, cassandraDao, "CAN");
 
         ClusteringBoltHybrid clusteringBoltUSA = new ClusteringBoltHybrid(cassandraDao,
                 Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "USA",USA_TASK_NUM);

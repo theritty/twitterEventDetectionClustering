@@ -176,24 +176,11 @@ public class CassandraDaoKeyBased implements Serializable
         prepareAll();
         CassandraConnection.connect().executeAsync(boundStatement_processtimes.bind(values));
     }
-    public ResultSet getProcessTimes(  ) throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_processtimes_get.bind());
 
-        return resultSet;
-    }
     public void insertIntoProcessed( Object[] values ) throws Exception
     {
         prepareAll();
         CassandraConnection.connect().execute(boundStatement_processed2Tweets.bind(values));
-    }
-    public ResultSet getProcessed( Object... values ) throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_processed2Tweets_get.bind(values));
-
-        return resultSet;
     }
 
     public ResultSet getAllProcessed( Object... values ) throws Exception
@@ -202,12 +189,6 @@ public class CassandraDaoKeyBased implements Serializable
         ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_processed2Tweets_getAll.bind(values));
 
         return resultSet;
-    }
-
-    public void insertIntoTweets( Object[] values ) throws Exception
-    {
-        prepareAll();
-        CassandraConnection.connect().executeAsync(boundStatement_tweets.bind(values));
     }
 
     public void insertIntoEvents( Object... values ) throws Exception
@@ -227,14 +208,6 @@ public class CassandraDaoKeyBased implements Serializable
     {
         prepareAll();
         ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_where.bind(values));
-
-        return resultSet;
-    }
-
-    public ResultSet getFromEvents( Object... values ) throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_events_get.bind(values));
 
         return resultSet;
     }
@@ -261,15 +234,6 @@ public class CassandraDaoKeyBased implements Serializable
 
         return resultSet;
     }
-
-    public ResultSet getRoundsFromEvents() throws Exception
-    {
-        prepareAll();
-        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_events_get_from_event.bind());
-
-        return resultSet;
-    }
-
 
     static FutureCallback<ResultSet> callback =  new FutureCallback<ResultSet>() {
         @Override public void onSuccess(ResultSet result) {

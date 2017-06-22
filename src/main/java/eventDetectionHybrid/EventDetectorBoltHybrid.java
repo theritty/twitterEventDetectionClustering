@@ -74,8 +74,7 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
         try {
             for(int i=0; i< clusters.size();) {
                 TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt",  "HoHoHoHo" + clusters.get(i).get("numTweets"));
-
-                if (clusters.get(i).get("numTweets") < 10.0)
+                if (clusters.get(i).get("numTweets") < 50.0)
                     clusters.remove(i);
                 else i++;
             }
@@ -129,6 +128,8 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
                             values_event.add((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets));
                             values_event.add(cNew.currentnumtweets + cNew.prevnumtweets );
                             cassandraDao.insertIntoEvents(values_event.toArray());
+                            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + "Updated Event Here !!!! :)))) ");
+
                         }
                         else
                             System.out.println("event rate " + (double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) );
@@ -208,7 +209,7 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
 
             newCluster.put("numTweets", (double) numTweets);
 
-            if(numTweets > 20) {
+            if(numTweets > 50) {
                 List<Object> values_event = new ArrayList<>();
                 values_event.add(round);
                 values_event.add(clusterid);

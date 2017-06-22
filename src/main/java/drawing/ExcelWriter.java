@@ -5,15 +5,7 @@ import cassandraConnector.CassandraDaoHybrid;
 import cassandraConnector.CassandraDaoKeyBased;
 import com.datastax.driver.core.ResultSet;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.charts.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFChart;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTLineSer;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTMarker;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTMarkerStyle;
-import org.openxmlformats.schemas.drawingml.x2006.chart.CTPlotArea;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -32,20 +24,20 @@ public class ExcelWriter {
     private static int[][] times;
     private static Date startTime = new Date();
     private static long startRound = 0;
-    private static String fileNum="keybasedsleep";
+    private static String fileNum="experiment-4-keybased-hybrid-xxx";
     private static int lastInd ;
     private static int rowNum = 3000000;
     private static int columnNum = 250;
-    private static int numOfBolts = 25;
+    private static int numOfBolts = 15;
     private static int createChart = 0;
 
     public static void setNumOfBolts(int numOfBoltsX){
-        numOfBolts = numOfBoltsX;
+        //numOfBolts = numOfBoltsX;
     }
 
     public static void putStartDate(Date date, String filenum, long round) {
-        startTime = date;
-        startRound = round;
+//        startTime = date;
+//        startRound = round;
         fileNum = filenum +"/";
     }
 
@@ -57,8 +49,11 @@ public class ExcelWriter {
         if(duration==0) duration = 1;
 
         while (duration-->0) {
-            int col = (id + numOfBolts * ((int) ((round - startRound)) % 10));
+            int col = (id + numOfBolts * ((int) (round - startRound) % 10));
+
 //            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "HEEEEEEELPXXXXXXXX : " + timeStart + " " + col + " " + id);
+            if(col%15!=id)
+                TopologyHelper.writeToFile(Constants.EXPERIMENT_FILE + " test-sout.txt", col + " " +  id + " " + numOfBolts + " " + startRound + " " + round);
             List<Object> values = new ArrayList<>();
             values.add((int) timeStart++);
             values.add(col);
@@ -80,6 +75,10 @@ public class ExcelWriter {
 
         while (duration-->0) {
             int col = (id + numOfBolts * ((int) ((round - startRound)) % 10));
+            if(col%15!=id)
+                TopologyHelper.writeToFile(Constants.EXPERIMENT_FILE + " test-sout.txt", col + " " +  id + " " + numOfBolts + " " + startRound + " " + round);
+
+            System.out.println(id + " " + numOfBolts + " " + startRound + " " + round);
             int row = (int) timeStart++;
 //            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "HEEEEEEELP : " + row + " " + col + " " + id);
             List<Object> values = new ArrayList<>();
@@ -103,6 +102,8 @@ public class ExcelWriter {
 
         while (duration-->0) {
             int col = (id + numOfBolts * ((int) ((round - startRound)) % 10));
+
+                TopologyHelper.writeToFile(Constants.EXPERIMENT_FILE + " test-sout.txt", startTime.toString());
             int row = (int) timeStart++;
 //            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "HEEEEEEELP : " + row + " " + col + " " + id);
             List<Object> values = new ArrayList<>();
@@ -123,9 +124,11 @@ public class ExcelWriter {
 
         lastInd = rowNum -1;
         times = new int[rowNum][columnNum];
+//        times = new int[rowNum][15];
 
         for(int i = 0; i< rowNum; i++) {
             times[i][0] = i;
+//            for (int j = 1; j < 15; j++)
             for (int j = 1; j < columnNum; j++)
                 times[i][j] = 0;
         }
@@ -137,12 +140,20 @@ public class ExcelWriter {
             while (iterator.hasNext()) {
                 com.datastax.driver.core.Row row = iterator.next();
                 int process_row = row.getInt("row");
-                int process_col = row.getInt("column");
+                int process_col = row.getInt("id");
+//                int process_col = row.getInt("column");
                 int process_id = row.getInt("id");
 
-                if(process_row<0 ||process_col<0 ) continue;
+                if(process_row<0 ||process_col<0 ) {
+                    System.out.println("?");
+                    continue;
+                }
+//                if(process_col%11!=process_id || )
+//                {
+//                    System.out.println("wow " + process_col + " " + process_id);;
+//                }
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                times[process_row][process_col-1]=process_id;
+                times[process_row][process_col]=process_id;
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
         } catch (Exception e) {
@@ -198,73 +209,41 @@ public class ExcelWriter {
         System.out.println("DONE");
     }
 
-    public static void main(String[] args) throws Exception {
-        Workbook wb = new XSSFWorkbook();
-        Sheet dataSheet = wb.createSheet("linechart");
 
-        final int NUM_OF_ROWS = 10;
-        final int NUM_OF_COLUMNS = 4;
+    public static void run(String filename, String tablename) throws Exception {
+        TopologyHelper topologyHelper = new TopologyHelper();
+        Properties properties = topologyHelper.loadProperties( "config.properties" );
 
-        Row row;
-        Cell cell;
-        for (int rowIndex = 0; rowIndex < NUM_OF_ROWS; rowIndex++) {
-            row = dataSheet.createRow((short) rowIndex);
-            for (int colIndex = 0; colIndex < NUM_OF_COLUMNS; colIndex++) {
-                cell = row.createCell((short) colIndex);
-                if(colIndex==0) cell.setCellValue(rowIndex);
-                else {
-                    int val = (int) (Math.random()*10);
-                    if(val == 0) cell.setCellValue("");
-                    else cell.setCellValue(rowIndex * ((colIndex + 1) + ((int) (Math.random() * 10))));
-                }
-            }
-        }
+        fileNum = filename;
 
-        Drawing drawing = dataSheet.createDrawingPatriarch();
-        ClientAnchor anchor = drawing.createAnchor(0, 0, 0, 0, NUM_OF_COLUMNS + 2, 3, NUM_OF_COLUMNS + 15, 20);
+        String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
+        String EVENTS_TABLE = properties.getProperty("clustering.events.table");
+        String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
+        String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
+        String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
+        String PROCESSTIMES_TABLE = properties.getProperty(tablename);
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
 
-        Chart chart = drawing.createChart(anchor);
-        ChartLegend legend = chart.getOrCreateLegend();
-        legend.setPosition(LegendPosition.RIGHT);
-
-        LineChartData data = chart.getChartDataFactory().createLineChartData();
-
-        ChartAxis bottomAxis = chart.getChartAxisFactory().createCategoryAxis(AxisPosition.BOTTOM);
-        ValueAxis leftAxis = chart.getChartAxisFactory().createValueAxis(AxisPosition.LEFT);
-        leftAxis.setCrosses(AxisCrosses.AUTO_ZERO);
-
-        ChartDataSource<Number> xs = DataSources.fromNumericCellRange(dataSheet, new CellRangeAddress(0, NUM_OF_ROWS - 1, 0, 0));
-        ChartDataSource<Number> ys1 = DataSources.fromNumericCellRange(dataSheet, new CellRangeAddress(0, NUM_OF_ROWS - 1, 1, 1));
-        ChartDataSource<Number> ys2 = DataSources.fromNumericCellRange(dataSheet, new CellRangeAddress(0, NUM_OF_ROWS - 1, 2, 2));
-        ChartDataSource<Number> ys3 = DataSources.fromNumericCellRange(dataSheet, new CellRangeAddress(0, NUM_OF_ROWS - 1, 3, 3));
-
-        LineChartSeries series1 = data.addSeries(xs, ys1);
-        series1.setTitle("one");
-        LineChartSeries series2 = data.addSeries(xs, ys2);
-        series2.setTitle("two");
-        LineChartSeries series3 = data.addSeries(xs, ys3);
-        series3.setTitle("three");
-
-        chart.plot(data, bottomAxis, leftAxis);
-
-        XSSFChart xssfChart = (XSSFChart) chart;
-        CTPlotArea plotArea = xssfChart.getCTChart().getPlotArea();
-        CTMarker ctMarker = CTMarker.Factory.newInstance();
-        ctMarker.setSymbol(CTMarkerStyle.Factory.newInstance());
-        for (CTLineSer ser : plotArea.getLineChartArray()[0].getSerArray()) {
-            ser.setMarker(ctMarker);
-        }
-
-        FileOutputStream fileOut = new FileOutputStream(Constants.EXPERIMENT_FILE + "testchart.xlsx");
-        wb.write(fileOut);
-        fileOut.close();
+        createChart = 1;
+        createTimeChart(cassandraDao);
+        System.out.println("DONE");
+        return;
     }
 
-//    public static void main(String[] args) throws Exception {
-////        times = new int[rowNum][columnNum];
-////        times[0][1] = 3;
-////        times[9][7] = 3;
-////        writeExcel();
+
+    public static void main(String[] args) throws Exception {
+//        times = new int[rowNum][columnNum];
+//        times[0][1] = 3;
+//        times[9][7] = 3;
+//        writeExcel();
+
+        run("experiment-4-method-keybasedx", "keybased.processtimes.table");
+        run("experiment-4-method-keybasedSleepx", "keybasedsleep.processtimes.table");
+        run("experiment-4-method-clusteringx", "clustering.processtimes.table");
+        run("experiment-4-method-hybridx", "hybrid.processtimes.table");
+
+        System.out.println("DONEXX");
+//
 //
 //        TopologyHelper topologyHelper = new TopologyHelper();
 //        Properties properties = topologyHelper.loadProperties( "config.properties" );
@@ -273,16 +252,16 @@ public class ExcelWriter {
 //        String EVENTS_TABLE = properties.getProperty("clustering.events.table");
 //        String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
 //        String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
-//        String CLUSTERANDTWEET_TABLE = properties.getProperty("clustering.clusterandtweets.table");
 //        String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
 ////        String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
 ////        String PROCESSTIMES_TABLE = properties.getProperty("keybased.processtimes.table");
-//        String PROCESSTIMES_TABLE = properties.getProperty("keybasedsleep.processtimes.table");
-//        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, CLUSTERANDTWEET_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+////        String PROCESSTIMES_TABLE = properties.getProperty("keybasedsleep.processtimes.table");
+//        String PROCESSTIMES_TABLE = properties.getProperty("hybrid.processtimes.table");
+//        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
 //
 //        createChart = 1;
 //        createTimeChart(cassandraDao);
 //        System.out.println("DONE");
 //        return;
-//    }
+    }
 }
