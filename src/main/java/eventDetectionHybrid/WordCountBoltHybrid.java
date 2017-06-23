@@ -91,8 +91,10 @@ public class WordCountBoltHybrid extends BaseRichBolt {
             cassandraDao.insertIntoProcessed(values.toArray());
 
             if(lastRoundEnd<round)
-                for(int i=firstDetectorId;i<firstDetectorId+numDetector;i++)
+                for(int i=firstDetectorId;i<firstDetectorId+numDetector;i++) {
                     this.collector.emitDirect(i, new Values("BLOCKEND", round, true, componentId));
+                    System.out.println("For detector " + i);
+                }
 
         } catch (Exception e) {
             e.printStackTrace();

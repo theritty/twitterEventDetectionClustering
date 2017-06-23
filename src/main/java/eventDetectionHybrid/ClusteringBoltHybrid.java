@@ -74,8 +74,10 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
             return;
         }
 
-        if(!numWordCountBoltsForRound.contains(comingCompId) && finalRound<round)
+        if(!numWordCountBoltsForRound.contains(comingCompId) && finalRound<round) {
             numWordCountBoltsForRound.add(comingCompId);
+            System.out.println("blockend came for " + componentId + " from " + comingCompId);
+        }
 
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Detector " + componentId + " num: " + numWordCountBoltsForRound + " " + numWordCountBolts);
         if(numWordCountBolts == numWordCountBoltsForRound.size()) {

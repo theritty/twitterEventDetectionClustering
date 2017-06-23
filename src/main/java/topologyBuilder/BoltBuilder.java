@@ -213,9 +213,9 @@ public class BoltBuilder {
                 Constants.RESULT_FILE_PATH,FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "CAN", CAN_TASK_NUM);
 
         ClusteringBoltHybrid clusteringBoltUSA = new ClusteringBoltHybrid(cassandraDao,
-                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "USA",USA_TASK_NUM);
+                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "USA",NUM_FINDERS);
         ClusteringBoltHybrid clusteringBoltCAN = new ClusteringBoltHybrid(cassandraDao,
-                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "CAN",CAN_TASK_NUM);
+                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "CAN",NUM_FINDERS);
 
         EventDetectorBoltHybrid eventDetectorBolt = new EventDetectorBoltHybrid(FILENUM, cassandraDao);
 

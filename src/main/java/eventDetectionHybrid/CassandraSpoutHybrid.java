@@ -158,8 +158,8 @@ public class CassandraSpoutHybrid extends BaseRichSpout {
 
     private void sendBlockEndInfoAndWait() {
         System.out.println("Sending blockend for " + current_round);
-        for(int k=2+numWorkers+2;k<CANTaskNumber+USATaskNumber+2+numWorkers+2;k++) {
-            System.out.println("blockend for " + k + " round " + current_round);
+        for(int k=numWorkers+4;k<CANTaskNumber+USATaskNumber+numWorkers+4;k++) {
+            System.out.println("blockend for wc " + k + " round " + current_round);
             collector.emitDirect(k, new Values("BLOCKEND", current_round, true));
         }
 
