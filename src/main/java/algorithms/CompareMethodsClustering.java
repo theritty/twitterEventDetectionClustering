@@ -13,7 +13,7 @@ public class CompareMethodsClustering {
         Properties properties = topologyHelper.loadProperties( "config.properties" );
 
         String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
-        String EVENTS_TABLE = properties.getProperty("hybrid.events.table");
+        String EVENTS_TABLE = properties.getProperty("clustering.events.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("keybased.events.table");
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
@@ -71,7 +71,8 @@ public class CompareMethodsClustering {
                             if(!wordNums.containsKey(roundClustering))
                                 wordNums.put(roundClustering, new HashMap<>());
 
-                            if(wordNums.get(roundClustering).containsKey(word))
+                            x = wordNums.get(roundClustering);
+                            if(x.containsKey(word))
                                 x.put(word, wordNums.get(roundClustering).get(word)+1);
                             else
                                 x.put(word,1);
@@ -89,7 +90,7 @@ public class CompareMethodsClustering {
                     System.out.println("Cluster: " + cosinevector);
                 }
                 else {
-                    System.out.println(roundClustering + " Wtf Cluster: " + cosinevector);
+//                    System.out.println(roundClustering + " Wtf Cluster: " + cosinevector);
                 }
             }
 
@@ -112,7 +113,8 @@ public class CompareMethodsClustering {
                 while (it.hasNext()) {
                     wordNumIntersection++;
                     Map.Entry<String, Integer> pair = (Map.Entry) it.next();
-                    System.out.println("Round " + rnd +  " word " + pair.getKey() + " has occurred in " + pair.getValue() + " clusters. Percentage: " + (double) pair.getValue() / (double) clusterNum);
+                    System.out.println( pair.getKey() + " has occurred in " + pair.getValue() + " clusters. Percentage: " + (double) pair.getValue() / (double) clusterNum);
+//                    System.out.println("Round " + rnd +  " word " + pair.getKey() + " has occurred in " + pair.getValue() + " clusters. Percentage: " + (double) pair.getValue() / (double) clusterNum);
                     it.remove(); // avoids a ConcurrentModificationException
                 }
             }

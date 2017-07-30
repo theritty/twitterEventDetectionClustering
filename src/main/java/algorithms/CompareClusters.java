@@ -5,6 +5,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import topologyBuilder.TopologyHelper;
 
+import java.io.IOException;
 import java.util.*;
 
 public class CompareClusters {
@@ -89,7 +90,7 @@ public class CompareClusters {
     public static void xx(double perc) {
         try {
             String EVENTS_TABLE1 = "eventclusterForExperiment5";
-            String EVENTS_TABLE2 = "eventsHybridForExperiment4";
+            String EVENTS_TABLE2 = "eventsHybridForExperiment5";
             System.out.println("CAN_____________________________");
             clusterPercentage("CAN", EVENTS_TABLE1, EVENTS_TABLE2, perc);
             System.out.println("USA_____________________________");
@@ -104,20 +105,64 @@ public class CompareClusters {
             e.printStackTrace();
         }
     }
+//    public static void main(String[] args) {
+//        System.out.println("Percentage: 0.1************************************************************************************************************************************");
+//        xx(0.1);
+//        System.out.println("Percentage: 0.2************************************************************************************************************************************");
+//        xx(0.2);
+//        System.out.println("Percentage: 0.3************************************************************************************************************************************");
+//        xx(0.3);
+//        System.out.println("Percentage: 0.4************************************************************************************************************************************");
+//        xx(0.4);
+//        System.out.println("Percentage: 0.5************************************************************************************************************************************");
+//        xx(0.5);
+//        System.out.println("Percentage: 0.6************************************************************************************************************************************");
+//        xx(0.6);
+//        System.out.println("Percentage: 0.7************************************************************************************************************************************");
+//        xx(0.7);
+//    }
     public static void main(String[] args) {
-        System.out.println("Percentage: 0.1************************************************************************************************************************************");
-        xx(0.1);
-        System.out.println("Percentage: 0.2************************************************************************************************************************************");
-        xx(0.2);
-        System.out.println("Percentage: 0.3************************************************************************************************************************************");
-        xx(0.3);
-        System.out.println("Percentage: 0.4************************************************************************************************************************************");
-        xx(0.4);
-        System.out.println("Percentage: 0.5************************************************************************************************************************************");
-        xx(0.5);
-        System.out.println("Percentage: 0.6************************************************************************************************************************************");
-        xx(0.6);
-        System.out.println("Percentage: 0.7************************************************************************************************************************************");
-        xx(0.7);
+
+        TopologyHelper topologyHelper = new TopologyHelper();
+        Properties properties = null;
+        try {
+            properties = topologyHelper.loadProperties( "config.properties" );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
+        String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
+        String EVENTS_TABLE1 = "eventclusterForExperiment5";
+        String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
+        String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
+        String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
+
+        CassandraDao cassandraDao = null;
+        int count = 0;
+        try {
+            cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE1, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+            ResultSet resultSet = null;
+            try {
+                for(long i=4068480; i<= 4070160; i++) {
+                    resultSet = cassandraDao.getTweetsByRound(i);
+                    Iterator<Row> iterator = resultSet.iterator();
+                    while(iterator.hasNext()) {
+                        iterator.next();
+                        count++;
+                    }
+                }
+                System.out.println("count " + count);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
     }
+
+
 }

@@ -237,10 +237,10 @@ public class ExcelWriter {
 //        times[9][7] = 3;
 //        writeExcel();
 
-        run("experiment-4-method-keybasedx", "keybased.processtimes.table");
-        run("experiment-4-method-keybasedSleepx", "keybasedsleep.processtimes.table");
-        run("experiment-4-method-clusteringx", "clustering.processtimes.table");
-        run("experiment-4-method-hybridx", "hybrid.processtimes.table");
+        run("experiment-4-method-keybased-no", "keybased.processtimes.table");
+        run("experiment-4-method-keybasedSleep-no", "keybasedsleep.processtimes.table");
+        run("experiment-4-method-clustering-no", "clustering.processtimes.table");
+        run("experiment-4-method-hybrid-no", "hybrid.processtimes.table");
 
         System.out.println("DONEXX");
 //

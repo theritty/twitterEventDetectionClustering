@@ -218,7 +218,8 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
                 values_event.add(newCluster);
                 values_event.add(1.0);
                 values_event.add(numTweets);
-                cassandraDao.insertIntoEvents(values_event.toArray());
+                cassandraDao.
+                        insertIntoEvents(values_event.toArray());
             }
         } catch (Exception e) {
             e.printStackTrace();

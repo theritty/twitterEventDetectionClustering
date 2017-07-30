@@ -139,11 +139,11 @@ public class EventCandidateFinderHybrid extends BaseRichBolt {
 
                 if (tfidfs.get(tfidfs.size() - 2) == 0) {
                     if (tfidfs.get(tfidfs.size() - 1) / 0.0001 > tfidfEventRate) {
-                        cassandraDao.insertIntoEvents(round, country, key, tfidfs.get(tfidfs.size()-1) / tfidfs.get(tfidfs.size()-2));
+                        cassandraDao.insertIntoEventsKeybased(round, country, key, tfidfs.get(tfidfs.size()-1) / tfidfs.get(tfidfs.size()-2));
                         this.collector.emit(new Values(key, round, false, componentId));
                     }
                 } else if (tfidfs.get(tfidfs.size() - 1) / tfidfs.get(tfidfs.size() - 2) > tfidfEventRate) {
-                    cassandraDao.insertIntoEvents(round, country, key, tfidfs.get(tfidfs.size()-1) / tfidfs.get(tfidfs.size()-2));
+                    cassandraDao.insertIntoEventsKeybased(round, country, key, tfidfs.get(tfidfs.size()-1) / tfidfs.get(tfidfs.size()-2));
                     this.collector.emit(new Values(key, round, false, componentId));
                 }
 
