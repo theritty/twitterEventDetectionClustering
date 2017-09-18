@@ -121,7 +121,49 @@ public class CompareClusters {
 //        System.out.println("Percentage: 0.7************************************************************************************************************************************");
 //        xx(0.7);
 //    }
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
+//
+//        TopologyHelper topologyHelper = new TopologyHelper();
+//        Properties properties = null;
+//        try {
+//            properties = topologyHelper.loadProperties( "config.properties" );
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
+//        String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
+//        String EVENTS_TABLE1 = "eventclusterForExperiment5";
+//        String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
+//        String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
+//        String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
+//
+//        CassandraDao cassandraDao = null;
+//        int count = 0;
+//        try {
+//            cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE1, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+//            ResultSet resultSet = null;
+//            try {
+//                for(long i=4068480; i<= 4070160; i++) {
+//                    resultSet = cassandraDao.getTweetsByRound(i);
+//                    Iterator<Row> iterator = resultSet.iterator();
+//                    while(iterator.hasNext()) {
+//                        iterator.next();
+//                        count++;
+//                    }
+//                }
+//                System.out.println("count " + count);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//
+//    }
+ public static void main(String[] args) {
 
         TopologyHelper topologyHelper = new TopologyHelper();
         Properties properties = null;
@@ -133,26 +175,55 @@ public class CompareClusters {
 
         String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
-        String EVENTS_TABLE1 = "eventclusterForExperiment5";
+        String EVENTS_TABLE1 = "eventsHybridForExperiment5";
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
 
-        CassandraDao cassandraDao = null;
-        int count = 0;
+        CassandraDao cassandraDao;
         try {
             cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE1, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
-            ResultSet resultSet = null;
             try {
-                for(long i=4068480; i<= 4070160; i++) {
-                    resultSet = cassandraDao.getTweetsByRound(i);
+                ResultSet resultSet = cassandraDao.getEvents("USA");
                     Iterator<Row> iterator = resultSet.iterator();
                     while(iterator.hasNext()) {
-                        iterator.next();
-                        count++;
+                        Row row = iterator.next();
+                        HashMap<String, Double> cosinevector2 = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
+                        UUID clusterid2 = row.getUUID("clusterid");
+                        long round2 = row.getLong("round");
+                        Iterator<Map.Entry<String, Double>> it2 = cosinevector2.entrySet().iterator();
+                        ArrayList<String> mostlyUsed = new ArrayList<>();
+                        while (it2.hasNext()) {
+                            Map.Entry<String, Double> entry2 = it2.next();
+                            String key2 = entry2.getKey();
+                            if(entry2.getValue()>0.2) mostlyUsed.add(key2+":"+entry2.getValue());
+                        }
+                        System.out.println(clusterid2 + " | " + round2 + " | "  + row.getString("country") + " | " + row.getInt("numtweet") + " | " + cosinevector2 + " | " + mostlyUsed );
                     }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                ResultSet resultSet = cassandraDao.getEvents("CAN");
+                Iterator<Row> iterator = resultSet.iterator();
+                while(iterator.hasNext()) {
+                    Row row = iterator.next();
+                    HashMap<String, Double> cosinevector2 = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
+                    UUID clusterid2 = row.getUUID("clusterid");
+                    long round2 = row.getLong("round");
+                    Iterator<Map.Entry<String, Double>> it2 = cosinevector2.entrySet().iterator();
+                    ArrayList<String> mostlyUsed = new ArrayList<>();
+                    while (it2.hasNext()) {
+                        Map.Entry<String, Double> entry2 = it2.next();
+                        String key2 = entry2.getKey();
+                        if(entry2.getValue()>0.2) mostlyUsed.add(key2+":"+entry2.getValue());
+                    }
+                    System.out.println(clusterid2 + " | " + round2 + " | "  + row.getString("country") + " | " + row.getInt("numtweet") + " | " + cosinevector2 + " | " + mostlyUsed );
                 }
-                System.out.println("count " + count);
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -56,7 +56,7 @@ TRUNCATE countsForExperimentSleep ;TRUNCATE eventsForExperimentSleep ;TRUNCATE p
 
 
 
-CREATE TABLE tweetcollection.clustershybridforexperiment5 (
+CREATE TABLE tweetcollection.clustershybridforexperiment_paper2 (
 country text,
 id timeuuid,
 cosinevector map<text, double>,
@@ -66,7 +66,7 @@ prevnumtweets int,
 PRIMARY KEY (country, id)
 );
 
-CREATE TABLE tweetcollection.countshybridforexperiment5 (
+CREATE TABLE tweetcollection.countshybridforexperiment_paper2 (
 round bigint,
 word text,
 country text,
@@ -75,7 +75,7 @@ totalnumofwords bigint,
 PRIMARY KEY (round, word, country)
 );
 
-CREATE TABLE tweetcollection.eventshybridforexperiment5 (
+CREATE TABLE tweetcollection.eventshybridforexperiment_paper2 (
 round bigint,
 clusterid timeuuid,
 cosinevector map<text, double>,
@@ -84,21 +84,21 @@ incrementrate double,
 numtweet int,
 PRIMARY KEY (round, clusterid)
 );
-CREATE TABLE tweetcollection.eventskeybasedhybridforexperiment5 (
+CREATE TABLE tweetcollection.eventskeybasedhybridforexperiment_paper2 (
 round bigint,
 country text,
 word text,
 incrementpercent double,
 PRIMARY KEY (round, country, word)
 );
-CREATE TABLE tweetcollection.processedhybridforexperiment5 (
+CREATE TABLE tweetcollection.processedhybridforexperiment_paper2 (
 round bigint,
 boltid int,
 finished boolean,
 PRIMARY KEY (round, boltid)
 );
 
-CREATE TABLE tweetcollection.processtimeshybridforexperiment5 (
+CREATE TABLE tweetcollection.processtimeshybridforexperiment_paper2 (
 row int,
 column int,
 id int,
@@ -112,7 +112,7 @@ PRIMARY KEY (row, column)
 
 
 
-CREATE TABLE tweetcollection.clusterforexperiment5 (
+CREATE TABLE tweetcollection.clusterforexperiment_paper2 (
 country text,
 id timeuuid,
 cosinevector map<text, double>,
@@ -121,7 +121,7 @@ lastround bigint,
 prevnumtweets int,
 PRIMARY KEY (country, id)
 );
-CREATE TABLE tweetcollection.eventclusterforexperiment5 (
+CREATE TABLE tweetcollection.eventclusterforexperiment_paper2 (
 round bigint,
 clusterid timeuuid,
 cosinevector map<text, double>,
@@ -130,7 +130,7 @@ incrementrate double,
 numtweet int,
 PRIMARY KEY (round, clusterid)
 );
-CREATE TABLE tweetcollection.processedtweetsforexperiment5 (
+CREATE TABLE tweetcollection.processedtweetsforexperiment_paper2 (
 round bigint,
 boltid int,
 boltprocessed bigint,
@@ -139,7 +139,7 @@ finished boolean,
 spoutsent bigint,
 PRIMARY KEY (round, boltid)
 );
-CREATE TABLE tweetcollection.processtimesforexperiment5 (
+CREATE TABLE tweetcollection.processtimesforexperiment_paper2 (
 row int,
 column int,
 id int,
@@ -153,7 +153,7 @@ PRIMARY KEY (row, column)
 
 
 
-CREATE TABLE tweetcollection.countsforexperiment5 (
+CREATE TABLE tweetcollection.countsforexperiment_paper2 (
 round bigint,
 word text,
 country text,
@@ -161,20 +161,20 @@ count bigint,
 totalnumofwords bigint,
 PRIMARY KEY (round, word, country)
 );
-CREATE TABLE tweetcollection.eventsforexperiment5 (
+CREATE TABLE tweetcollection.eventsforexperiment_paper2 (
 round bigint,
 country text,
 word text,
 incrementpercent double,
 PRIMARY KEY (round, country, word)
 );
-CREATE TABLE tweetcollection.processedforexperiment5 (
+CREATE TABLE tweetcollection.processedforexperiment_paper2 (
 round bigint,
 boltid int,
 finished boolean,
 PRIMARY KEY (round, boltid)
 );
-CREATE TABLE tweetcollection.processtimeskeybasedforexperiment5 (
+CREATE TABLE tweetcollection.processtimeskeybasedforexperiment_paper2 (
 row int,
 column int,
 id int,
@@ -186,7 +186,7 @@ PRIMARY KEY (row, column)
 
 
 
-CREATE TABLE tweetcollection.countsforexperimentSleep5 (
+CREATE TABLE tweetcollection.countsforexperimentSleep_paper2 (
 round bigint,
 word text,
 country text,
@@ -194,20 +194,20 @@ count bigint,
 totalnumofwords bigint,
 PRIMARY KEY (round, word, country)
 );
-CREATE TABLE tweetcollection.eventsforexperimentSleep5 (
+CREATE TABLE tweetcollection.eventsforexperimentSleep_paper2 (
 round bigint,
 country text,
 word text,
 incrementpercent double,
 PRIMARY KEY (round, country, word)
 );
-CREATE TABLE tweetcollection.processedforexperimentSleep5 (
+CREATE TABLE tweetcollection.processedforexperimentSleep_paper2 (
 round bigint,
 boltid int,
 finished boolean,
 PRIMARY KEY (round, boltid)
 );
-CREATE TABLE tweetcollection.processtimeskeybasedforexperimentSleep5 (
+CREATE TABLE tweetcollection.processtimeskeybasedforexperimentSleep_paper2 (
 row int,
 column int,
 id int,
@@ -215,8 +215,25 @@ PRIMARY KEY (row, column)
 );
 
 
-TRUNCATE clustershybridforexperiment5; TRUNCATE countshybridforexperiment5; TRUNCATE eventskeybasedhybridforexperiment5; TRUNCATE eventshybridforexperiment5; TRUNCATE processedhybridforexperiment5; TRUNCATE processtimeshybridforexperiment5;
-TRUNCATE clusterforexperiment4; TRUNCATE eventclusterforexperiment4; TRUNCATE eventsforexperiment4; TRUNCATE processedtweetsforexperiment4; TRUNCATE processtimesforexperiment4;
-TRUNCATE countsforexperiment4; TRUNCATE eventsforexperiment4; TRUNCATE processedforexperiment4; TRUNCATE processtimeskeybasedforexperiment4;
-TRUNCATE countsforexperimentSleep4; TRUNCATE eventsforexperimentSleep4; TRUNCATE processedforexperimentSleep4; TRUNCATE processtimeskeybasedforexperimentSleep4;
+TRUNCATE clustershybridforexperiment_paper2; TRUNCATE countshybridforexperiment_paper2; TRUNCATE eventskeybasedhybridforexperiment_paper2; TRUNCATE eventshybridforexperiment_paper2; TRUNCATE processedhybridforexperiment_paper2; TRUNCATE processtimeshybridforexperiment_paper2;
+TRUNCATE clusterforexperiment_paper2; TRUNCATE eventclusterforexperiment_paper2; TRUNCATE eventsforexperiment_paper2; TRUNCATE processedtweetsforexperiment_paper2; TRUNCATE processtimesforexperiment_paper2;
+TRUNCATE countsforexperiment_paper2; TRUNCATE eventsforexperiment_paper2; TRUNCATE processedforexperiment_paper2; TRUNCATE processtimeskeybasedforexperiment_paper2;
+TRUNCATE countsforexperimentSleep_paper2; TRUNCATE eventsforexperimentSleep_paper2; TRUNCATE processedforexperimentSleep_paper2; TRUNCATE processtimeskeybasedforexperimentSleep_paper2;
 
+
+select count(*) from eventshybridforexperiment_paper2;
+select count(*) from eventclusterforexperiment_paper2;
+select count(*) from eventsforexperiment_paper2;
+
+
+select count(*) from eventshybridforexperiment_paper1;
+select count(*) from eventclusterforexperiment_paper1;
+select count(*) from eventsforexperiment_paper1;
+
+select count(*) from eventshybridforexperiment5;
+select count(*) from eventclusterforexperiment5;
+select count(*) from eventsforexperiment5;
+
+./cqlsh -f resCluster.txt > outputCluster.txt
+./cqlsh -f resHybrid.txt > outputHybrid.txt
+./cqlsh -f resKeybased.txt > outputKeybased.txt

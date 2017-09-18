@@ -201,12 +201,11 @@ public class ExcelWriter {
                 cell.setCellValue(times[i][j]);
             }
         }
-        System.out.println("here 2");
         try (FileOutputStream outputStream = new FileOutputStream(Constants.EXPERIMENT_FILE + fileNum + ".xlsx")) {
             workbook.write(outputStream);
         }
         workbook.close();
-        System.out.println("DONE");
+        System.out.println("DONE exc");
     }
 
 
@@ -226,7 +225,7 @@ public class ExcelWriter {
 
         createChart = 1;
         createTimeChart(cassandraDao);
-        System.out.println("DONE");
+        System.out.println("DONE run");
         return;
     }
 
@@ -238,7 +237,7 @@ public class ExcelWriter {
 //        writeExcel();
 
         run("experiment-4-method-keybased-no", "keybased.processtimes.table");
-        run("experiment-4-method-keybasedSleep-no", "keybasedsleep.processtimes.table");
+//        run("experiment-4-method-keybasedSleep-no", "keybasedsleep.processtimes.table");
         run("experiment-4-method-clustering-no", "clustering.processtimes.table");
         run("experiment-4-method-hybrid-no", "hybrid.processtimes.table");
 
