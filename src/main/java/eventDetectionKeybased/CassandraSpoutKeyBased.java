@@ -91,15 +91,16 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
         }
         Row row = iterator.next();
         String tweet = row.getString("tweet");
+        long id = row.getLong("id");
         String country = row.getString("country");
 
         if(tweet == null || tweet.length() == 0) return;
 
         if(iterator.hasNext()) {
-            splitAndEmit(tweet, current_round, country);
+            splitAndEmit(tweet, current_round, country, id);
         }
         else {
-            splitAndEmit(tweet, current_round, country);
+            splitAndEmit(tweet, current_round, country, id);
             putProcessedBoltInfoToCassandra();
             sendBlockEndInfoAndWait();
 
@@ -161,7 +162,7 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
         System.out.println("Sending blockend for " + current_round);
         for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+2+numWorkers;k++) {
             System.out.println("blockend for " + k + " round " + current_round);
-            collector.emitDirect(k, new Values("BLOCKEND", current_round, true));
+            collector.emitDirect(k, new Values("BLOCKEND", current_round, true, 0L));
         }
 
         TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + current_round + ".txt",
@@ -180,7 +181,7 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
                 else Thread.sleep(2000);
 
                 if(++sleepCnt>2) {
-                    System.out.println("Sending blockend again for " + current_round + " ");
+                    TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() +"Sending blockend again for " + current_round + " ");
                     for(int k=2+numWorkers;k<CANTaskNumber+USATaskNumber+2+numWorkers;k++)
                         collector.emitDirect(k, new Values("BLOCKEND", current_round, true));
                 }
@@ -192,36 +193,42 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
     }
 
 
-    public void sendToNextTaskNum(String country, String tweet, long round) {
-        if(country.equals("USA")) {
-            if(USAwordMap.containsKey(tweet)) {
-                this.collector.emitDirect(USAwordMap.get(tweet), new Values(tweet, round, false));
-            }
-            else {
-                this.collector.emitDirect(USATask, new Values(tweet, round, false));
-                USAwordMap.put(tweet, USATask++);
-                if ((USATask < 2 + numWorkers) || (USATask >= USATaskNumber + 2 + numWorkers))
-                    USATask = 2 + numWorkers;
-            }
-        }
-        else {
-            if(CANwordMap.containsKey(tweet)) {
-                this.collector.emitDirect(CANwordMap.get(tweet), new Values(tweet, round, false));
-            }
-            else {
-                this.collector.emitDirect(CANTask, new Values(tweet, round, false));
-                CANwordMap.put(tweet, CANTask++);
-                if ((CANTask < USATaskNumber + 2 + numWorkers) || (CANTask >= CANTaskNumber + USATaskNumber + 2 + numWorkers))
-                    CANTask = USATaskNumber + 2 + numWorkers;
-            }
-        }
+    public void sendToNextTaskNum(String country, String tweet, long round, long id) {
+        CANTask = USATaskNumber + 2 + numWorkers;
+        if(country.equals("USA")) return;
+        //TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "workhistory.txt", new Date() + " can task" +  CANTask);
+        this.collector.emitDirect(CANTask, new Values(tweet, round, false, id));
+        return;
+
+//        if(country.equals("USA")) {
+//            if(USAwordMap.containsKey(tweet)) {
+//                this.collector.emitDirect(USAwordMap.get(tweet), new Values(tweet, round, false));
+//            }
+//            else {
+//                this.collector.emitDirect(USATask, new Values(tweet, round, false));
+//                USAwordMap.put(tweet, USATask++);
+//                if ((USATask < 2 + numWorkers) || (USATask >= USATaskNumber + 2 + numWorkers))
+//                    USATask = 2 + numWorkers;
+//            }
+//        }
+//        else {
+//            if(CANwordMap.containsKey(tweet)) {
+//                this.collector.emitDirect(CANwordMap.get(tweet), new Values(tweet, round, false));
+//            }
+//            else {
+//                this.collector.emitDirect(CANTask, new Values(tweet, round, false));
+//                CANwordMap.put(tweet, CANTask++);
+//                if ((CANTask < USATaskNumber + 2 + numWorkers) || (CANTask >= CANTaskNumber + USATaskNumber + 2 + numWorkers))
+//                    CANTask = USATaskNumber + 2 + numWorkers;
+//            }
+//        }
     }
 
-    public void splitAndEmit(String tweetSentence, long round, String country) {
+    public void splitAndEmit(String tweetSentence, long round, String country, long id) {
         List<String> tweets = Arrays.asList(tweetSentence.split(" "));
         for (String tweet : tweets) {
             if (!tweet.equals("") && tweet.length() > 2 && !tweet.equals("hiring") && !tweet.equals("careerarc")) {
-                sendToNextTaskNum(country, tweet, round);
+                sendToNextTaskNum(country, tweet, round, id);
             }
         }
     }
@@ -243,9 +250,9 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
                     return m1.compareTo(m2);
                 }
             });
-            while (roundlist.get(0)<4068478)
+            while (roundlist.get(0)<4069530)
                 roundlist.remove(0);
-            while (roundlist.get(roundlist.size()-1)>=4070160)
+            while (roundlist.get(roundlist.size()-1)>=4069560)
                 roundlist.remove(roundlist.size()-1);
 
             int i = 0;
@@ -263,7 +270,7 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
     public ResultSet getDataFromCassandra(long round) {
         ResultSet resultSet = null;
         try {
-            resultSet = cassandraDao.getTweetsByRound(round);
+            resultSet = cassandraDao.getTweetsByRoundAndCountry(round, "CAN");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -291,7 +298,7 @@ public class CassandraSpoutKeyBased extends BaseRichSpout {
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("word", "round", "blockEnd"));
+        declarer.declare(new Fields("word", "round", "blockEnd", "id"));
     }
 
 }

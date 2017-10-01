@@ -51,29 +51,29 @@ public class BoltBuilder {
 
         CassandraDaoKeyBased cassandraDao = new CassandraDaoKeyBased(TWEETS_TABLE, COUNTS_TABLE, EVENTS_TABLE, PROCESSED_TABLE, PROCESSTIMES_TABLE);
         CassandraSpoutKeyBasedWithSleep cassandraSpout = new CassandraSpoutKeyBasedWithSleep(cassandraDao,
-                Integer.parseInt(properties.getProperty("keybasedsleep.compare.size")), FILENUM,CAN_TASK_NUM+USA_TASK_NUM+NUM_DETECTORS*2+2);
+                Integer.parseInt(properties.getProperty("keybasedsleep.compare.size")), FILENUM,CAN_TASK_NUM+NUM_DETECTORS+2);
         WordCountBoltKeyBasedWithSleep countBoltCAN = new WordCountBoltKeyBasedWithSleep(COUNT_THRESHOLD, FILENUM, cassandraDao);
-        WordCountBoltKeyBasedWithSleep countBoltUSA = new WordCountBoltKeyBasedWithSleep(COUNT_THRESHOLD, FILENUM, cassandraDao);
-        EventDetectorWithCassandraBoltKeyBasedWithSleep eventDetectorBolt1 = new EventDetectorWithCassandraBoltKeyBasedWithSleep(cassandraDao,
-                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE);
+//        WordCountBoltKeyBasedWithSleep countBoltUSA = new WordCountBoltKeyBasedWithSleep(COUNT_THRESHOLD, FILENUM, cassandraDao);
+//        EventDetectorWithCassandraBoltKeyBasedWithSleep eventDetectorBolt1 = new EventDetectorWithCassandraBoltKeyBasedWithSleep(cassandraDao,
+//                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE);
         EventDetectorWithCassandraBoltKeyBasedWithSleep eventDetectorBolt2 = new EventDetectorWithCassandraBoltKeyBasedWithSleep(cassandraDao,
                 Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE);
 
         EventCompareBoltKeyBasedWithSleep eventCompareBolt = new EventCompareBoltKeyBasedWithSleep(cassandraDao, FILENUM);
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpout,1);
 
-        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,USA_TASK_NUM).
-                fieldsGrouping(Constants.CASS_SPOUT_ID, "USA", new Fields("word"));
+//        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,USA_TASK_NUM).
+//                fieldsGrouping(Constants.CASS_SPOUT_ID, "USA", new Fields("word"));
         builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,CAN_TASK_NUM).
                 fieldsGrouping(Constants.CASS_SPOUT_ID, "CAN", new Fields("word"));
 
-        builder.setBolt( Constants.COUNTRY1_EVENT_DETECTOR_BOLT, eventDetectorBolt1,NUM_DETECTORS).
-                shuffleGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
+//        builder.setBolt( Constants.COUNTRY1_EVENT_DETECTOR_BOLT, eventDetectorBolt1,NUM_DETECTORS).
+//                shuffleGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
         builder.setBolt( Constants.COUNTRY2_EVENT_DETECTOR_BOLT, eventDetectorBolt2,NUM_DETECTORS).
                 shuffleGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
 
         builder.setBolt( Constants.EVENT_COMPARE_BOLT, eventCompareBolt,1).
-                globalGrouping(Constants.COUNTRY1_EVENT_DETECTOR_BOLT).
+//                globalGrouping(Constants.COUNTRY1_EVENT_DETECTOR_BOLT).
                 globalGrouping(Constants.COUNTRY2_EVENT_DETECTOR_BOLT);
 
         return builder.createTopology();
@@ -108,24 +108,24 @@ public class BoltBuilder {
 
         CassandraDaoKeyBased cassandraDao = new CassandraDaoKeyBased(TWEETS_TABLE, COUNTS_TABLE, EVENTS_TABLE, PROCESSED_TABLE, PROCESSTIMES_TABLE);
         CassandraSpoutKeyBased cassandraSpout = new CassandraSpoutKeyBased(cassandraDao, FILENUM, USA_TASK_NUM, CAN_TASK_NUM, NUM_WORKERS, NUM_DETECTORS*NUM_COUNTRIES,CAN_TASK_NUM+USA_TASK_NUM+NUM_DETECTORS*2+2);
-        WordCountBoltKeyBased countBoltUSA = new WordCountBoltKeyBased(COUNT_THRESHOLD, FILENUM, "USA", cassandraDao, NUM_DETECTORS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+3);
-        WordCountBoltKeyBased countBoltCAN = new WordCountBoltKeyBased(COUNT_THRESHOLD, FILENUM, "CAN", cassandraDao, NUM_DETECTORS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+3+NUM_DETECTORS);
-        EventDetectorWithCassandraBoltKeyBased eventDetectorBoltUSA = new EventDetectorWithCassandraBoltKeyBased(cassandraDao,
-                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("keybased.compare.size")), "USA",USA_TASK_NUM);
+//        WordCountBoltKeyBased countBoltUSA = new WordCountBoltKeyBased(COUNT_THRESHOLD, FILENUM, "USA", cassandraDao, NUM_DETECTORS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+3);
+        WordCountBoltKeyBased countBoltCAN = new WordCountBoltKeyBased(COUNT_THRESHOLD, FILENUM, "CAN", cassandraDao, NUM_DETECTORS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+2+NUM_DETECTORS);
+//        EventDetectorWithCassandraBoltKeyBased eventDetectorBoltUSA = new EventDetectorWithCassandraBoltKeyBased(cassandraDao,
+//                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("keybased.compare.size")), "USA",USA_TASK_NUM);
         EventDetectorWithCassandraBoltKeyBased eventDetectorBoltCAN = new EventDetectorWithCassandraBoltKeyBased(cassandraDao,
                 Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("keybased.compare.size")), "CAN",CAN_TASK_NUM);
 
         EventCompareBoltKeyBased eventCompareBolt = new EventCompareBoltKeyBased(cassandraDao, FILENUM);
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpout,1);
 
-        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,USA_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
+//        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,USA_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
         builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,CAN_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
 
-        builder.setBolt( Constants.COUNTRY1_EVENT_DETECTOR_BOLT, eventDetectorBoltUSA,NUM_DETECTORS).directGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
+//        builder.setBolt( Constants.COUNTRY1_EVENT_DETECTOR_BOLT, eventDetectorBoltUSA,NUM_DETECTORS).directGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
         builder.setBolt( Constants.COUNTRY2_EVENT_DETECTOR_BOLT, eventDetectorBoltCAN,NUM_DETECTORS).directGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
 
         builder.setBolt( Constants.EVENT_COMPARE_BOLT, eventCompareBolt,1).
-                globalGrouping(Constants.COUNTRY1_EVENT_DETECTOR_BOLT).
+//                globalGrouping(Constants.COUNTRY1_EVENT_DETECTOR_BOLT).
                 globalGrouping(Constants.COUNTRY2_EVENT_DETECTOR_BOLT);
 
         return builder.createTopology();
@@ -160,15 +160,15 @@ public class BoltBuilder {
         CassandraSpoutClustering cassandraSpoutClustering = new CassandraSpoutClustering(cassandraDao, FILENUM, START_ROUND, END_ROUND, CAN_TASK_NUM, USA_TASK_NUM, NUM_WORKERS,CAN_TASK_NUM+USA_TASK_NUM+3);
 
         ClusteringBolt countBoltCAN = new ClusteringBolt( FILENUM, cassandraDao, "CAN");
-        ClusteringBolt countBoltUSA = new ClusteringBolt( FILENUM, cassandraDao, "USA");
+//        ClusteringBolt countBoltUSA = new ClusteringBolt( FILENUM, cassandraDao, "USA");
         EventDetectorBoltClustering eventDetectorBoltClusteringCAN = new EventDetectorBoltClustering(FILENUM, cassandraDao, "CAN", CAN_TASK_NUM);
-        EventDetectorBoltClustering eventDetectorBoltClusteringUSA = new EventDetectorBoltClustering(FILENUM, cassandraDao, "USA", USA_TASK_NUM);
+//        EventDetectorBoltClustering eventDetectorBoltClusteringUSA = new EventDetectorBoltClustering(FILENUM, cassandraDao, "USA", USA_TASK_NUM);
 
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpoutClustering,1);
         builder.setBolt(Constants.COUNTRY2_CLUSTERING_BOLT_ID, countBoltCAN,CAN_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
-        builder.setBolt(Constants.COUNTRY1_CLUSTERING_BOLT_ID, countBoltUSA,USA_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
+//        builder.setBolt(Constants.COUNTRY1_CLUSTERING_BOLT_ID, countBoltUSA,USA_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
         builder.setBolt(Constants.COUNTRY2_EVENTDETECTOR_BOLT_ID, eventDetectorBoltClusteringCAN,1).shuffleGrouping(Constants.COUNTRY2_CLUSTERING_BOLT_ID);
-        builder.setBolt(Constants.COUNTRY1_EVENTDETECTOR_BOLT_ID, eventDetectorBoltClusteringUSA,1).shuffleGrouping(Constants.COUNTRY1_CLUSTERING_BOLT_ID);
+//        builder.setBolt(Constants.COUNTRY1_EVENTDETECTOR_BOLT_ID, eventDetectorBoltClusteringUSA,1).shuffleGrouping(Constants.COUNTRY1_CLUSTERING_BOLT_ID);
 
         System.out.println("Bolts ready");
 
@@ -204,16 +204,16 @@ public class BoltBuilder {
         TopologyBuilder builder = new TopologyBuilder();
 
         CassandraSpoutHybrid cassandraSpoutClustering = new CassandraSpoutHybrid(cassandraDao, FILENUM, USA_TASK_NUM, CAN_TASK_NUM, NUM_WORKERS, NUM_FINDERS, CAN_TASK_NUM+USA_TASK_NUM+4+NUM_FINDERS*2);
-        WordCountBoltHybrid countBoltUSA = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, "USA", cassandraDao, NUM_FINDERS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+5);
+//        WordCountBoltHybrid countBoltUSA = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, "USA", cassandraDao, NUM_FINDERS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+5);
         WordCountBoltHybrid countBoltCAN = new WordCountBoltHybrid(COUNT_THRESHOLD, FILENUM, "CAN", cassandraDao, NUM_FINDERS, NUM_WORKERS+CAN_TASK_NUM+USA_TASK_NUM+5+NUM_FINDERS);
 
-        EventCandidateFinderHybrid eventCandidateFinderHybridUSA = new EventCandidateFinderHybrid(cassandraDao,
-                Constants.RESULT_FILE_PATH,FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "USA", USA_TASK_NUM);
+//        EventCandidateFinderHybrid eventCandidateFinderHybridUSA = new EventCandidateFinderHybrid(cassandraDao,
+ //               Constants.RESULT_FILE_PATH,FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "USA", USA_TASK_NUM);
         EventCandidateFinderHybrid eventCandidateFinderHybridCAN = new EventCandidateFinderHybrid(cassandraDao,
                 Constants.RESULT_FILE_PATH,FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "CAN", CAN_TASK_NUM);
 
-        ClusteringBoltHybrid clusteringBoltUSA = new ClusteringBoltHybrid(cassandraDao,
-                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "USA",NUM_FINDERS);
+//        ClusteringBoltHybrid clusteringBoltUSA = new ClusteringBoltHybrid(cassandraDao,
+//                Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "USA",NUM_FINDERS);
         ClusteringBoltHybrid clusteringBoltCAN = new ClusteringBoltHybrid(cassandraDao,
                 Constants.RESULT_FILE_PATH, FILENUM, TFIDF_EVENT_RATE, Integer.parseInt(properties.getProperty("hybrid.compare.size")), "CAN",NUM_FINDERS);
 
@@ -221,15 +221,15 @@ public class BoltBuilder {
 
         builder.setSpout(Constants.CASS_SPOUT_ID, cassandraSpoutClustering,1);
         builder.setBolt(Constants.COUNTRY2_COUNT_BOLT_ID, countBoltCAN,CAN_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
-        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,USA_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
+//        builder.setBolt(Constants.COUNTRY1_COUNT_BOLT_ID, countBoltUSA,USA_TASK_NUM).directGrouping(Constants.CASS_SPOUT_ID);
 
-        builder.setBolt( Constants.COUNTRY1_EVENT_FINDER_BOLT, eventCandidateFinderHybridUSA,NUM_FINDERS).directGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
+//        builder.setBolt( Constants.COUNTRY1_EVENT_FINDER_BOLT, eventCandidateFinderHybridUSA,NUM_FINDERS).directGrouping(Constants.COUNTRY1_COUNT_BOLT_ID);
         builder.setBolt( Constants.COUNTRY2_EVENT_FINDER_BOLT, eventCandidateFinderHybridCAN,NUM_FINDERS).directGrouping(Constants.COUNTRY2_COUNT_BOLT_ID);
 
         builder.setBolt(Constants.COUNTRY2_CLUSTERING_BOLT_ID, clusteringBoltCAN, 1).shuffleGrouping(Constants.COUNTRY2_EVENT_FINDER_BOLT);
-        builder.setBolt(Constants.COUNTRY1_CLUSTERING_BOLT_ID, clusteringBoltUSA, 1).shuffleGrouping(Constants.COUNTRY1_EVENT_FINDER_BOLT);
+//        builder.setBolt(Constants.COUNTRY1_CLUSTERING_BOLT_ID, clusteringBoltUSA, 1).shuffleGrouping(Constants.COUNTRY1_EVENT_FINDER_BOLT);
         builder.setBolt( Constants.COUNTRY1_EVENT_DETECTOR_BOLT, eventDetectorBolt,1).
-                globalGrouping(Constants.COUNTRY1_CLUSTERING_BOLT_ID).
+//                globalGrouping(Constants.COUNTRY1_CLUSTERING_BOLT_ID).
                 globalGrouping(Constants.COUNTRY2_CLUSTERING_BOLT_ID);
 
 

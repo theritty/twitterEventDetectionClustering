@@ -89,6 +89,7 @@ public class WordCountBoltKeyBasedWithSleep extends BaseRichBolt {
         countsForRounds.put(word, count);
 
         if (count == threshold) {
+            TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", round + " word " + word + ", count " + count  + " threshold " + threshold);
             this.collector.emit(new Values(word, round, false, tuple.getValueByField("dates"), tuple.getSourceStreamId()));
         }
         lastDate = new Date();

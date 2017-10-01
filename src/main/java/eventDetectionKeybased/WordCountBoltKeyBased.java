@@ -49,6 +49,7 @@ public class WordCountBoltKeyBased extends BaseRichBolt {
     @Override
     public void execute(Tuple tuple) {
         String word = tuple.getStringByField("word");
+        long id = tuple.getLongByField("id");
         long round = tuple.getLongByField("round");
         boolean blockend = tuple.getBooleanByField("blockEnd");
 
@@ -64,6 +65,9 @@ public class WordCountBoltKeyBased extends BaseRichBolt {
             ExcelWriter.putData(componentId,nowDate,new Date(), round, cassandraDao);
             return;
         }
+
+        if(word.equals("bradley") && round==4069532)
+            TopologyHelper.writeToFile(Constants.WORKHISTORY_FILE + fileNum+ "sout.txt", round + " bradley " + id + " " + countsForRounds.get("bradley"));
 
         Long count = countsForRounds.get(word);
         if (count == null) count = 0L;
@@ -81,7 +85,7 @@ public class WordCountBoltKeyBased extends BaseRichBolt {
     }
 
     private void markComponentAsFinishedInCassaandra(long round) {
-        System.out.println("Receive blockend for " + round + ", bolt id " + componentId);
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " Receive blockend for " + round + ", bolt id " + componentId + ", first det id: " + firstDetectorId);
         try {
             List<Object> values = new ArrayList<>();
             values.add(round);
@@ -103,9 +107,12 @@ public class WordCountBoltKeyBased extends BaseRichBolt {
     private void processNewWord(String word, long count, long round) {
 
         if(count==threshold) {
-            this.collector.emitDirect(detectorTask++, new Values(word, round, false, componentId));
-            if(detectorTask==firstDetectorId+numDetector)
-                detectorTask=firstDetectorId;
+
+            //TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", round + " word " + word + ", count " + count  + " threshold " + threshold);
+            //this.collector.emitDirect(detectorTask++, new Values(word, round, false, componentId));
+            this.collector.emitDirect(detectorTask, new Values(word, round, false, componentId));
+            //if(detectorTask==firstDetectorId+numDetector)
+            //    detectorTask=firstDetectorId;
         }
 
         countsForRounds.put(word, count);

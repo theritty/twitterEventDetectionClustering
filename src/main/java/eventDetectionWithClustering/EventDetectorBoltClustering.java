@@ -251,7 +251,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
 
             List<Object> values3 = new ArrayList<>();
             values3.add(round);
-            values3.add(componentId);
+            values3.add(componentId+1);
             values3.add(0L);
             values3.add(0L);
             values3.add(true);

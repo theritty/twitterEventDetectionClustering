@@ -58,7 +58,7 @@ import java.util.*;
             if("dummyBLOCKdone".equals(key))
                 this.collector.emit(new Values(key, new ArrayList<Double>(), round, country));
 
-            TopologyHelper.writeToFile(Constants.WORKHISTORY_FILE + fileNum+ "workhistory.txt", new Date() +  " Detector " + componentId + " working " + round);
+            TopologyHelper.writeToFile(Constants.WORKHISTORY_FILE + fileNum+ "sout.txt", new Date() +  " Detector " + componentId + " working " + round + " key " + key );
 
             ArrayList<Double> tfidfs = new ArrayList<>();
             if(currentRound < round) {

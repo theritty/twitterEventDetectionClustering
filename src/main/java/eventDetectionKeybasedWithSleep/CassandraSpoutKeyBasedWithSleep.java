@@ -71,7 +71,7 @@ public class CassandraSpoutKeyBasedWithSleep extends BaseRichSpout {
             {
                 if(sent) return;
                 try {
-                    collector.emit("USA", new Values("dummy", current_round+1, true, new ArrayList<Long>()));
+                    //collector.emit("USA", new Values("dummy", current_round+1, true, new ArrayList<Long>()));
                     collector.emit("CAN", new Values("dummy", current_round+1, true, new ArrayList<Long>()));
                     try {
                         System.out.println("sleeeeeeeep");
@@ -81,7 +81,7 @@ public class CassandraSpoutKeyBasedWithSleep extends BaseRichSpout {
                         e.printStackTrace();
                     }
 
-                    collector.emit("USA", new Values("dummyBLOCKdone", current_round+1, true, new ArrayList<Long>()));
+                    //collector.emit("USA", new Values("dummyBLOCKdone", current_round+1, true, new ArrayList<Long>()));
                     collector.emit("CAN", new Values("dummyBLOCKdone", current_round+1, true, new ArrayList<Long>()));
                     sent=true;
 
@@ -130,7 +130,7 @@ public class CassandraSpoutKeyBasedWithSleep extends BaseRichSpout {
         }
         else {
             splitAndEmit(tweet, current_round, tmp_roundlist, country);
-            collector.emit("USA", new Values("BLOCKEND", current_round, true, tmp_roundlist));
+            //collector.emit("USA", new Values("BLOCKEND", current_round, true, tmp_roundlist));
             collector.emit("CAN", new Values("BLOCKEND", current_round, true, tmp_roundlist));
             TopologyHelper.writeToFile(Constants.TIMEBREAKDOWN_FILE_PATH + fileNum + current_round + ".txt",
                     new Date() + ": Round end from cass spout =>" + current_round );
@@ -166,9 +166,9 @@ public class CassandraSpoutKeyBasedWithSleep extends BaseRichSpout {
                 }
             });
 
-            while (roundlist.get(0)<4068478)
+            while (roundlist.get(0)<4069530)
                 roundlist.remove(0);
-            while (roundlist.get(roundlist.size()-1)>=4070160)
+            while (roundlist.get(roundlist.size()-1)>=4069560)
                 roundlist.remove(roundlist.size()-1);
 
             int i = 0;
@@ -214,7 +214,7 @@ public class CassandraSpoutKeyBasedWithSleep extends BaseRichSpout {
      */
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream("USA", new Fields("word", "round", "blockEnd", "dates"));
+        //declarer.declareStream("USA", new Fields("word", "round", "blockEnd", "dates"));
         declarer.declareStream("CAN", new Fields("word", "round", "blockEnd", "dates"));
     }
 

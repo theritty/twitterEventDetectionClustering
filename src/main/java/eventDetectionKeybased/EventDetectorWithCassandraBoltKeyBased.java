@@ -72,7 +72,7 @@ public class EventDetectorWithCassandraBoltKeyBased extends BaseRichBolt {
         }
 
         if(!numWordCountBoltsForRound.contains(comingCompId) && finalRound<round) numWordCountBoltsForRound.add(comingCompId);
-        System.out.println("Detector " + componentId + " num: " + numWordCountBoltsForRound + " " + numWordCountBolts);
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " Detector " + componentId + " num: " + numWordCountBoltsForRound + " " + numWordCountBolts);
         if(numWordCountBolts == numWordCountBoltsForRound.size()) {
 
             for (String key : words) {

@@ -95,7 +95,8 @@ public class TopologyCreator {
         int nimbusPort = Integer.parseInt(properties.getProperty("nimbus.port"));
         String stormZookeeperServers = properties.getProperty("storm.zookeeper.serverss");
         String stormPorts = properties.getProperty("storm.ports");
-        int numWorkers = Integer.parseInt(properties.getProperty(methodName + ".num.workers"));
+        //int numWorkers = Integer.parseInt(properties.getProperty(methodName + ".num.workers"));
+        int numWorkers = 2;
 
 //        config.setDebug( true );
 
@@ -116,7 +117,7 @@ public class TopologyCreator {
                 storm_conf.put("supervisor.slots.ports", ports);
                 storm_conf.put("topology.workers", numWorkers);
                 storm_conf.put("topology.acker.executors", numWorkers);
-                String inputJar = "/Users/ozlemcerensahin/Desktop/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar";
+                String inputJar = "/home/ceren/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar";
                 NimbusClient nimbus = new NimbusClient(storm_conf, nimbusHosts, nimbusPort);
                 String uploadedJarLocation = StormSubmitter.submitJar(storm_conf, inputJar);
 

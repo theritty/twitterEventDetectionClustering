@@ -80,9 +80,9 @@ public class CassandraSpoutClustering extends BaseRichSpout {
          * we will wait and then return
          */
 
-        if( (USATask<2+numWorkers) || (USATask>= USATaskNumber+2+numWorkers))
-            USATask = 2+numWorkers;
-        if( (CANTask < USATaskNumber+2+numWorkers) || (CANTask>=CANTaskNumber+USATaskNumber+2+numWorkers))
+     //   if( (USATask<2+numWorkers) || (USATask>= USATaskNumber+2+numWorkers))
+     //       USATask = 2+numWorkers;
+     //   if( (CANTask < USATaskNumber+2+numWorkers) || (CANTask>=CANTaskNumber+USATaskNumber+2+numWorkers))
             CANTask = USATaskNumber+2+numWorkers;
 
 
@@ -157,8 +157,9 @@ public class CassandraSpoutClustering extends BaseRichSpout {
                     values.add(counts.get(k));
                     values.add(0L);
                     values.add(false);
-                    if(k<USATaskNumber+2+numWorkers) values.add("USA");
-                    else values.add("CAN");
+                    //if(k<USATaskNumber+2+numWorkers) values.add("USA");
+                    //else
+                    values.add("CAN");
                     cassandraDao.insertIntoProcessed(values.toArray());
                 }
                 counts.clear();
@@ -166,14 +167,14 @@ public class CassandraSpoutClustering extends BaseRichSpout {
                     collector.emitDirect(k, new Values(new ArrayList<>(), 0L, current_round, true, false));
 
 
-                List<Object> values = new ArrayList<>();
-                values.add(current_round);
-                values.add(CANTaskNumber+USATaskNumber+1+numWorkers);
-                values.add(0L);
-                values.add(0L);
-                values.add(false);
-                values.add("USA");
-                cassandraDao.insertIntoProcessed(values.toArray());
+//                List<Object> values = new ArrayList<>();
+//                values.add(current_round);
+//                values.add(CANTaskNumber+USATaskNumber+1+numWorkers);
+//                values.add(0L);
+//                values.add(0L);
+//                values.add(false);
+//                values.add("USA");
+//                cassandraDao.insertIntoProcessed(values.toArray());
 
 
                 List<Object> values2 = new ArrayList<>();
@@ -227,24 +228,24 @@ public class CassandraSpoutClustering extends BaseRichSpout {
 
 
         if(tweetMap.size()>1) {
-            if(country.equals("USA")) {
-                collector.emitDirect(USATask, new Values(tweetMap, id, round, false, false));
-                if ( counts.get(USATask) != null)
-                    counts.put(USATask, counts.get(USATask)+1);
-                else
-                    counts.put(USATask, 1L);
-                USATask++;
+           // if(country.equals("USA")) {
+           //     collector.emitDirect(USATask, new Values(tweetMap, id, round, false, false));
+           //    if ( counts.get(USATask) != null)
+           //         counts.put(USATask, counts.get(USATask)+1);
+           //     else
+           //         counts.put(USATask, 1L);
+           //     USATask++;
 //                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " USA emit: " + (USATask-1));
-            }
-            else {
+           // }
+           // else {
                 collector.emitDirect(CANTask, new Values(tweetMap, id, round, false, false));
                 if ( counts.get(CANTask) != null)
                     counts.put(CANTask, counts.get(CANTask)+1);
                 else
                     counts.put(CANTask, 1L);
-                CANTask++;
+            //    CANTask++;
 //                TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " CAN emit: " + (CANTask-1));
-            }
+           // }
         }
     }
 
