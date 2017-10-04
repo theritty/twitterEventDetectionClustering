@@ -117,7 +117,7 @@ public class TopologyCreator {
                 storm_conf.put("supervisor.slots.ports", ports);
                 storm_conf.put("topology.workers", numWorkers);
                 storm_conf.put("topology.acker.executors", numWorkers);
-                String inputJar = "/home/ceren/workspace/twitterEventDetectionClustering/target/eventdetection-1.0-jar-with-dependencies.jar";
+                String inputJar = Constants.inputJar;
                 NimbusClient nimbus = new NimbusClient(storm_conf, nimbusHosts, nimbusPort);
                 String uploadedJarLocation = StormSubmitter.submitJar(storm_conf, inputJar);
 

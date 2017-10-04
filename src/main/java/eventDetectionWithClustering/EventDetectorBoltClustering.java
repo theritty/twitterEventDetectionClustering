@@ -81,7 +81,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                 double value1 = entry.getValue();
                 double value2 = cluster2.get(key);
                 double newValue = (value1 * numTweets1 + value2 * numTweets2) / (numTweets1+numTweets2);
-                if(numTweets1+numTweets2>50 && newValue<0.01) {
+                if(numTweets1+numTweets2>50 && newValue<0.08) {
                     it.remove();
                 }
                 else {
@@ -97,7 +97,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             String key = entry.getKey();
             double value = entry.getValue();
             double newValue = (value * numTweets2) / (numTweets1+numTweets2);
-            if(numTweets1+numTweets2<50 || newValue>0.01) {
+            if(numTweets1+numTweets2<50 || newValue>0.08) {
                 cluster1.put(key, newValue);
             }
         }
@@ -190,7 +190,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                         while(it.hasNext()) {
                             Map.Entry<String, Double> entry = it.next();
                             double value = entry.getValue();
-                            if(value < 0.01) {
+                            if(value < 0.08) {
                                 it.remove();
                             }
                         }
