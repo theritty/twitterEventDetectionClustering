@@ -56,7 +56,7 @@ TRUNCATE countsForExperimentSleep ;TRUNCATE eventsForExperimentSleep ;TRUNCATE p
 
 
 
-CREATE TABLE tweetcollection.clustershybridforexperiment_paper2 (
+CREATE TABLE tweetcollection.clustershybridforexperiment_paper3 (
 country text,
 id timeuuid,
 cosinevector map<text, double>,
@@ -66,7 +66,7 @@ prevnumtweets int,
 PRIMARY KEY (country, id)
 );
 
-CREATE TABLE tweetcollection.countshybridforexperiment_paper2 (
+CREATE TABLE tweetcollection.countshybridforexperiment_paper3 (
 round bigint,
 word text,
 country text,
@@ -75,7 +75,7 @@ totalnumofwords bigint,
 PRIMARY KEY (round, word, country)
 );
 
-CREATE TABLE tweetcollection.eventshybridforexperiment_paper2 (
+CREATE TABLE tweetcollection.eventshybridforexperiment_paper3 (
 round bigint,
 clusterid timeuuid,
 cosinevector map<text, double>,
@@ -84,21 +84,21 @@ incrementrate double,
 numtweet int,
 PRIMARY KEY (round, clusterid)
 );
-CREATE TABLE tweetcollection.eventskeybasedhybridforexperiment_paper2 (
+CREATE TABLE tweetcollection.eventskeybasedhybridforexperiment_paper3 (
 round bigint,
 country text,
 word text,
 incrementpercent double,
 PRIMARY KEY (round, country, word)
 );
-CREATE TABLE tweetcollection.processedhybridforexperiment_paper2 (
+CREATE TABLE tweetcollection.processedhybridforexperiment_paper3 (
 round bigint,
 boltid int,
 finished boolean,
 PRIMARY KEY (round, boltid)
 );
 
-CREATE TABLE tweetcollection.processtimeshybridforexperiment_paper2 (
+CREATE TABLE tweetcollection.processtimeshybridforexperiment_paper3 (
 row int,
 column int,
 id int,
@@ -112,7 +112,7 @@ PRIMARY KEY (row, column)
 
 
 
-CREATE TABLE tweetcollection.clusterforexperiment_paper2 (
+CREATE TABLE tweetcollection.clusterforexperiment_paper3 (
 country text,
 id timeuuid,
 cosinevector map<text, double>,
@@ -121,7 +121,7 @@ lastround bigint,
 prevnumtweets int,
 PRIMARY KEY (country, id)
 );
-CREATE TABLE tweetcollection.eventclusterforexperiment_paper2 (
+CREATE TABLE tweetcollection.eventclusterforexperiment_paper3 (
 round bigint,
 clusterid timeuuid,
 cosinevector map<text, double>,
@@ -130,7 +130,7 @@ incrementrate double,
 numtweet int,
 PRIMARY KEY (round, clusterid)
 );
-CREATE TABLE tweetcollection.processedtweetsforexperiment_paper2 (
+CREATE TABLE tweetcollection.processedtweetsforexperiment_paper3 (
 round bigint,
 boltid int,
 boltprocessed bigint,
@@ -139,11 +139,16 @@ finished boolean,
 spoutsent bigint,
 PRIMARY KEY (round, boltid)
 );
-CREATE TABLE tweetcollection.processtimesforexperiment_paper2 (
+CREATE TABLE tweetcollection.processtimesforexperiment_paper3 (
 row int,
 column int,
 id int,
 PRIMARY KEY (row, column)
+);
+CREATE TABLE tweetcollection.tweetsandcluster_paper3 (
+clusterid timeuuid,
+tweetid bigint,
+PRIMARY KEY (clusterid, tweetid)
 );
 
 
@@ -153,7 +158,7 @@ PRIMARY KEY (row, column)
 
 
 
-CREATE TABLE tweetcollection.countsforexperiment_paper2 (
+CREATE TABLE tweetcollection.countsforexperiment_paper3 (
 round bigint,
 word text,
 country text,
@@ -161,20 +166,20 @@ count bigint,
 totalnumofwords bigint,
 PRIMARY KEY (round, word, country)
 );
-CREATE TABLE tweetcollection.eventsforexperiment_paper2 (
+CREATE TABLE tweetcollection.eventsforexperiment_paper3 (
 round bigint,
 country text,
 word text,
 incrementpercent double,
 PRIMARY KEY (round, country, word)
 );
-CREATE TABLE tweetcollection.processedforexperiment_paper2 (
+CREATE TABLE tweetcollection.processedforexperiment_paper3 (
 round bigint,
 boltid int,
 finished boolean,
 PRIMARY KEY (round, boltid)
 );
-CREATE TABLE tweetcollection.processtimeskeybasedforexperiment_paper2 (
+CREATE TABLE tweetcollection.processtimeskeybasedforexperiment_paper3 (
 row int,
 column int,
 id int,
@@ -186,7 +191,7 @@ PRIMARY KEY (row, column)
 
 
 
-CREATE TABLE tweetcollection.countsforexperimentSleep_paper2 (
+CREATE TABLE tweetcollection.countsforexperimentSleep_paper3 (
 round bigint,
 word text,
 country text,
@@ -194,20 +199,20 @@ count bigint,
 totalnumofwords bigint,
 PRIMARY KEY (round, word, country)
 );
-CREATE TABLE tweetcollection.eventsforexperimentSleep_paper2 (
+CREATE TABLE tweetcollection.eventsforexperimentSleep_paper3 (
 round bigint,
 country text,
 word text,
 incrementpercent double,
 PRIMARY KEY (round, country, word)
 );
-CREATE TABLE tweetcollection.processedforexperimentSleep_paper2 (
+CREATE TABLE tweetcollection.processedforexperimentSleep_paper3 (
 round bigint,
 boltid int,
 finished boolean,
 PRIMARY KEY (round, boltid)
 );
-CREATE TABLE tweetcollection.processtimeskeybasedforexperimentSleep_paper2 (
+CREATE TABLE tweetcollection.processtimeskeybasedforexperimentSleep_paper3 (
 row int,
 column int,
 id int,
@@ -215,15 +220,15 @@ PRIMARY KEY (row, column)
 );
 
 
-TRUNCATE clustershybridforexperiment_paper2; TRUNCATE countshybridforexperiment_paper2; TRUNCATE eventskeybasedhybridforexperiment_paper2; TRUNCATE eventshybridforexperiment_paper2; TRUNCATE processedhybridforexperiment_paper2; TRUNCATE processtimeshybridforexperiment_paper2;
-TRUNCATE clusterforexperiment_paper2; TRUNCATE eventclusterforexperiment_paper2; TRUNCATE eventsforexperiment_paper2; TRUNCATE processedtweetsforexperiment_paper2; TRUNCATE processtimesforexperiment_paper2;
-TRUNCATE countsforexperiment_paper2; TRUNCATE eventsforexperiment_paper2; TRUNCATE processedforexperiment_paper2; TRUNCATE processtimeskeybasedforexperiment_paper2;
-TRUNCATE countsforexperimentSleep_paper2; TRUNCATE eventsforexperimentSleep_paper2; TRUNCATE processedforexperimentSleep_paper2; TRUNCATE processtimeskeybasedforexperimentSleep_paper2;
+TRUNCATE clustershybridforexperiment_paper3; TRUNCATE countshybridforexperiment_paper3; TRUNCATE eventskeybasedhybridforexperiment_paper3; TRUNCATE eventshybridforexperiment_paper3; TRUNCATE processedhybridforexperiment_paper3; TRUNCATE processtimeshybridforexperiment_paper3;
+TRUNCATE clusterforexperiment_paper3; TRUNCATE eventclusterforexperiment_paper3; TRUNCATE eventsforexperiment_paper3; TRUNCATE processedtweetsforexperiment_paper3; TRUNCATE processtimesforexperiment_paper3;
+TRUNCATE countsforexperiment_paper3; TRUNCATE eventsforexperiment_paper3; TRUNCATE processedforexperiment_paper3; TRUNCATE processtimeskeybasedforexperiment_paper3;
+TRUNCATE countsforexperimentSleep_paper3; TRUNCATE eventsforexperimentSleep_paper3; TRUNCATE processedforexperimentSleep_paper3; TRUNCATE processtimeskeybasedforexperimentSleep_paper3;
 
 
-select count(*) from eventshybridforexperiment_paper2;
-select count(*) from eventclusterforexperiment_paper2;
-select count(*) from eventsforexperiment_paper2;
+select count(*) from eventshybridforexperiment_paper3;
+select count(*) from eventclusterforexperiment_paper3;
+select count(*) from eventsforexperiment_paper3;
 
 
 select count(*) from eventshybridforexperiment_paper1;

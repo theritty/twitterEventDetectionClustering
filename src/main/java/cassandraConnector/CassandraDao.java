@@ -25,6 +25,7 @@ public class CassandraDao implements Serializable
     private transient PreparedStatement statement_processedTweets_getCountry;
     private transient PreparedStatement statement_processedTweets_getAll;
     private transient PreparedStatement statement_processedTweets;
+    private transient PreparedStatement statement_tweetsandcluster;
     private transient BoundStatement boundStatement_tweets_get;
     private transient BoundStatement boundStatement_processedTweets_get;
     private transient BoundStatement boundStatement_processedTweets_getCountry;
@@ -41,6 +42,7 @@ public class CassandraDao implements Serializable
     private transient BoundStatement boundStatement_event_wordBased;
     private transient BoundStatement boundStatement_cluster_get;
     private transient BoundStatement boundStatement_cluster_get_by_id;
+    private transient BoundStatement boundStatement_tweetsandcluster;
 
 
     private static String CLUSTER_FIELDS =   "(id, country, cosinevector, prevnumtweets, currentnumtweets, lastround)";
@@ -58,26 +60,35 @@ public class CassandraDao implements Serializable
     private static String PROCESSED_FIELDS =   "(round, boltid, spoutSent, boltProcessed, finished, country)";
     private static String PROCESSED_VALUES = "(?, ?, ?, ?, ?, ?)";
 
+    private static String TWEETSANDCLUSTER_FIELDS =   "(clusterid, tweetid)";
+    private static String TWEETSANDCLUSTER_VALUES = "(?, ?)";
+
     private String tweetsTable;
     private String processTimesTable;
     private String clusterTable;
     private String eventTable;
     private String eventWordBasedTable;
     private String processedTweetsTable;
+    private String tweetsandclusterTable;
 
-    public CassandraDao(String tweetsTable, String clusterTable, String eventTable, String eventWordBasedTable, String processedTweetsTable, String processTimesTable) throws Exception {
+    public CassandraDao(String tweetsTable, String clusterTable, String eventTable, String eventWordBasedTable, String processedTweetsTable, String processTimesTable, String tweetsandclusterTable) throws Exception {
         this.tweetsTable = tweetsTable;
         this.clusterTable = clusterTable;
         this.eventTable = eventTable;
         this.eventWordBasedTable = eventWordBasedTable;
         this.processedTweetsTable = processedTweetsTable;
         this.processTimesTable = processTimesTable;
+        this.tweetsandclusterTable = tweetsandclusterTable;
 
         prepareAll();
     }
 
     private void prepareAll()
     {
+        if(statement_tweetsandcluster==null) {
+            statement_tweetsandcluster = CassandraConnection.connect().prepare(
+                    "INSERT INTO " + tweetsandclusterTable + " " + TWEETSANDCLUSTER_FIELDS
+                            + " VALUES " + TWEETSANDCLUSTER_VALUES + ";");
         if(statement_event==null) {
             statement_event = CassandraConnection.connect().prepare(
                     "INSERT INTO " + eventTable + " " + EVENT_FIELDS
@@ -162,6 +173,8 @@ public class CassandraDao implements Serializable
                     "SELECT * FROM " + clusterTable + " WHERE country=? AND id=?;");
         }
 
+        if(boundStatement_tweetsandcluster == null)
+            boundStatement_tweetsandcluster = new BoundStatement(statement_tweetsandcluster);
         if(boundStatement_tweets_get == null)
             boundStatement_tweets_get = new BoundStatement(statement_tweet_get);
         if(boundStatement_processtimes_get == null)
@@ -194,6 +207,12 @@ public class CassandraDao implements Serializable
             boundStatement_event_get = new BoundStatement(statement_event_get);
         if(boundStatement_event_wordBased == null)
             boundStatement_event_wordBased = new BoundStatement(statement_event_wordbased);
+    }
+
+    public void insertIntoTweetsAndCluster( Object[] values ) throws Exception
+    {
+        prepareAll();
+        CassandraConnection.connect().execute(boundStatement_tweetsandcluster.bind(values));
     }
 
     public void insertIntoProcessed( Object[] values ) throws Exception

@@ -343,6 +343,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
         c.cosinevector = cosinevectorCluster;
         c.currentnumtweets = c.currentnumtweets + (int) numTweetsLocal;
 
+
         return c;
     }
 
