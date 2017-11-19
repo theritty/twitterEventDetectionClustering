@@ -219,9 +219,10 @@ public class ExcelWriter {
         String EVENTS_TABLE = properties.getProperty("clustering.events.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
+        String TWEETSANDCLUSTER_TABLE = properties.getProperty("clustering.tweetsclusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty(tablename);
-        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE, TWEETSANDCLUSTER_TABLE);
 
         createChart = 1;
         createTimeChart(cassandraDao);

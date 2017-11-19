@@ -109,6 +109,13 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                 double similarity = cosineSimilarity.cosineSimilarityFromMap(clusters.get(j), clusters.get(i));
                 if(similarity>0.5) {
                     updateCluster(clusters.get(i), clusters.get(j));
+                    List<Object> values_event = new ArrayList<>();
+                    values_event.add(clusters.get(i).);
+                    cassandraDao.insertIntoEvents(values_event.toArray());
+
+
+
+
                     clusters.remove(j);
                 }
                 else j++;
@@ -293,6 +300,12 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             values.add(round);
             cassandraDao.insertIntoClusters(values.toArray());
 
+
+            List<Object> values_eventx = new ArrayList<>();
+            values_eventx.add(clusterid);
+            values_eventx.add(newCluster.get("clusterid"));
+            cassandraDao.updateClusterTweets(values_eventx.toArray());
+
             newCluster.put("numTweets", (double) numTweets);
 
             if(numTweets > 100) {
@@ -310,7 +323,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
         }
     }
 
-    public Cluster updateCluster(Cluster c, HashMap<String, Double> cosinevectorLocal) {
+    public Cluster updateCluster(Cluster c, HashMap<String, Double> cosinevectorLocal) throws Exception {
         HashMap<String, Double> cosinevectorCluster = c.cosinevector;
         double numTweetsLocal   = cosinevectorLocal.get("numTweets");
         double numTweetsCluster = c.prevnumtweets;
@@ -320,6 +333,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
         while(it.hasNext()) {
             Map.Entry<String, Double> entry = it.next();
             String key = entry.getKey();
+            if(key.equals("clusterid")) continue;
             double value = entry.getValue();
 
             double valueLocal = 0;
@@ -335,10 +349,17 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
         while(it2.hasNext()) {
             Map.Entry<String, Double> entry = it2.next();
             String key = entry.getKey();
+            if(key.equals("clusterid")) continue;
             double value = entry.getValue();
             double newValue = (value * numTweetsLocal) / (numTweetsLocal + numTweetsCluster);
             cosinevectorCluster.put(key, newValue);
         }
+
+
+        List<Object> values_event = new ArrayList<>();
+        values_event.add(cosinevectorCluster.get("clusterid"));
+        values_event.add(cosinevectorLocal.get("clusterid"));
+        cassandraDao.updateClusterTweets(values_event.toArray());
 
         c.cosinevector = cosinevectorCluster;
         c.currentnumtweets = c.currentnumtweets + (int) numTweetsLocal;

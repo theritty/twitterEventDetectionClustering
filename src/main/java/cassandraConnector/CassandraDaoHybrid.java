@@ -31,6 +31,8 @@ public class CassandraDaoHybrid implements Serializable
     private transient PreparedStatement statement_cluster;
     private transient PreparedStatement statement_cluster_delete;
     private transient PreparedStatement statement_cluster_get_with_lastround;
+    private transient PreparedStatement statement_tweetsandcluster;
+    private transient PreparedStatement statement_clustertweets;
 
     private transient BoundStatement boundStatement_processtimes;
     private transient BoundStatement boundStatement_processtimes_get;
@@ -51,6 +53,9 @@ public class CassandraDaoHybrid implements Serializable
     private transient BoundStatement boundStatement_cluster_get_with_lastround;
     private transient BoundStatement boundStatement_cluster_get;
     private transient BoundStatement boundStatement_cluster_get_by_id;
+    private transient BoundStatement boundStatement_tweetsandcluster;
+    private transient BoundStatement boundStatement_clustertweets;
+
 
     private static String TWEETS_FIELDS =   "(id, tweet, userid, tweettime, retweetcount, round, country, " +
             "class_politics, class_music,class_sports)";
@@ -76,6 +81,10 @@ public class CassandraDaoHybrid implements Serializable
     private static String CLUSTER_FIELDS =   "(id, country, cosinevector, prevnumtweets, currentnumtweets, lastround)";
     private static String CLUSTER_VALUES = "(?, ?, ?, ?, ?, ?)";
 
+    private static String TWEETSANDCLUSTER_FIELDS =   "(clusterid, tweetid)";
+    private static String TWEETSANDCLUSTER_VALUES = "(?, ?)";
+
+
     private String tweetsTable;
     private String countsTable;
     private String eventsTable;
@@ -83,8 +92,9 @@ public class CassandraDaoHybrid implements Serializable
     private String processedTable;
     private String processTimesTable;
     private String clusterTable;
+    private String tweetsandclusterTable;
 
-    public CassandraDaoHybrid(String tweetsTable, String countsTable, String eventsTable, String processedTable, String processTimesTable, String clusterTable, String eventsKeybasedTable) throws Exception {
+    public CassandraDaoHybrid(String tweetsTable, String countsTable, String eventsTable, String processedTable, String processTimesTable, String clusterTable, String eventsKeybasedTable, String tweetsandclusterTable) throws Exception {
         this.tweetsTable = tweetsTable;
         this.countsTable = countsTable;
         this.eventsTable = eventsTable;
@@ -92,6 +102,7 @@ public class CassandraDaoHybrid implements Serializable
         this.processTimesTable = processTimesTable;
         this.clusterTable = clusterTable;
         this.eventsKeybasedTable = eventsKeybasedTable;
+        this.tweetsandclusterTable = tweetsandclusterTable;
 
         prepareAll();
     }
@@ -190,6 +201,19 @@ public class CassandraDaoHybrid implements Serializable
         }
 
 
+        if(statement_tweetsandcluster==null) {
+            statement_tweetsandcluster = CassandraConnection.connect().prepare(
+                    "INSERT INTO " + tweetsandclusterTable + " " + TWEETSANDCLUSTER_FIELDS
+                            + " VALUES " + TWEETSANDCLUSTER_VALUES + ";");
+        }
+//        if(statement_clustertweets ==null) {
+//            statement_clustertweets = CassandraConnection.connect().prepare(
+//                    "SELECT * FROM " + tweetsandclusterTable + " WHERE clusterid=?;");
+//        }
+        if(statement_clustertweets ==null) {
+            statement_clustertweets = CassandraConnection.connect().prepare(
+                    "UPDATE " +  tweetsandclusterTable + " SET clusterid = ? where clusterid = ?;");
+        }
         if(boundStatement_tweets == null)
             boundStatement_tweets = new BoundStatement(statement_tweets);
         if(boundStatement_events == null)
@@ -228,6 +252,11 @@ public class CassandraDaoHybrid implements Serializable
             boundStatement_cluster = new BoundStatement(statement_cluster);
         if(boundStatement_cluster_delete == null)
             boundStatement_cluster_delete = new BoundStatement(statement_cluster_delete);
+        if(boundStatement_tweetsandcluster == null)
+            boundStatement_tweetsandcluster = new BoundStatement(statement_tweetsandcluster);
+        if(boundStatement_clustertweets == null)
+            boundStatement_clustertweets = new BoundStatement(statement_clustertweets);
+
     }
 
 
@@ -317,6 +346,21 @@ public class CassandraDaoHybrid implements Serializable
         prepareAll();
         ResultSetFuture rsf = CassandraConnection.connect().executeAsync(boundStatement_counts.bind(values));
         checkError(rsf);
+    }
+
+    public void insertIntoTweetsAndCluster( Object[] values ) throws Exception
+    {
+        prepareAll();
+        CassandraConnection.connect().execute(boundStatement_tweetsandcluster.bind(values));
+    }
+
+
+
+    public void updateClusterTweets( Object[] values ) throws Exception
+    {
+        prepareAll();
+        CassandraConnection.connect().execute(boundStatement_clustertweets.bind(values));
+
     }
 
     static FutureCallback<ResultSet> callback =  new FutureCallback<ResultSet>() {

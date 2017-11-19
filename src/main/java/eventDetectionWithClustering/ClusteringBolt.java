@@ -115,10 +115,7 @@ public class ClusteringBolt extends BaseRichBolt {
 
                 if (clusters.size() == 0) {
                     List<Object> values_event = new ArrayList<>();
-                    values_event.add(Long.parseLong(round+"-1"));
-                    values_event.add(tweetid);
-                    cassandraDao.insertIntoTweetsAndCluster(values_event.toArray());
-                    addNewCluster(tweetmap, tweetid);
+                    addNewCluster(tweetmap, tweetid, Long.parseLong(String.valueOf(round)+"1"));
                 } else {
                     boolean similarclusterfound = false;
 
@@ -134,20 +131,12 @@ public class ClusteringBolt extends BaseRichBolt {
                         if(maxSim<similarity) maxSim=similarity;
                         if (similarity > 0.5) {
                             similarclusterfound = true;
-                            List<Object> values_event = new ArrayList<>();
-                            values_event.add(Long.parseLong(round+"-"+i));
-                            values_event.add(tweetid);
-                            cassandraDao.insertIntoTweetsAndCluster(values_event.toArray());
-                            updateCluster(clustermap, tweetmap, i, tweetid);
+                            updateCluster(clustermap, tweetmap, i, tweetid, (long) (double) clustermap.get("clusterid"));
                             break;
                         }
                     }
                     if (!similarclusterfound) {
-                        List<Object> values_event = new ArrayList<>();
-                        values_event.add(Long.parseLong(round+"-"+clusters.size()));
-                        values_event.add(tweetid);
-                        cassandraDao.insertIntoTweetsAndCluster(values_event.toArray());
-                        addNewCluster(tweetmap, tweetid);
+                        addNewCluster(tweetmap, tweetid, Long.parseLong(String.valueOf(round)+clusters.size()));
                     }
                 }
             } catch (Exception e) {
@@ -160,7 +149,7 @@ public class ClusteringBolt extends BaseRichBolt {
 
     }
 
-    public void updateCluster(HashMap<String, Double> clustermap, ArrayList<String> tweetmap, int index, long tweetid) throws Exception {
+    public void updateCluster(HashMap<String, Double> clustermap, ArrayList<String> tweetmap, int index, long tweetid, long clusterid) throws Exception {
         double numTweets = clustermap.get("numTweets");
         for(String key : tweetmap) {
             double value = 1.0;
@@ -178,19 +167,31 @@ public class ClusteringBolt extends BaseRichBolt {
             clustermap.put(key, newValue);
         }
 
+
+        List<Object> values_event = new ArrayList<>();
+        values_event.add(clusterid);
+        values_event.add(tweetid);
+        cassandraDao.insertIntoTweetsAndCluster(values_event.toArray());
+
         clustermap.put("numTweets", numTweets+1.0);
         clusters.remove(index);
         clusters.add(clustermap);
 
     }
 
-    public void addNewCluster(ArrayList<String> tweetmap, long tweetid) throws Exception {
+    public void addNewCluster(ArrayList<String> tweetmap, long tweetid, long clusterid) throws Exception {
         HashMap<String, Double> tweetMap = new HashMap<>();
         for(String key : tweetmap) {
             tweetMap.put(key, 1.0);
         }
         tweetMap.put("numTweets",1.0);
 
+        List<Object> values_event = new ArrayList<>();
+        values_event.add(clusterid);
+        values_event.add(tweetid);
+        cassandraDao.insertIntoTweetsAndCluster(values_event.toArray());
+
+        tweetMap.put("clusterid", ((Number)clusterid).doubleValue());
         clusters.add(tweetMap);
     }
 
