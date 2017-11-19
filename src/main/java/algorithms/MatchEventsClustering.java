@@ -38,7 +38,9 @@ public class MatchEventsClustering {
     String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
     start = Long.parseLong(properties.getProperty("clustering.start.round"));
     end = Long.parseLong(properties.getProperty("clustering.end.round"));
-    cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+    String TWEETSANDCLUSTER_TABLE = properties.getProperty("clustering.tweetsandcluster.table");
+
+    cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE, TWEETSANDCLUSTER_TABLE);
   }
 
 //    public static void main(String[] args) throws Exception {
@@ -80,7 +82,14 @@ public class MatchEventsClustering {
 //        }
 //    }
 
-//  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) throws Exception {
+    double x = Double.parseDouble("462913");
+    HashMap<String, Double> cosinevectorLocal = new HashMap<>();
+    cosinevectorLocal.put("cs", x);
+    System.out.println(x);
+    String y = String.valueOf( (long) (double) cosinevectorLocal.get("cs"));
+    System.out.println(y);
+  }
 //
 //    MatchEventsClustering m = new MatchEventsClustering();
 //    for (long i=m.start; i <= m.end; i++) {

@@ -1,6 +1,7 @@
 package topologyBuilder;
 
-import org.apache.storm.Config;
+
+import backtype.storm.Config;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class TopologyHelper {
         return list;
     }
 
-    protected static synchronized Config copyPropertiesToStormConfig( Properties properties )
+    protected static synchronized Config copyPropertiesToStormConfig(Properties properties )
     {
         Config config = new Config();
         for (String name : properties.stringPropertyNames()) {

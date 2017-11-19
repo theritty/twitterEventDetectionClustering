@@ -15,9 +15,9 @@ import eventDetectionWithClustering.EventDetectorBoltClustering;
 import eventDetectionWithClustering.CassandraSpoutClustering;
 import eventDetectionKeybased.CassandraSpoutKeyBased;
 import eventDetectionKeybasedWithSleep.CassandraSpoutKeyBasedWithSleep;
-import org.apache.storm.generated.StormTopology;
-import org.apache.storm.topology.TopologyBuilder;
-import org.apache.storm.tuple.Fields;
+import backtype.storm.generated.StormTopology;
+import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
 
 import java.util.Properties;
 
@@ -141,6 +141,7 @@ public class BoltBuilder {
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
+        String TWEETSANDCLUSTER_TABLE = properties.getProperty("clustering.tweetsandcluster.table");
         long START_ROUND = Long.parseLong(properties.getProperty("clustering.start.round"));
         long END_ROUND = Long.parseLong(properties.getProperty("clustering.end.round"));
 
@@ -153,7 +154,7 @@ public class BoltBuilder {
         TopologyHelper.createFolder(Constants.IMAGES_FILE_PATH + FILENUM);
         TopologyHelper.createFolder(Constants.TIMEBREAKDOWN_FILE_PATH + FILENUM);
 
-        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE);
+        CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE, TWEETSANDCLUSTER_TABLE);
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + FILENUM + "/" + "sout.txt", "Preparing Bolts...");
         TopologyBuilder builder = new TopologyBuilder();
 
@@ -186,6 +187,8 @@ public class BoltBuilder {
         String CLUSTER_TABLE = properties.getProperty("hybrid.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("hybrid.processed.table");
         String PROCESSTIMES_TABLE = properties.getProperty("hybrid.processtimes.table");
+        String TWEETSANDCLUSTER_TABLE = properties.getProperty("clustering.tweetsandcluster.table");
+
         double TFIDF_EVENT_RATE = Double.parseDouble(properties.getProperty("hybrid.tfidf.event.rate"));
 
         int CAN_TASK_NUM= Integer.parseInt(properties.getProperty("hybrid.can.taskNum"));
@@ -198,7 +201,7 @@ public class BoltBuilder {
         TopologyHelper.createFolder(Constants.IMAGES_FILE_PATH + FILENUM);
         TopologyHelper.createFolder(Constants.TIMEBREAKDOWN_FILE_PATH + FILENUM);
 
-        CassandraDaoHybrid cassandraDao = new CassandraDaoHybrid(TWEETS_TABLE, COUNTS_TABLE, EVENTS_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE, CLUSTER_TABLE, EVENTS_KEYBASED_TABLE);
+        CassandraDaoHybrid cassandraDao = new CassandraDaoHybrid(TWEETS_TABLE, COUNTS_TABLE, EVENTS_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE, CLUSTER_TABLE, EVENTS_KEYBASED_TABLE, TWEETSANDCLUSTER_TABLE);
 
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + FILENUM + "/" + "sout.txt", "Preparing Bolts...");
         TopologyBuilder builder = new TopologyBuilder();

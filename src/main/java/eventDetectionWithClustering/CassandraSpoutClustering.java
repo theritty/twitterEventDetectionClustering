@@ -4,12 +4,12 @@ import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import drawing.*;
-import org.apache.storm.spout.SpoutOutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichSpout;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Values;
+import backtype.storm.spout.SpoutOutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichSpout;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -140,11 +140,11 @@ public class CassandraSpoutClustering extends BaseRichSpout {
         String country = row.getString("country");
 
         if(iterator.hasNext()) {
-            vectorizeAndEmit(tweet, 0L, current_round, country);
+            vectorizeAndEmit(tweet, row.getLong("id"), current_round, country);
             numTweetRound ++;
         }
         else {
-            vectorizeAndEmit(tweet, 0L, current_round, country);
+            vectorizeAndEmit(tweet, row.getLong("id"), current_round, country);
 
 
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Round " + current_round + " number of tweets " + ++numTweetRound);

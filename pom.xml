@@ -17,8 +17,8 @@
 
     <properties>
         <storm.topology>topologies.EventDetectionWithCassandraTopology</storm.topology>
-        <storm-core.version>1.0.3</storm-core.version>
-        <!--<storm-core.version>0.10.0</storm-core.version>-->
+        <!--<storm-core.version>1.0.3</storm-core.version>-->
+        <storm-core.version>0.10.0</storm-core.version>
         <gson.version>2.2.4</gson.version>
         <guava.version>18.0</guava.version>
         <junit.version>4.11</junit.version>
@@ -113,7 +113,7 @@
             <artifactId>storm-core</artifactId>
             <version>${storm-core.version}</version>
             <!-- keep storm out of the jar-with-dependencies -->
-            <scope>provided</scope>
+            <!--<scope>provided</scope>-->
             <exclusions>
             </exclusions>
         </dependency>

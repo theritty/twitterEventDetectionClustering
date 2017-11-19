@@ -4,8 +4,13 @@ import com.datastax.driver.core.*;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
+import topologyBuilder.Constants;
+import topologyBuilder.TopologyHelper;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class CassandraDao implements Serializable
 {
@@ -62,8 +67,8 @@ public class CassandraDao implements Serializable
     private static String PROCESSED_FIELDS =   "(round, boltid, spoutSent, boltProcessed, finished, country)";
     private static String PROCESSED_VALUES = "(?, ?, ?, ?, ?, ?)";
 
-    private static String TWEETSANDCLUSTER_FIELDS =   "(clusterid, tweetid)";
-    private static String TWEETSANDCLUSTER_VALUES = "(?, ?)";
+    private static String TWEETSANDCLUSTER_FIELDS =   "(round, clusterid, tweetid)";
+    private static String TWEETSANDCLUSTER_VALUES = "(?, ?, ?)";
 
     private String tweetsTable;
     private String processTimesTable;
@@ -175,14 +180,11 @@ public class CassandraDao implements Serializable
             statement_cluster_get_by_id = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + clusterTable + " WHERE country=? AND id=?;");
         }
-//        if(statement_clustertweets ==null) {
-//            statement_clustertweets = CassandraConnection.connect().prepare(
-//                    "SELECT * FROM " + tweetsandclusterTable + " WHERE clusterid=?;");
-//        }
         if(statement_clustertweets ==null) {
             statement_clustertweets = CassandraConnection.connect().prepare(
-                    "UPDATE " +  tweetsandclusterTable + " SET clusterid = ? where clusterid = ?;");
+                    "SELECT * FROM " + tweetsandclusterTable + " WHERE round=?");
         }
+
 
         if(boundStatement_tweetsandcluster == null)
             boundStatement_tweetsandcluster = new BoundStatement(statement_tweetsandcluster);
@@ -320,11 +322,31 @@ public class CassandraDao implements Serializable
     }
 
 
-    public void updateClusterTweets( Object[] values ) throws Exception
-    {
+    public ResultSet getClusterTweets( Object... values ) throws Exception {
         prepareAll();
-        CassandraConnection.connect().execute(boundStatement_clustertweets.bind(values));
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_clustertweets.bind(values));
 
+        return resultSet;
+
+    }
+
+
+    public void updateClusterTweets(long round, String oldClusterId, String newClusterId) throws Exception
+    {
+        ResultSet resultSet = getClusterTweets(round);
+        Iterator<Row> iterator = resultSet.iterator();
+        TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH  + "experiment-4methods-clustering-weekData-db-eval/sout.txt", "Old cluster id: " + oldClusterId + ", new clusterid: " + newClusterId );
+
+        while (iterator.hasNext()) {
+            Row row = iterator.next();
+            if (row.getString("clusterid").equals(oldClusterId)) {
+                List<Object> values_event = new ArrayList<>();
+                values_event.add(round);
+                values_event.add(newClusterId);
+                values_event.add(row.getLong("tweetid"));
+                insertIntoTweetsAndCluster(values_event.toArray());
+            }
+        }
     }
 
     static FutureCallback<ResultSet> callback =  new FutureCallback<ResultSet>() {

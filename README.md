@@ -109,10 +109,15 @@ PRIMARY KEY (row, column)
 
 
 
+clustering.clusters.table=clusterforexperiment_eval
+clustering.events.table=eventclusterforexperiment_eval
+clustering.events_wordbased.table=eventsForExperiment_eval
+clustering.processed_tweets.table=processedtweetsforexperiment_eval
+clustering.processtimes.table=processtimesforexperiment_eval
+clustering.tweetsandcluster.table=tweetsandcluster_eval
 
 
-
-CREATE TABLE tweetcollection.clusterforexperiment_paper3 (
+CREATE TABLE tweetcollection.clusterforexperiment_eval (
 country text,
 id timeuuid,
 cosinevector map<text, double>,
@@ -121,7 +126,7 @@ lastround bigint,
 prevnumtweets int,
 PRIMARY KEY (country, id)
 );
-CREATE TABLE tweetcollection.eventclusterforexperiment_paper3 (
+CREATE TABLE tweetcollection.eventclusterforexperiment_eval (
 round bigint,
 clusterid timeuuid,
 cosinevector map<text, double>,
@@ -130,7 +135,7 @@ incrementrate double,
 numtweet int,
 PRIMARY KEY (round, clusterid)
 );
-CREATE TABLE tweetcollection.processedtweetsforexperiment_paper3 (
+CREATE TABLE tweetcollection.processedtweetsforexperiment_eval (
 round bigint,
 boltid int,
 boltprocessed bigint,
@@ -139,16 +144,17 @@ finished boolean,
 spoutsent bigint,
 PRIMARY KEY (round, boltid)
 );
-CREATE TABLE tweetcollection.processtimesforexperiment_paper3 (
+CREATE TABLE tweetcollection.processtimesforexperiment_eval (
 row int,
 column int,
 id int,
 PRIMARY KEY (row, column)
 );
-CREATE TABLE tweetcollection.tweetsandcluster_paper3 (
-clusterid timeuuid,
+CREATE TABLE tweetcollection.tweetsandcluster_eval (
+round bigint,
+clusterid text,
 tweetid bigint,
-PRIMARY KEY (clusterid, tweetid)
+PRIMARY KEY (round, tweetid)
 );
 
 
@@ -221,7 +227,7 @@ PRIMARY KEY (row, column)
 
 
 TRUNCATE clustershybridforexperiment_paper3; TRUNCATE countshybridforexperiment_paper3; TRUNCATE eventskeybasedhybridforexperiment_paper3; TRUNCATE eventshybridforexperiment_paper3; TRUNCATE processedhybridforexperiment_paper3; TRUNCATE processtimeshybridforexperiment_paper3;
-TRUNCATE clusterforexperiment_paper3; TRUNCATE eventclusterforexperiment_paper3; TRUNCATE eventsforexperiment_paper3; TRUNCATE processedtweetsforexperiment_paper3; TRUNCATE processtimesforexperiment_paper3;
+TRUNCATE clusterforexperiment_eval; TRUNCATE eventclusterforexperiment_eval; TRUNCATE eventsforexperiment_eval; TRUNCATE processedtweetsforexperiment_eval; TRUNCATE processtimesforexperiment_eval; TRUNCATE processtimesforexperiment_eval;
 TRUNCATE countsforexperiment_paper3; TRUNCATE eventsforexperiment_paper3; TRUNCATE processedforexperiment_paper3; TRUNCATE processtimeskeybasedforexperiment_paper3;
 TRUNCATE countsforexperimentSleep_paper3; TRUNCATE eventsforexperimentSleep_paper3; TRUNCATE processedforexperimentSleep_paper3; TRUNCATE processtimeskeybasedforexperimentSleep_paper3;
 

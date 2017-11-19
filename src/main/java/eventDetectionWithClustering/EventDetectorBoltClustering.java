@@ -1,17 +1,17 @@
 package eventDetectionWithClustering;
 
+import backtype.storm.task.OutputCollector;
 import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.utils.UUIDs;
 import algorithms.*;
 import drawing.*;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -109,13 +109,6 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                 double similarity = cosineSimilarity.cosineSimilarityFromMap(clusters.get(j), clusters.get(i));
                 if(similarity>0.5) {
                     updateCluster(clusters.get(i), clusters.get(j));
-                    List<Object> values_event = new ArrayList<>();
-                    values_event.add(clusters.get(i).);
-                    cassandraDao.insertIntoEvents(values_event.toArray());
-
-
-
-
                     clusters.remove(j);
                 }
                 else j++;
@@ -129,6 +122,14 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
         String country = tuple.getStringByField("country");
         ArrayList<HashMap<String, Double>> clustersx = (ArrayList<HashMap<String, Double>>) tuple.getValueByField("clusters");
         clusters.addAll(clustersx);
+
+
+        for(HashMap<String, Double> clustersdd : clusters) {
+            if(String.valueOf((long) (double) clustersdd.get("clusterid")).startsWith("3")) {
+                System.out.println("nooooo " + clustersdd.get("clusterid"));
+            }
+        }
+
 
         if(++count < taskNum) {
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Event detector " + componentId + " gets entry. " + count + ". Not finished " + round + " " + country);
@@ -145,7 +146,6 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             collector.ack(tuple);
             return;
         }
-
         Date nowDate = new Date();
         try {
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", country +  " " + round + " before " + clusters.size());
@@ -160,7 +160,11 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                 else i++;
             }
 
-            System.out.println(country + " final " + componentId + " " + clusters.size());
+            for(HashMap<String, Double> clustersdd : clusters) {
+                if(String.valueOf((long) (double) clustersdd.get("clusterid")).startsWith("3")) {
+                    System.out.println("nooooo2 " + clustersdd.get("clusterid"));
+                }
+            }
 
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " Event Detector " + componentId + " evaluates clusters for "  + round + " " + country);
 
@@ -171,6 +175,14 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                 resultSetx = cassandraDao.getClusters(country);
                 Iterator<Row> iteratorx = resultSetx.iterator();
                 while (iteratorx.hasNext()) {
+
+
+                    for(HashMap<String, Double> clustersdd : clusters) {
+                        if(String.valueOf((long) (double) clustersdd.get("clusterid")).startsWith("3")) {
+                            System.out.println("nooooo3 " + clustersdd.get("clusterid"));
+                        }
+                    }
+
                     boolean updated = false;
                     Row row = iteratorx.next();
                     Cluster cNew = new Cluster(row.getString("country"), row.getUUID("id"), (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class), row.getInt("currentnumtweets"), row.getLong("lastround"), row.getInt("prevnumtweets"));
@@ -182,7 +194,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
 
                         if(similarity>maxSim) maxSim = similarity;
                         if(similarity>0.5) {
-                            cNew = updateCluster(cNew, clusters.get(j));
+                            cNew = updateCluster(cNew, clusters.get(j), round);
                             System.out.println("Update clusters between cass and local!!!!!!!");
                             clusters.remove(j);
                             updated = true;
@@ -238,7 +250,6 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             }
 
 
-            System.out.println("start add");
             for(int i=0; i<clusters.size();i++) {
                 Iterator<Map.Entry<String, Double>> it = clusters.get(i).entrySet().iterator();
                 while(it.hasNext()) {
@@ -248,7 +259,6 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                         it.remove();
                     }
                 }
-
                 addNewCluster(round, clusters.get(i));
             }
 
@@ -300,11 +310,11 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             values.add(round);
             cassandraDao.insertIntoClusters(values.toArray());
 
+            System.out.println("CHECK:::  " + newCluster.get("clusterid") + " String " +  String.valueOf((long) (double) newCluster.get("clusterid")));
 
-            List<Object> values_eventx = new ArrayList<>();
-            values_eventx.add(clusterid);
-            values_eventx.add(newCluster.get("clusterid"));
-            cassandraDao.updateClusterTweets(values_eventx.toArray());
+            cassandraDao.updateClusterTweets(round, String.valueOf((long) (double) newCluster.get("clusterid")), String.valueOf(clusterid));
+
+//            newCluster.put("clusterid", clusterid);
 
             newCluster.put("numTweets", (double) numTweets);
 
@@ -323,7 +333,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
         }
     }
 
-    public Cluster updateCluster(Cluster c, HashMap<String, Double> cosinevectorLocal) throws Exception {
+    public Cluster updateCluster(Cluster c, HashMap<String, Double> cosinevectorLocal, long round) throws Exception {
         HashMap<String, Double> cosinevectorCluster = c.cosinevector;
         double numTweetsLocal   = cosinevectorLocal.get("numTweets");
         double numTweetsCluster = c.prevnumtweets;
@@ -355,11 +365,8 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             cosinevectorCluster.put(key, newValue);
         }
 
-
-        List<Object> values_event = new ArrayList<>();
-        values_event.add(cosinevectorCluster.get("clusterid"));
-        values_event.add(cosinevectorLocal.get("clusterid"));
-        cassandraDao.updateClusterTweets(values_event.toArray());
+        System.out.println("CHECK:::  " + cosinevectorLocal.get("clusterid") + " String " +  String.valueOf( (long) (double) cosinevectorLocal.get("clusterid")));
+        cassandraDao.updateClusterTweets(round, String.valueOf( (long) (double) cosinevectorLocal.get("clusterid")), String.valueOf((long) (double) cosinevectorCluster.get("clusterid")));
 
         c.cosinevector = cosinevectorCluster;
         c.currentnumtweets = c.currentnumtweets + (int) numTweetsLocal;
