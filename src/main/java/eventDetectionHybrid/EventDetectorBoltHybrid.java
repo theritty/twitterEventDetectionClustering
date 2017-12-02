@@ -6,11 +6,11 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.utils.UUIDs;
 import algorithms.*;
 import drawing.*;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Tuple;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Tuple;
 import eventDetectionWithClustering.Cluster;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
@@ -177,6 +177,7 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
 
     public void addNewCluster(long round, Cluster newCluster, String country)  {
         try {
+            System.out.println("New");
 
             int numTweets = newCluster.currentnumtweets;
             UUID clusterid = UUIDs.timeBased();
@@ -216,6 +217,7 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
         HashMap<String, Double> cosinevectorCluster = c.cosinevector;
         double numTweetsLocal   = cosinevectorLocal.currentnumtweets;
         double numTweetsCluster = c.prevnumtweets;
+        System.out.println("update");
 
         Iterator<Map.Entry<String, Double>> it = cosinevectorCluster.entrySet().iterator();
         while(it.hasNext()) {

@@ -239,6 +239,19 @@ PRIMARY KEY (row, column)
 TRUNCATE countsforexperimentSleep_thesis; TRUNCATE eventsforexperimentSleep_thesis; TRUNCATE processedforexperimentSleep_thesis; TRUNCATE processtimeskeybasedforexperimentSleep_thesis;
 
 
+
+
+
+
+
+TRUNCATE clustershybridforexperiment_thesis; TRUNCATE countshybridforexperiment_thesis; TRUNCATE eventskeybasedhybridforexperiment_thesis; TRUNCATE eventshybridforexperiment_thesis; TRUNCATE processedhybridforexperiment_thesis; TRUNCATE processtimeshybridforexperiment_thesis; TRUNCATE tweetsandclusterhybrid_thesis;
+TRUNCATE clusterforexperiment_thesis; TRUNCATE eventclusterforexperiment_thesis; TRUNCATE eventsforexperiment_thesis; TRUNCATE processedtweetsforexperiment_thesis; TRUNCATE processtimesforexperiment_thesis; TRUNCATE processtimesforexperiment_thesis;
+TRUNCATE countsforexperiment_thesis; TRUNCATE eventsforexperiment_thesis; TRUNCATE processedforexperiment_thesis; TRUNCATE processtimeskeybasedforexperiment_thesis;
+TRUNCATE countsforexperimentSleep_thesis; TRUNCATE eventsforexperimentSleep_thesis; TRUNCATE processedforexperimentSleep_thesis; TRUNCATE processtimeskeybasedforexperimentSleep_thesis;
+
+
+
+
 select count(*) from eventshybridforexperiment_thesis;
 select count(*) from eventclusterforexperiment_thesis;
 select count(*) from eventsforexperiment_thesis;
