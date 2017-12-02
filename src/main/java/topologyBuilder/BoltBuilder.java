@@ -187,7 +187,7 @@ public class BoltBuilder {
         String CLUSTER_TABLE = properties.getProperty("hybrid.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("hybrid.processed.table");
         String PROCESSTIMES_TABLE = properties.getProperty("hybrid.processtimes.table");
-        String TWEETSANDCLUSTER_TABLE = properties.getProperty("clustering.tweetsandcluster.table");
+        String TWEETSANDCLUSTER_TABLE = properties.getProperty("hybrid.tweetsandcluster.table");
 
         double TFIDF_EVENT_RATE = Double.parseDouble(properties.getProperty("hybrid.tfidf.event.rate"));
 

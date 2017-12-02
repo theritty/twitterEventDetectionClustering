@@ -12,6 +12,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import eventDetectionWithClustering.Cluster;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -34,7 +35,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
     private String country;
     private long finalRound = 0;
     private CosineSimilarity cosineSimilarity = new CosineSimilarity();
-    private ArrayList<HashMap<String, Double>> clusters = new ArrayList<>();
+    private ArrayList<Cluster> clusters = new ArrayList<>();
 
     public ClusteringBoltHybrid(CassandraDaoHybrid cassandraDao, String filePath, String fileNum, double tfidfEventRate, int compareSize, String country, int numWordCountBolts )
     {
@@ -112,6 +113,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
             while(iterator.hasNext()) {
                 Row row = iterator.next();
                 String tweet = row.getString("tweet");
+                long tweetid = row.getLong("id");
                 if (eventCandidates.parallelStream().anyMatch(tweet::contains)) {
                     numTweets++;
                     List<String> tweets = Arrays.asList(tweet.split(" "));
@@ -122,17 +124,17 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
                     }
                     if ( tweetmap.size() < 3 ) continue;
                     if ( clusters.size() == 0 ) {
-                        addNewCluster(tweetmap);
+                        addNewCluster(tweetmap, tweetid, round);
                     } else {
                         int indexOfSimilarCluster = getIndexOfSimilarCluster(tweetmap);
-                        if(indexOfSimilarCluster == -1) addNewCluster(tweetmap);
-                        else updateCluster(clusters.get(indexOfSimilarCluster), tweetmap, indexOfSimilarCluster);
+                        if(indexOfSimilarCluster == -1) addNewCluster(tweetmap, tweetid, round);
+                        else updateCluster(clusters.get(indexOfSimilarCluster), tweetmap, indexOfSimilarCluster, tweetid);
                     }
                 }
             }
             double maxNum=0.0;
-            for(HashMap<String,Double> m:clusters) {
-                if(m.get("numTweets")>maxNum) maxNum=m.get("numTweets");
+            for(Cluster m:clusters) {
+                if(m.currentnumtweets>maxNum) maxNum=m.currentnumtweets;
             }
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "clustering end putting :::: " + componentId  + " num tweets for selection " + numTweets  + " max::::: " + maxNum);
             System.out.println("clustering end putting " + round + " :::: " + componentId  + " num tweets for selection " + numTweets  + " max::::: " + maxNum);
@@ -142,46 +144,48 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
 
     }
 
-    public void updateCluster(HashMap<String, Double> cluster1, HashMap<String, Double> cluster2) {
-        double numTweets1 = cluster1.get("numTweets");
-        double numTweets2 = cluster2.get("numTweets");
+    public void updateCluster(Cluster cluster1, Cluster cluster2) {
+        double numTweets1 = cluster1.currentnumtweets;
+        double numTweets2 = cluster2.currentnumtweets;
 
-        Iterator<Map.Entry<String, Double>> it = cluster1.entrySet().iterator();
+        Iterator<Map.Entry<String, Double>> it = cluster1.cosinevector.entrySet().iterator();
         while(it.hasNext()) {
             Map.Entry<String, Double> entry = it.next();
             String key = entry.getKey();
-            if(cluster2.containsKey(key)){
+            if(cluster2.cosinevector.containsKey(key)){
                 double value1 = entry.getValue();
-                double value2 = cluster2.get(key);
+                double value2 = cluster2.cosinevector.get(key);
                 double newValue = (value1 * numTweets1 + value2 * numTweets2) / (numTweets1+numTweets2);
                 if(numTweets1+numTweets2>50 && newValue<0.03) {
                     it.remove();
                 }
                 else {
-                    cluster1.put(key, newValue);
-                    cluster1.put("numTweets", numTweets1+numTweets2);
+                    cluster1.cosinevector.put(key, newValue);
                 }
-                cluster2.remove(key);
+                cluster2.cosinevector.remove(key);
             }
         }
-        Iterator<Map.Entry<String, Double>> it2 = cluster2.entrySet().iterator();
+        Iterator<Map.Entry<String, Double>> it2 = cluster2.cosinevector.entrySet().iterator();
         while(it2.hasNext()) {
             Map.Entry<String, Double> entry = it2.next();
             String key = entry.getKey();
             double value = entry.getValue();
             double newValue = (value * numTweets2) / (numTweets1+numTweets2);
             if(numTweets1+numTweets2<50 || newValue>0.03) {
-                cluster1.put(key, newValue);
+                cluster1.cosinevector.put(key, newValue);
             }
         }
+
     }
 
     public void mergeClusters() {
         for(int i=0;i<clusters.size()-1;i++) {
             for(int j=i+1; j< clusters.size();){
-                double similarity = cosineSimilarity.cosineSimilarityFromMap(clusters.get(j), clusters.get(i));
+                double similarity = cosineSimilarity.cosineSimilarityFromMap(clusters.get(j).cosinevector, clusters.get(i).cosinevector);
                 if(similarity>0.5) {
                     updateCluster(clusters.get(i), clusters.get(j));
+                    clusters.get(i).currentnumtweets += clusters.get(j).currentnumtweets;
+                    clusters.get(i).tweetList.addAll(clusters.get(j).tweetList);
                     clusters.remove(j);
                 }
                 else j++;
@@ -196,7 +200,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
 
         double maxSim = 0.0;
         for (int i = 0; i < clusters.size(); i++) {
-            HashMap<String, Double> clustermap = clusters.get(i);
+            HashMap<String, Double> clustermap = clusters.get(i).cosinevector;
             if (clustermap == null) continue;
 
             double similarity = cosineSimilarity.cosineSimilarityFromMap(clustermap, tweetmap, magnitude2);
@@ -210,7 +214,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
 
     private void endOfRoundOperations(long round) {
 
-        ArrayList<HashMap<String, Double>> clustersCopy = new ArrayList<>(clusters);
+        ArrayList<Cluster> clustersCopy = new ArrayList<>(clusters);
         this.collector.emit(new Values( round, country, clustersCopy));
         clusters.clear();
 
@@ -249,41 +253,44 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
     }
 
 
-    public void updateCluster(HashMap<String, Double> clustermap, ArrayList<String> tweetmap, int index) throws Exception {
+    public void updateCluster(Cluster clustermap, ArrayList<String> tweetmap, int index, long tweetId) throws Exception {
 
-        double numTweets = clustermap.get("numTweets");
+        double numTweets = clustermap.currentnumtweets;
         for(String key : tweetmap) {
             double value = 1.0;
-            if(clustermap.get(key) != null)
-                clustermap.put(key, ((clustermap.get(key)*numTweets ) + value) / numTweets);
+            if(clustermap.cosinevector.get(key) != null)
+                clustermap.cosinevector.put(key, ((clustermap.cosinevector.get(key)*numTweets ) + value) / numTweets);
             else
-                clustermap.put(key, value / numTweets);
+                clustermap.cosinevector.put(key, value / numTweets);
         }
-        Iterator<Map.Entry<String, Double>> it = clustermap.entrySet().iterator();
+        Iterator<Map.Entry<String, Double>> it = clustermap.cosinevector.entrySet().iterator();
         while(it.hasNext()) {
             Map.Entry<String, Double> entry = it.next();
             String key = entry.getKey();
             double value = entry.getValue();
             double newValue = value * numTweets / (numTweets+1.0);
-            clustermap.put(key, newValue);
+            clustermap.cosinevector.put(key, newValue);
         }
 
-        clustermap.put("numTweets", numTweets+1.0);
+        clustermap.currentnumtweets++;
+        clustermap.tweetList.addAll(clusters.get(index).tweetList);
+
         clusters.remove(index);
         clusters.add(clustermap);
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Updated cluster........... " + clustermap  );
 
     }
 
-    public void addNewCluster(ArrayList<String> tweetmap) throws Exception {
+    public void addNewCluster(ArrayList<String> tweetmap, long tweetId, long round) throws Exception {
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "New cluster..........."  );
         HashMap<String, Double> tweetMap = new HashMap<>();
         for(String key : tweetmap) {
             tweetMap.put(key, 1.0);
         }
-        tweetMap.put("numTweets",1.0);
 
-        clusters.add(tweetMap);
+        Cluster newCluster = new Cluster(country, null, tweetMap, 1, round, 0);
+        newCluster.tweetList.add(tweetId);
+        clusters.add(newCluster);
     }
 
     @Override
