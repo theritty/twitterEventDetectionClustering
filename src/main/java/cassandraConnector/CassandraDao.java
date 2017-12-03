@@ -25,6 +25,7 @@ public class CassandraDao implements Serializable
     private transient PreparedStatement statement_cluster_get;
     private transient PreparedStatement statement_cluster_get_by_id;
     private transient PreparedStatement statement_tweet_get;
+    private transient PreparedStatement statement_tweet_getbyid;
     private transient PreparedStatement statement_round_get;
     private transient PreparedStatement statement_processedTweets_get;
     private transient PreparedStatement statement_processedTweets_getCountry;
@@ -33,6 +34,7 @@ public class CassandraDao implements Serializable
     private transient PreparedStatement statement_tweetsandcluster;
     private transient PreparedStatement statement_clustertweets;
     private transient BoundStatement boundStatement_tweets_get;
+    private transient BoundStatement boundStatement_tweets_getbyid;
     private transient BoundStatement boundStatement_processedTweets_get;
     private transient BoundStatement boundStatement_processedTweets_getCountry;
     private transient BoundStatement boundStatement_processedTweets_getAll;
@@ -159,6 +161,11 @@ public class CassandraDao implements Serializable
                     "SELECT * FROM " + tweetsTable + " WHERE round=?;");
         }
 
+        if(statement_tweet_getbyid==null) {
+            statement_tweet_getbyid = CassandraConnection.connect().prepare(
+                    "SELECT * FROM " + tweetsTable + " WHERE round=? AND country=? AND id=? ALLOW FILTERING;");
+        }
+
         if(statement_event_get==null) {
             statement_event_get = CassandraConnection.connect().prepare(
                     "SELECT * FROM " + eventTable + " WHERE country=? ALLOW FILTERING;");
@@ -182,7 +189,7 @@ public class CassandraDao implements Serializable
         }
         if(statement_clustertweets ==null) {
             statement_clustertweets = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + tweetsandclusterTable + " WHERE round=?");
+                    "SELECT * FROM " + tweetsandclusterTable + " WHERE round=? AND clusterid=? ALLOW FILTERING;");
         }
 
 
@@ -190,6 +197,8 @@ public class CassandraDao implements Serializable
             boundStatement_tweetsandcluster = new BoundStatement(statement_tweetsandcluster);
         if(boundStatement_tweets_get == null)
             boundStatement_tweets_get = new BoundStatement(statement_tweet_get);
+        if(boundStatement_tweets_getbyid == null)
+            boundStatement_tweets_getbyid = new BoundStatement(statement_tweet_getbyid);
         if(boundStatement_processtimes_get == null)
             boundStatement_processtimes_get = new BoundStatement(statement_processtimes_get);
         if(boundStatement_processtimes == null)
@@ -261,6 +270,13 @@ public class CassandraDao implements Serializable
     {
         prepareAll();
         ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_tweets_get.bind(values));
+
+        return resultSet;
+    }
+    public ResultSet getTweetsById( Object... values ) throws Exception
+    {
+        prepareAll();
+        ResultSet resultSet = CassandraConnection.connect().execute(boundStatement_tweets_getbyid.bind(values));
 
         return resultSet;
     }

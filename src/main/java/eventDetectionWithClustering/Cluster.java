@@ -1,5 +1,6 @@
 package eventDetectionWithClustering;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.UUID;
 /**
  * Created by ozlemcerensahin on 02/12/2017.
  */
-public class Cluster {
+public class Cluster implements Serializable {
     public String country;
     public UUID id;
     public HashMap<String, Double> cosinevector;
