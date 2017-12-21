@@ -201,7 +201,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                         while(it.hasNext()) {
                             Map.Entry<String, Double> entry = it.next();
                             double value = entry.getValue();
-                            if(value < 0.01) {
+                            if(value < 0.05) {
                                 it.remove();
                             }
                         }
@@ -345,6 +345,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
 
             double newValue = (value * numTweetsCluster + valueLocal * numTweetsLocal) / (numTweetsLocal + numTweetsCluster);
             cosinevectorCluster.put(key, newValue);
+            if(newValue<0.1)cosinevectorCluster.remove(key);
             cosinevectorLocal.cosinevector.remove(key);
         }
 
@@ -355,6 +356,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             double value = entry.getValue();
             double newValue = (value * numTweetsLocal) / (numTweetsLocal + numTweetsCluster);
             cosinevectorCluster.put(key, newValue);
+            if(newValue<0.05)cosinevectorCluster.remove(key);
         }
 
 //        System.out.println("CHECK:::  " + cosinevectorLocal.get("clusterid") + " String " +  String.valueOf( (long) (double) cosinevectorLocal.get("clusterid")));

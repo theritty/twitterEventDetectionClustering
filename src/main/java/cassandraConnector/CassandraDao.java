@@ -189,7 +189,8 @@ public class CassandraDao implements Serializable
         }
         if(statement_clustertweets ==null) {
             statement_clustertweets = CassandraConnection.connect().prepare(
-                    "SELECT * FROM " + tweetsandclusterTable + " WHERE round=? AND clusterid=? ALLOW FILTERING;");
+//                    "SELECT * FROM " + tweetsandclusterTable + " WHERE round=? AND clusterid=? ALLOW FILTERING;");
+                    "SELECT * FROM " + tweetsandclusterTable + " WHERE round=?;");
         }
 
 

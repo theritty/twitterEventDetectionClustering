@@ -99,7 +99,7 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
                         while(it.hasNext()) {
                             Map.Entry<String, Double> entry = it.next();
                             double value = entry.getValue();
-                            if(value < 0.01) it.remove();
+                            if(value < 0.05) it.remove();
                         }
 
                         if( ((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > 0.5) ) {
@@ -201,6 +201,7 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
                 cassandraDao.insertIntoEvents(values_event.toArray());
             }
 
+
             for(long tweetId: newCluster.tweetList) {
                 List<Object> values_event = new ArrayList<>();
                 values_event.add(round);
@@ -231,6 +232,7 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
 
             double newValue = (value * numTweetsCluster + valueLocal * numTweetsLocal) / (numTweetsLocal + numTweetsCluster);
             cosinevectorCluster.put(key, newValue);
+            if(newValue<0.1)cosinevectorCluster.remove(key);
         }
 
         Iterator<Map.Entry<String, Double>> it2 = cosinevectorLocal.cosinevector.entrySet().iterator();
@@ -240,6 +242,7 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
             double value = entry.getValue();
             double newValue = (value * numTweetsLocal) / (numTweetsLocal + numTweetsCluster);
             cosinevectorCluster.put(key, newValue);
+            if(newValue<0.05)cosinevectorCluster.remove(key);
         }
 
         c.cosinevector = cosinevectorCluster;

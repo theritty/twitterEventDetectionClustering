@@ -273,7 +273,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
         }
 
         clustermap.currentnumtweets++;
-        clustermap.tweetList.addAll(clusters.get(index).tweetList);
+        clustermap.tweetList.add(tweetId);
 
         clusters.remove(index);
         clusters.add(clustermap);

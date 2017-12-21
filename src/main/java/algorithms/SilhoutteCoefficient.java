@@ -23,7 +23,37 @@ public class SilhoutteCoefficient {
         }
     }
 
+    public static double getMean(List<Double> data)
+    {
+        double sum = 0.0;
+        for(double a : data)
+            sum += a;
+        return sum/data.size();
+    }
+
+    public static double getVariance(List<Double> data)
+    {
+        double mean = getMean(data);
+        double temp = 0;
+        for(double a :data)
+            temp += (a-mean)*(a-mean);
+        return temp/(data.size()-1);
+    }
+
+    public static double getStdDev(List<Double> data)
+    {
+        return Math.sqrt(getVariance(data));
+    }
+
+
     public static void main(String[] args) {
+        getResult("USA", "clustering");
+        getResult("CAN", "clustering");
+        getResult("USA", "hybrid");
+        getResult("CAN", "hybrid");
+
+    }
+    public static void getResult(String country, String mode) {
 
         HashMap<Long, List<Cluster>> clusters = new HashMap<>();
         TopologyHelper topologyHelper = new TopologyHelper();
@@ -36,17 +66,17 @@ public class SilhoutteCoefficient {
 
         String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
-        String EVENTS_TABLE1 =  properties.getProperty("clustering.events.table");
+        String EVENTS_TABLE1 =  properties.getProperty(mode + ".events.table");
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
-        String TWEETSANDCLUSTER_TABLE = properties.getProperty("clustering.tweetsandcluster.table");
+        String TWEETSANDCLUSTER_TABLE = properties.getProperty(mode + ".tweetsandcluster.table");
 
         CassandraDao cassandraDao;
         try {
             cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE1, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE, TWEETSANDCLUSTER_TABLE);
             try {
-                ResultSet resultSetx = cassandraDao.getEvents("USA");
+                ResultSet resultSetx = cassandraDao.getEvents(country);
                 HashMap<Long, Integer> roundCount = new HashMap<>();
 
                 Iterator<Row> iteratorx = resultSetx.iterator();
@@ -58,25 +88,27 @@ public class SilhoutteCoefficient {
                     else roundCount.put(round,1);
                 }
 
-                ResultSet resultSet = cassandraDao.getEvents("USA");
+                ResultSet resultSet = cassandraDao.getEvents(country);
                 Iterator<Row> iterator = resultSet.iterator();
                 while(iterator.hasNext()) {
                     Row row = iterator.next();
                     UUID clusterid = row.getUUID("clusterid");
                     long round = row.getLong("round");
 
-                    if(roundCount.get(round)<2) continue;
+//                    if(roundCount.get(round)<2) continue;
                     HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
 
                     Cluster c = new Cluster(clusterid, cosinevector);
 
-                    ResultSet resultSet2 = cassandraDao.getClusterTweets(round, clusterid);
+                    ResultSet resultSet2 = cassandraDao.getClusterTweets(round);
                     Iterator<Row> iterator2 = resultSet2.iterator();
                     while (iterator2.hasNext()) {
                         Row row2 = iterator2.next();
                         long tweetid = row2.getLong("tweetid");
+                        UUID clusteridx = row2.getUUID("clusterid");
+                        if(!clusterid.equals(clusteridx)) continue;
 
-                        ResultSet resultSet3 = cassandraDao.getTweetsById(round, "USA", tweetid);
+                        ResultSet resultSet3 = cassandraDao.getTweetsById(round, country, tweetid);
                         Iterator<Row> iterator3 = resultSet3.iterator();
                         while (iterator3.hasNext()) {
                             Row row3 = iterator3.next();
@@ -106,18 +138,43 @@ public class SilhoutteCoefficient {
             e.printStackTrace();
         }
 
+        int clusterNum = 0;
+        int oneClusterNum = 0;
+        List<Double> coeffs = new ArrayList<>();
         for(Map.Entry<Long, List<Cluster>> entry : clusters.entrySet()) {
             long key = entry.getKey();
             List<Cluster> value = entry.getValue();
+            clusterNum += value.size();
 
-            if(value.size()<2) continue;
-            System.out.println("Round: "+ key + " -----------------");
+
+            if(value.size()<2) oneClusterNum++;
+//            System.out.println("Round: "+ key + " -----------------");
             for(int i=0; i<value.size(); i++) {
-                avgSilhoutteCoefForCluster(value, i);
+                coeffs.add(avgSilhoutteCoefForCluster(value, i));
             }
         }
-        System.out.println("DONE");
+
+        double var = getStdDev(coeffs);
+        double min = 100000000.0;
+        double max = -100000000.0;
+        double avg = 0;
+        double avgMed = 0;
+        int medCnt = 0;
+        for(double t : coeffs) {
+            avg+=t;
+            if(t>0.0 && t<1.0) {
+                medCnt++;
+                avgMed+=t;
+            }
+            if(min > t) min = t;
+            if(max < t) max = t;
+        }
+        avg = avg / clusterNum;
+        avgMed = avgMed / medCnt;
+        System.out.println(mode + "-" + country + " -> num clusters: " + clusterNum + ", number of rounds containing one cluster: " + oneClusterNum + ", avg: " + avg + ", avg of (0,1): " + avgMed + ", min: " + min + ", max: " + max + ", std-dev: " + var) ;
     }
+
+
 
     public static double averageSimilarityInsideCluster(Cluster c, int objIndex, HashMap<String, Double> currentVector) {
         double sum = 0.0;
@@ -171,7 +228,7 @@ public class SilhoutteCoefficient {
         }
 
         double avgCoeff = coeff/((double)count);
-        System.out.println("ID: " + clusters.get(clusterIndex).id + ", maxCoeff: " + maxCoeff + ", minCoeff: " + minCoeff + ", avgCoeff: " + avgCoeff);
+//        System.out.println("ID: " + clusters.get(clusterIndex).id + ", maxCoeff: " + maxCoeff + ", minCoeff: " + minCoeff + ", avgCoeff: " + avgCoeff);
         return avgCoeff;
     }
 

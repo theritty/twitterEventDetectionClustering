@@ -249,7 +249,10 @@ TRUNCATE countsforexperimentSleep_thesis; TRUNCATE eventsforexperimentSleep_thes
 
 
 
-
+select * from eventsforexperiment_thesis;
+select * from processtimeskeybasedforexperiment_thesis;
+select * from eventsforexperimentSleep_thesis;
+select * from processtimeskeybasedforexperimentSleep_thesis;
 
 
 TRUNCATE clustershybridforexperiment_thesis; TRUNCATE countshybridforexperiment_thesis; TRUNCATE eventskeybasedhybridforexperiment_thesis; TRUNCATE eventshybridforexperiment_thesis; TRUNCATE processedhybridforexperiment_thesis; TRUNCATE processtimeshybridforexperiment_thesis; TRUNCATE tweetsandclusterhybrid_thesis;
@@ -276,3 +279,21 @@ select count(*) from eventsforexperiment5;
 ./cqlsh -f resCluster.txt > outputCluster.txt
 ./cqlsh -f resHybrid.txt > outputHybrid.txt
 ./cqlsh -f resKeybased.txt > outputKeybased.txt
+
+
+
+
+
+CREATE TABLE tweetcollection.tweets_updated (
+    round bigint,
+    country text,
+    class_music boolean,
+    class_sports boolean,
+    class_politics boolean,
+    tweettime timestamp,
+    id bigint,
+    retweetcount bigint,
+    tweet text,
+    userid bigint,
+    PRIMARY KEY (round, country, id, class_music, class_sports, class_politics, tweettime)
+)

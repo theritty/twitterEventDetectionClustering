@@ -219,7 +219,7 @@ public class ExcelWriter {
         String EVENTS_TABLE = properties.getProperty("clustering.events.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
-        String TWEETSANDCLUSTER_TABLE = properties.getProperty("clustering.tweetsclusters.table");
+        String TWEETSANDCLUSTER_TABLE = properties.getProperty("clustering.tweetsandcluster.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty(tablename);
         CassandraDao cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE, TWEETSANDCLUSTER_TABLE);
@@ -237,10 +237,10 @@ public class ExcelWriter {
 //        times[9][7] = 3;
 //        writeExcel();
 
-        run("experiment-4-method-keybased-no1", "keybased.processtimes.table");
-        run("experiment-4-method-keybasedSleep-no1", "keybasedsleep.processtimes.table");
-        run("experiment-4-method-clustering-no1", "clustering.processtimes.table");
-//        run("experiment-4-method-hybrid-no", "hybrid.processtimes.table");
+//        run("experiment-4-method-keybased-no1", "keybased.processtimes.table");
+//        run("experiment-4-method-keybasedSleep-no1", "keybasedsleep.processtimes.table");
+//        run("experiment-4-method-clustering-thesis", "clustering.processtimes.table");
+        run("experiment-4-method-hybrid-thesis", "hybrid.processtimes.table");
 
         System.out.println("DONEXX");
 //
