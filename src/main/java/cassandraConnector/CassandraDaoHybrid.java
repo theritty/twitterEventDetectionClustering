@@ -262,7 +262,7 @@ public class CassandraDaoHybrid implements Serializable
     public void insertIntoTweetsAndCluster( Object[] values ) throws Exception
     {
         prepareAll();
-        CassandraConnection.connect().execute(boundStatement_tweetsandcluster.bind(values));
+        CassandraConnection.connect().executeAsync(boundStatement_tweetsandcluster.bind(values));
     }
     
     public ResultSet getClusterTweets( Object... values ) throws Exception {

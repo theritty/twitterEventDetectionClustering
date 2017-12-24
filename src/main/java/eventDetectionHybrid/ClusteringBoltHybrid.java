@@ -5,13 +5,13 @@ import cassandraConnector.CassandraDaoHybrid;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import drawing.*;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import eventDetectionWithClustering.Cluster;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
@@ -55,7 +55,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
 
         this.componentId = context.getThisTaskId()-1;
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "clustering : " + componentId  );
-        System.out.println( "clustering : " + componentId  );
+        System.out.println( "clustering : " + componentId + " " + country );
     }
 
     @Override
@@ -272,11 +272,11 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
             clustermap.cosinevector.put(key, newValue);
         }
 
-        clustermap.currentnumtweets++;
-        clustermap.tweetList.addAll(clusters.get(index).tweetList);
 
-        clusters.remove(index);
-        clusters.add(clustermap);
+
+        clustermap.currentnumtweets++;
+        clustermap.tweetList.add(tweetId);
+
         TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", "Updated cluster........... " + clustermap  );
 
     }

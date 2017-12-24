@@ -1,7 +1,7 @@
 package topologyBuilder;
 
 
-import org.apache.storm.Config;
+import backtype.storm.Config;
 
 import java.io.*;
 import java.util.ArrayList;

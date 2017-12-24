@@ -1,17 +1,17 @@
 package eventDetectionWithClustering;
 
-import org.apache.storm.task.OutputCollector;
+import backtype.storm.task.OutputCollector;
 import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.utils.UUIDs;
 import algorithms.*;
 import drawing.*;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import topologyBuilder.Constants;
 import topologyBuilder.TopologyHelper;
 
@@ -28,6 +28,39 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
     private int count ;
     private int taskNum = 0;
 
+    private int updateCntCond = 50;
+    private double updateCntPer = 0.01;
+    private double similarityThreshold = 0.5;
+    private int totCntThre = 100;
+    private double newCntPer = 0.05;
+
+////
+//    private int updateCntCond = 40;
+//    private double updateCntPer = 0.01;
+//    private double similarityThreshold = 0.4;
+//    private int totCntThre = 50;
+//    private double newCntPer = 0.04;
+//
+//
+//    private int updateCntCond = 60;
+//    private double updateCntPer = 0.025;
+//    private double similarityThreshold = 0.6;
+//    private int totCntThre = 120;
+//    private double newCntPer = 0.06;
+
+
+//    private int updateCntCond = 30;
+//    private double updateCntPer = 0.005;
+//    private double similarityThreshold = 0.3;
+//    private int totCntThre = 30;
+//    private double newCntPer = 0.005;
+
+////
+//    private int updateCntCond = 70;
+//    private double updateCntPer = 0.05;
+//    private double similarityThreshold = 0.7;
+//    private int totCntThre = 150;
+//    private double newCntPer = 0.07;
     private CassandraDao cassandraDao;
 
     private CosineSimilarity cosineSimilarity = new CosineSimilarity();
@@ -63,7 +96,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                 double value1 = entry.getValue();
                 double value2 = cluster2.cosinevector.get(key);
                 double newValue = (value1 * numTweets1 + value2 * numTweets2) / (numTweets1+numTweets2);
-                if(numTweets1+numTweets2>50 && newValue<0.01) {
+                if(numTweets1+numTweets2>updateCntCond && newValue<updateCntPer) {
                     it.remove();
                 }
                 else {
@@ -79,7 +112,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             String key = entry.getKey();
             double value = entry.getValue();
             double newValue = (value * numTweets2) / (numTweets1+numTweets2);
-            if(numTweets1+numTweets2<50 || newValue>0.01) {
+            if(numTweets1+numTweets2<updateCntCond || newValue>updateCntPer) {
                 cluster1.cosinevector.put(key, newValue);
             }
         }
@@ -89,7 +122,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
         for(int i=0;i<clusters.size()-1;i++) {
             for(int j=i+1; j< clusters.size();){
                 double similarity = cosineSimilarity.cosineSimilarityFromMap(clusters.get(j).cosinevector, clusters.get(i).cosinevector);
-                if(similarity>0.5) {
+                if(similarity>similarityThreshold) {
                     updateCluster(clusters.get(i), clusters.get(j));
                     clusters.get(i).currentnumtweets += clusters.get(j).currentnumtweets;
                     clusters.get(i).tweetList.addAll(clusters.get(j).tweetList);
@@ -105,8 +138,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
     public void execute(Tuple tuple) {
         long round = tuple.getLongByField("round");
         String country = tuple.getStringByField("country");
-        ArrayList<Cluster> clustersx = (ArrayList<Cluster>) tuple.getValueByField("clusters");
-        clusters.addAll(clustersx);
+        clusters = (ArrayList<Cluster>) tuple.getValueByField("clusters");
 
 
         if(++count < taskNum) {
@@ -185,7 +217,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                         double similarity = cosineSimilarity.cosineSimilarityFromMap(cNew.cosinevector, clusters.get(j).cosinevector);
 
                         if(similarity>maxSim) maxSim = similarity;
-                        if(similarity>0.5) {
+                        if(similarity>similarityThreshold) {
                             cNew = updateCluster(cNew, clusters.get(j), round);
                             System.out.println("Update clusters between cass and local!!!!!!!");
                             clusters.remove(j);
@@ -201,12 +233,12 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                         while(it.hasNext()) {
                             Map.Entry<String, Double> entry = it.next();
                             double value = entry.getValue();
-                            if(value < 0.01) {
+                            if(value < updateCntPer) {
                                 it.remove();
                             }
                         }
 
-                        if( ((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > 0.5) ) {
+                        if( ((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > similarityThreshold) && ((cNew.currentnumtweets + cNew.prevnumtweets) > totCntThre)) {
                             System.out.println("updated event again: " + cNew.id);
                             List<Object> values_event = new ArrayList<>();
                             values_event.add(round);
@@ -231,8 +263,6 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                         values2.add(round);
                         cassandraDao.insertIntoClusters(values2.toArray());
 
-
-
                     }
                     else if(round - cNew.lastround >= 2) {
                         cassandraDao.deleteFromClusters(country, cNew.id);
@@ -251,7 +281,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                 while(it.hasNext()) {
                     Map.Entry<String, Double> entry = it.next();
                     double value = entry.getValue();
-                    if(value < 0.05) {
+                    if(value < newCntPer) {
                         it.remove();
                     }
                 }
@@ -304,7 +334,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             values.add(round);
             cassandraDao.insertIntoClusters(values.toArray());
 
-            if(numTweets > 100) {
+            if(numTweets > totCntThre) {
                 List<Object> values_event = new ArrayList<>();
                 values_event.add(round);
                 values_event.add(clusterid);

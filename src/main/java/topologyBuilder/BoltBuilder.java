@@ -15,9 +15,9 @@ import eventDetectionWithClustering.EventDetectorBoltClustering;
 import eventDetectionWithClustering.CassandraSpoutClustering;
 import eventDetectionKeybased.CassandraSpoutKeyBased;
 import eventDetectionKeybasedWithSleep.CassandraSpoutKeyBasedWithSleep;
-import org.apache.storm.generated.StormTopology;
-import org.apache.storm.topology.TopologyBuilder;
-import org.apache.storm.tuple.Fields;
+import backtype.storm.generated.StormTopology;
+import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
 
 import java.util.Properties;
 

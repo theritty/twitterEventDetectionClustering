@@ -1,0 +1,462 @@
+
+ Round: 4068668 -----------------
+\begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} &  \\ \hline 
+\hline cluster id&silhoutte coefficient &cosine vector & comment \\ \hline
+078b42f0-de95-11e7-8575-75834ce46b2b & 1.0 & {guest=0.976744, movie=0.976744, please=1.0, see=1.74419, trailer=0.976744} &  \\ \hline
+\end{longtable}    \newpage
+  
+ Round: 4069052 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+b19452a0-dea4-11e7-8575-75834ce46b2b & 0.9999999999999998 & {bundle=1.0, buy=1.0, free=1.0, get=1.0, huge=1.0, low=1.0, sale=1.0} &  \\ \hline 
+b1958b20-dea4-11e7-8575-75834ce46b2b & 0.9985748188310011 & {fdb=1.0, music=1.0, official=1.0, ringtone=1.0, video=1.0, ztro=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068924 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+fc6be290-de9d-11e7-8575-75834ce46b2b & 0.35946230367282217 & {accept=0.052632, application=0.062422, artist=0.052632, associate=0.096314, community=0.052632, cook=0.059211, correction=0.052632, datum=0.051877, fit=0.993103, great=1.0, inbound=0.052632, interest=0.622078, manager=0.101328, might=0.548184, near=0.622078, outside=0.052632, production=0.052632, register=0.052632, representative=0.052632, sale=0.105806, texa=0.052038, travel=0.113947} &  \\ \hline 
+fc735ca0-de9d-11e7-8575-75834ce46b2b & 0.19884201374701665 & {apply=1.00926, assistant=0.0625, attendant=0.166667, big=0.058824, business=0.074074, care=0.051376, cath=0.0625, claim=0.166667, click=1.0, cna=0.166667, commercial=0.0625, counter=0.082687, customer=0.163551, datum=0.058824, diesel=0.113889, engineer=0.058574, estate=0.083882, forklift=0.0625, hair=0.112016, handler=0.0625, hospitality=0.111111, installer=0.0625, lab=0.0625, latest=0.75241, lead=0.152679, leader=0.152679, manager=0.195676, material=0.0625, ohio=0.0625, operator=0.064375, opportunity=0.114987, party=0.166667, position=0.166667, production=0.0625, project=0.05255, real=0.083882, register=0.069509, representative=0.05888, restaurant=0.111111, retail=0.22964, room=0.143791, ryder=0.0625, sale=0.267679, see=0.75241, senior=0.164583, service=0.189425, shift=0.146352, specialist=0.085714, store=0.160629, stylist=0.112016, surgical=0.0625, team=0.153603, time=0.084328, trainee=0.146352, travel=0.0625} &  \\ \hline 
+fc761bc0-de9d-11e7-8575-75834ce46b2b & 0.21825050392992518 & {analyst=0.073424, auto=0.142857, care=0.166414, half=0.170694, intelligent=0.142857, international=0.14966, join=0.531173, latest=1.0, manager=0.053306, new=0.054054, noodle=0.285714, open=0.314882, opening=0.756716, part=0.140802, read=0.419085, remedy=0.142857, robert=0.170694, see=0.531173, specialist=0.053636, staffing=0.142857, supplemental=0.166414, team=0.531173, technology=0.170694, view=0.511952, wis=0.153247} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069044 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+edecbcc0-dea3-11e7-8575-75834ce46b2b & 1.0 & {chain=1.0, cross=1.0, jesus=1.0, necklace=1.0, pendant=1.0, religious=1.0, steel=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069300 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+7dd8c210-deaf-11e7-8575-75834ce46b2b & 1.0 & {amazing=0.093074, baby=0.119318, back=0.125, beautiful=0.058265, bestfriend=0.115778, big=0.108553, birthday=0.990385, danielle=0.090909, day=0.206223, finally=0.087045, friend=0.173479, get=0.061063, girl=0.14071, good=0.090278, great=0.081515, happy=1.0, homie=0.056604, hope=0.211559, later=0.065625, legal=0.076923, lil=0.125, love=0.374203, maddie=0.090909, man=0.093768, miss=0.136046, moon=0.125, much=0.228316, pretty=0.237745, savvy=0.125, say=0.070775, see=0.148821, sorry=0.125, syd=0.125, tell=0.135294, today=0.05921, tonight=0.125, wait=0.243454, weekend=0.125, weirdo=0.090909, whole=0.125, world=0.125} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069554 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+14d9bee0-deb9-11e7-8575-75834ce46b2b & 1.0 & {album=0.08, alus=0.122886, bee=0.078312, biggest=0.086811, boxer=0.060019, butterfly=0.078312, damn=0.151833, death=0.083333, fan=0.08, float=0.078312, free=0.051852, great=0.104862, greatest=0.261681, inspiration=0.082409, legend=0.232629, live=0.099291, long=0.111111, lose=0.081242, miss=0.057084, mohamm=0.099291, muhamm=0.138549, muhammad=0.866994, name=0.08, peace=0.22278, rest=0.224962, retweet=0.083333, rip=0.680784, sting=0.078312, tao=0.090909, time=0.17607, today=0.07551, truth=0.051852, via=0.123208, world=0.071268} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069170 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+d5606ae0-dea7-11e7-8575-75834ce46b2b & 1.0 & {analyst=0.090822, assistant=0.1, business=0.057971, california=0.068902, crew=0.111111, customer=0.121821, delivery=0.123457, driver=0.13654, first=0.111111, fit=1.0, great=1.0, interest=0.776845, labor=0.111111, local=0.111111, member=0.111111, might=0.654138, near=0.776845, part=0.055556, physical=0.051304, plant=0.057755, register=0.117284, representative=0.054753, service=0.102581, technician=0.079332, therapist=0.051304, truck=0.124378} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069552 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+00723450-deb9-11e7-8575-75834ce46b2b & 1.0 & {alus=0.083786, athlete=0.050137, avec=0.142857, believe=0.142602, boxer=0.080532, champ=0.140948, clay=0.051575, damn=0.058849, dare=0.090909, dead=0.060619, detail=0.0625, family=0.0625, goat=0.095188, gon=0.142857, great=0.055466, greatest=0.277798, heaven=0.150442, icon=0.119372, legend=0.094865, life=0.108462, live=0.090909, lose=0.148723, muhamm=0.15483, muhammad=0.886301, peace=0.164785, prayer=0.0625, prepare=0.142857, profit=0.090909, quote=0.069106, remember=0.104683, rest=0.204116, retire=0.142857, rip=0.690837, say=0.142857, time=0.182534, tonight=0.142857, true=0.18797, well=0.120301} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069553 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+0a6cd4b0-deb9-11e7-8575-75834ce46b2b & 1.0 & {alus=0.065848, athlete=0.121409, boxer=0.097807, boxing=0.188609, brother=0.096774, butterfly=0.0581, century=0.082154, champ=0.080427, chief=0.090909, come=0.090909, conscientious=0.090909, damn=0.090666, dead=0.106952, earth=0.090909, everyone=0.090909, figure=0.098086, float=0.0581, great=0.093023, greatest=0.363088, hear=0.052632, huge=0.090909, humanitarian=0.052632, important=0.077922, inspiration=0.0625, keef=0.090909, legend=0.163826, live=0.090909, make=0.090909, man=0.058036, mind=0.090909, model=0.090909, muhammad=0.898113, news=0.078947, nigga=0.090909, objector=0.090909, paradise=0.110315, pass=0.094683, pave=0.090909, pay=0.090909, peace=0.108219, people=0.076923, picture=0.090909, put=0.090909, reason=0.076923, rent=0.090909, rest=0.25717, rip=0.709742, role=0.090909, room=0.090909, say=0.094728, see=0.051763, service=0.090909, set=0.090909, simply=0.053922, sport=0.105812, time=0.209745, today=0.090909, truly=0.054689, via=0.106952, way=0.090909} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069550 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+e8a8ba10-deb8-11e7-8575-75834ce46b2b & -0.033246458398047136 & {age=0.098224, alus=0.69575, away=0.073333, bee=0.063908, boxer=0.383123, boxing=0.056343, break=0.292092, butterfly=0.078607, call=0.285714, cassius=0.094965, clay=0.094965, dead=0.145313, fighter=0.083333, float=0.075048, goat=0.078221, grandma=0.142857, great=0.070827, greatest=0.429043, heaven=0.241803, hero=0.057485, kind=0.5, knock=0.25, legend=0.14433, life=0.055556, live=0.05844, lord=0.142857, miss=0.054682, muhammad=0.891026, poster=0.111111, prayer=0.076389, rip=0.568755, say=0.063722, see=0.055, senseless=0.25, sting=0.06786, tell=0.142857, time=0.256808, via=0.271307, video=0.055556} &  \\ \hline 
+e8b31a50-deb8-11e7-8575-75834ce46b2b & 0.08728485204161276 & {ali=0.982906, atlanta=0.066667, boxing=0.091459, damn=0.062602, dead=0.070356, dude=0.066667, forget=0.051282, georgia=0.066667, goat=0.116856, great=0.059081, greatest=0.21064, heavyweight=0.066667, inspirational=0.066667, justice=0.066667, knockout=0.066667, legend=0.121155, legendary=0.083792, lose=0.077912, man=0.056759, much=0.09465, muhammad=0.897436, night=0.066667, north=0.066667, officially=0.066667, peace=0.132829, pound=0.133333, report=0.066667, rest=0.166456, rip=0.656044, ruin=0.066667, shout=0.066667, time=0.050021, tonight=0.066667, world=0.133333} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069551 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+f4766cc0-deb8-11e7-8575-75834ce46b2b & -0.01957094400283586 & {alli=0.1, angele=0.111111, believe=0.065657, boxer=0.05287, butterfly=0.261364, california=0.111111, champ=0.266671, champion=0.05679, day=0.166667, easy=0.105168, everlasting=0.055556, fall=0.111111, float=0.261364, goat=0.116346, great=0.256133, greatest=0.216935, guess=0.166667, heaven=0.282541, hero=0.062269, inspiration=0.107921, king=0.052721, legend=0.236497, lose=0.073694, mohamm=0.277778, muhamm=0.119043, muhammad=0.639341, peace=0.557619, realize=0.166667, rest=0.584158, ring=0.082305, rip=0.536372, star=0.111111, time=0.111111, true=0.1, warrior=0.055556, world=0.0625} &  \\ \hline 
+f478ddc0-deb8-11e7-8575-75834ce46b2b & 0.13923816674294706 & {ali=0.981685, alus=0.130245, awe=0.1, bee=0.053594, boxer=0.051415, butterfly=0.053594, count=0.063554, damn=0.075862, day=0.133243, dead=0.073354, fighter=0.121016, float=0.053594, free=0.1, goat=0.103078, great=0.146396, greatest=0.215301, hard=0.081481, humble=0.083333, inspiration=0.110345, inspire=0.099038, legend=0.091996, make=0.057231, man=0.093662, mohammad=0.164444, muhammad=0.936222, pass=0.051341, peace=0.106859, rest=0.117848, rip=0.693293, show=0.081502, sting=0.053594, time=0.114651, truly=0.101651, truth=0.1} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069548 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+cf1a5e50-deb8-11e7-8575-75834ce46b2b & 0.3385486837211895 & {alus=0.13303, bad=0.069437, bee=0.052117, boxer=0.058617, butterfly=0.05323, cassius=0.073919, clay=0.073919, damn=0.075527, easy=0.119299, fight=0.086804, float=0.051449, great=0.076224, greatest=0.297849, legend=0.097678, man=0.065119, muhamm=0.104755, muhammad=0.79963, pass=0.063237, peace=0.40046, rest=0.504745, rip=0.683409, say=0.053219, stay=0.083333, sting=0.053532, time=0.121537, world=0.051208} &  \\ \hline 
+cf250cb0-deb8-11e7-8575-75834ce46b2b & 0.6060512524223126 & {ali=0.144477, alus=0.069695, bee=0.947961, boxing=0.101709, butterfly=0.968354, champ=0.083767, eye=0.153425, float=0.898734, fly=0.121577, forever=0.078095, forget=0.111111, goat=0.058474, great=0.063297, greatest=0.094415, hand=0.165834, heaven=0.129586, hit=0.149921, legend=0.081893, muhammad=0.127279, peace=0.101357, rest=0.104878, rip=0.174141, rumble=0.12234, see=0.16109, sting=0.974294, talent=0.111111, way=0.106275, world=0.057143} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069549 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+dc636660-deb8-11e7-8575-75834ce46b2b & 0.34363792094062534 & {black=0.081194, boxer=0.08133, butterfly=0.052963, cassius=0.090909, champ=0.105095, clay=0.090909, damn=0.063014, fight=0.050416, fighter=0.161631, forget=0.097845, goat=0.079225, great=0.158821, greatest=0.219908, legend=0.152799, lose=0.114485, lucky=0.095238, man=0.055979, many=0.114063, meet=0.09148, muhamm=0.094881, muhammad=0.8022, peace=0.20048, rest=0.274447, rip=0.664985, see=0.090909, superman=0.081194, time=0.137563, today=0.084423, true=0.147126, warrior=0.1, world=0.096495, year=0.1} &  \\ \hline 
+dc6dedb0-deb8-11e7-8575-75834ce46b2b & 0.64955307424251 & {ali=0.214926, alus=0.117632, bee=0.96748, butterfly=0.966869, champion=0.085366, dance=0.077922, eye=0.055107, float=0.926152, flow=0.083333, fly=0.058017, forever=0.148649, greatest=0.155091, hand=0.102492, hit=0.055107, important=0.083333, inspiring=0.083333, legend=0.053505, mohame=0.076754, muhammad=0.20456, peace=0.056277, person=0.083333, rest=0.056277, rip=0.167142, rumble=0.074003, see=0.055107, sting=0.99187} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069546 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+b30530a0-deb8-11e7-8575-75834ce46b2b & 0.23378984803275277 & {boxer=0.05957, goat=0.051215, great=0.050305, greatest=0.265041, legend=0.102851, muhamm=0.053993, muhammad=0.835905, peace=0.172858, power=0.052125, rest=0.233731, rip=0.718726, time=0.103026} &  \\ \hline 
+b3189190-deb8-11e7-8575-75834ce46b2b & 0.22535223404657542 & {ali=0.342522, alus=0.139105, athlete=0.05368, bee=0.08193, boxer=0.076269, boxing=0.107438, butterfly=0.079445, career=0.052632, champ=0.466598, damn=0.05889, easy=0.412252, finish=0.052632, float=0.090909, goat=0.088655, great=0.054128, greatest=0.367318, heaven=0.090909, history=0.138756, leave=0.097345, legend=0.284437, liston=0.090909, louisville=0.054945, love=0.05877, mohamm=0.090909, muhammad=0.275228, name=0.060807, paradise=0.087874, peace=0.844251, photo=0.090909, piece=0.055556, power=0.072821, remain=0.08193, rest=1.0, ring=0.082061, rip=0.091909, sport=0.088112, stay=0.055556, step=0.052632, sting=0.090909, time=0.150942, true=0.095904, world=0.098962} &  \\ \hline 
+b31d9aa0-deb8-11e7-8575-75834ce46b2b & 0.20111801356352524 & {ali=0.110164, alus=0.268739, around=0.090909, athlete=0.088387, bad=0.052632, boxer=0.154372, cassius=0.07328, champ=0.171941, clay=0.075352, dead=0.141108, eternal=0.090909, fantastic=0.058824, fighter=0.118111, greatest=0.945205, hard=0.052632, hero=0.081005, hit=0.052632, legend=0.160339, life=0.176471, man=0.079415, meet=0.058824, memory=0.090909, miss=0.076222, moment=0.13369, muhammad=0.186371, native=0.052649, opportunity=0.058824, peace=0.115145, people=0.083333, real=0.058824, remember=0.181818, rest=0.113254, rip=0.827962, shock=0.052632, simply=0.090909, sport=0.074853, story=0.058824, take=0.090909, tear=0.058824, time=0.671764, via=0.133075, way=0.076923, whole=0.071429, world=0.247504} &  \\ \hline 
+b3219240-deb8-11e7-8575-75834ce46b2b & 0.5673757372116404 & {ali=0.268178, alus=0.088421, arm=0.066667, bee=0.918967, boxer=0.074591, butterfly=0.992701, champ=0.067191, damn=0.054825, easy=0.055395, eye=0.069369, float=0.937651, forget=0.052174, god=0.066667, great=0.0602, greatest=0.091318, hand=0.069369, hit=0.069369, legend=0.051556, live=0.057652, lose=0.060386, mohamm=0.051459, muhamm=0.054722, muhammad=0.20809, peace=0.057982, rest=0.080298, rip=0.273723, see=0.070131, sting=0.945025, time=0.078276, today=0.066667, well=0.066667, youth=0.066667} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069930 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+0bb99f00-dec4-11e7-8575-75834ce46b2b & 1.0 & {animal=0.076923, automation=0.166667, care=0.076923, cater=0.166667, coordinator=0.166667, counsel=0.071429, customer=0.0625, dialysis=0.076923, engineer=0.175, general=0.093098, group=0.057046, hair=0.076923, join=0.387023, latest=1.0, law=0.071429, lead=0.076923, management=0.166667, manager=0.108694, member=0.156667, omaha=0.071429, open=0.291825, opening=0.871163, part=0.08908, principal=0.166667, processing=0.076923, read=0.557225, register=0.107092, retail=0.086893, sale=0.129335, see=0.387023, service=0.0625, staffing=0.06, sterile=0.076923, stylist=0.076923, system=0.166667, team=0.502968, technician=0.162681, time=0.0625, view=0.588727} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069291 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+b105c2b0-deae-11e7-8575-75834ce46b2b & 0.32061986284375404 & {battle=0.071429, beat=0.173871, bench=0.95959, better=0.098054, carry=0.243922, cav=0.403378, crazy=0.103558, damn=0.096065, dominate=0.172917, domination=0.071429, even=0.129525, every=0.09725, fact=0.1, fantastic=0.1, fire=0.055667, game=0.516603, get=0.144818, good=0.110169, hope=0.086854, let=0.239811, light=0.062585, lineup=0.2, livingston=0.102639, nice=0.101408, play=0.174388, puttin=0.090909, right=0.091576, save=0.102326, score=0.081905, series=0.055556, shut=0.1, splash=0.1, start=0.578195, starter=0.14838, story=0.071429, tho=0.101408, tonight=0.085512, warrior=0.863577, well=0.056261, wild=0.1, win=0.32288} &  \\ \hline 
+b10b19e0-deae-11e7-8575-75834ce46b2b & 0.35556670647234184 & {barbosa=0.127076, break=0.129072, cav=0.062771, cold=0.050067, curry=0.110217, final=0.120558, freak=0.054054, game=0.096646, get=0.097472, god=0.070708, hate=0.053582, injury=0.08, life=0.051736, livingston=0.988, look=0.066847, man=0.074832, mid=0.176739, miss=0.122459, mvp=0.19094, nigga=0.074539, play=0.130094, player=0.085114, range=0.163272, real=0.064398, right=0.071427, shaun=0.894892, warrior=0.103525, well=0.054054, world=0.081081} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069547 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+c1c2b040-deb8-11e7-8575-75834ce46b2b & 0.31745112365073747 & {alus=0.063469, bee=0.083433, boxer=0.061855, boxing=0.051953, butterfly=0.085302, damn=0.051207, float=0.086448, goat=0.053772, great=0.059391, greatest=0.259293, legend=0.126147, lose=0.058261, man=0.050842, muhammad=0.87995, peace=0.095789, rest=0.157336, rip=0.667105, sting=0.083433, time=0.139934, world=0.050963} &  \\ \hline 
+c1d46380-deb8-11e7-8575-75834ce46b2b & 0.26588657404374977 & {ali=0.313162, alus=0.233973, away=0.103509, boxer=0.07459, boxing=0.3, butterfly=0.081538, cassius=0.06069, champ=0.2875, clay=0.06069, easy=0.222332, float=0.091355, forever=0.168, forget=0.113208, glove=0.1, great=0.110718, greatest=0.334959, hero=0.117393, inspiration=0.1, legend=0.167428, life=0.093, live=0.160879, lose=0.054404, miss=0.088541, model=0.1, muhamm=0.149003, muhammad=0.280633, pair=0.1, pass=0.1, peace=0.913947, power=0.061194, put=0.1, rest=1.0, role=0.1, time=0.129144, today=0.1, true=0.053955} &  \\ \hline 
+c1d797d0-deb8-11e7-8575-75834ce46b2b & 0.5954820081586605 & {ali=0.130433, alus=0.063709, bee=0.938202, butter=0.06125, butterfly=0.988764, champ=0.08304, easy=0.058111, eye=0.053077, float=0.914659, fly=0.104775, goat=0.130498, greatest=0.107313, hand=0.052035, hit=0.059327, legend=0.058712, miss=0.066667, muhamm=0.063878, muhammad=0.099489, peace=0.056618, problem=0.066667, respiratory=0.066667, rest=0.106007, rip=0.204681, see=0.053077, sting=0.966155, toast=0.066667} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069544 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+95087e40-deb8-11e7-8575-75834ce46b2b & 0.34767168654212377 & {ali=0.925101, boxer=0.063976, damn=0.050299, goat=0.062605, greatest=0.263855, legend=0.080975, man=0.051236, muhamm=0.096385, muhammad=0.763782, peace=0.150388, rest=0.181478, rip=0.780833, time=0.097819} &  \\ \hline 
+951ddb00-deb8-11e7-8575-75834ce46b2b & 0.2833237297223334 & {ali=0.351485, alus=0.150795, american=0.070968, bee=0.2, butterfly=0.266667, cassius=0.071932, champ=0.29705, clay=0.063959, damn=0.075388, family=0.055556, float=0.266667, great=0.079254, greatest=0.349636, legend=0.314522, lose=0.066543, loss=0.055556, man=0.120192, muhamm=0.166138, muhammad=0.17083, nashville=0.066667, paradise=0.161426, peace=0.874573, prayer=0.055556, rest=1.0, sting=0.2, tennessee=0.066667, tie=0.058824, time=0.208305, true=0.135989, world=0.065274} &  \\ \hline 
+9520c130-deb8-11e7-8575-75834ce46b2b & 0.5689992297332164 & {ali=0.209553, alus=0.116163, bee=0.900201, butterfly=0.976879, champ=0.051374, damn=0.078502, eye=0.085322, float=0.878613, fly=0.153061, goat=0.062985, greatest=0.115422, hand=0.085322, heaven=0.063848, hero=0.076923, hit=0.089152, legend=0.107063, man=0.056742, miss=0.074053, muhammad=0.184084, muhammed=0.073362, peace=0.075167, rest=0.109556, rip=0.234738, see=0.102998, sting=0.959104, time=0.068841} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069545 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+a3981010-deb8-11e7-8575-75834ce46b2b & -0.031803346834160306 & {alus=0.061168, boxer=0.05938, greatest=0.23231, legend=0.102689, muhamm=0.056769, muhammad=0.79248, peace=0.216314, rest=0.257952, rip=0.689802, time=0.107642} &  \\ \hline 
+a3b69490-deb8-11e7-8575-75834ce46b2b & 0.0062224274434399 & {ali=0.905485, alus=0.149206, boxer=0.060319, damn=0.116773, goat=0.110098, greatest=0.184831, legend=0.105711, muhamm=0.084496, muhammad=0.803756, rip=0.820354, time=0.055293} &  \\ \hline 
+a3bc60f0-deb8-11e7-8575-75834ce46b2b & 0.19305945104913624 & {ali=0.070985, alus=0.271844, athlete=0.132459, away=0.14174, boxer=0.254488, dead=0.083864, finest=0.066667, goat=0.084068, great=0.071779, greatest=0.967362, hear=0.05, heavyweight=0.053024, inspiration=0.064646, legend=0.146331, live=0.079392, longer=0.075229, louisville=0.075075, miss=0.123283, muhammad=0.134295, paradise=0.062143, pass=0.195381, peace=0.060291, rest=0.088853, ring=0.076523, rip=0.766523, seem=0.055556, situation=0.05, step=0.097281, tell=0.05, time=0.688334, world=0.074561} &  \\ \hline 
+a3c0cdc0-deb8-11e7-8575-75834ce46b2b & 0.5453826887766301 & {ali=0.160656, alus=0.088525, bee=0.930693, boxer=0.071497, butterfly=0.960656, champ=0.07421, eye=0.057677, float=0.898361, fly=0.070099, goat=0.050188, greatest=0.156063, hand=0.060978, heaven=0.063824, hit=0.054377, keep=0.05141, legend=0.06638, legendary=0.055556, muhammad=0.14936, peace=0.065046, rest=0.098133, rip=0.298361, rumble=0.074361, see=0.070879, sting=0.963696, time=0.105626, world=0.050532} &  \\ \hline 
+a3c95940-deb8-11e7-8575-75834ce46b2b & 0.2263326367472144 & {age=0.23541, alus=0.980769, away=0.384778, biggest=0.061047, boxer=0.081469, boxing=0.236586, break=0.395191, champ=0.088123, damn=0.130893, dead=0.054977, definition=0.142857, fight=0.066667, forever=0.061064, forget=0.051948, great=0.284884, greatest=0.201932, hear=0.137294, hero=0.05974, hit=0.052632, icon=0.053687, legend=0.260707, life=0.05, man=0.067308, muhammad=0.949578, news=0.151263, night=0.078087, pass=0.392795, peace=0.106289, real=0.146348, rest=0.104312, rip=0.115469, ruin=0.055556, say=0.052766, see=0.07319, song=0.142857, time=0.112155, today=0.061501, totally=0.055556, try=0.052632, via=0.08907} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069289 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+80f2c8c0-deae-11e7-8575-75834ce46b2b & 0.2865912450732357 & {anyone=0.25, ball=0.080664, cool=0.057755, damn=0.055556, delly=0.129662, dick=0.809784, dude=0.153436, face=0.055995, get=0.605615, hit=0.990654, hostile=0.25, iggy=0.29017, iguodala=0.132352, man=0.455834, many=0.092929, nigga=0.317179, none=0.25, nut=0.583981, okay=0.075214, person=0.062156, piss=0.053512, play=0.105406, purpose=0.135367, quit=0.25, replay=0.075862, right=0.055597, say=0.160337, shake=0.066667, shit=0.134615, sorry=0.1, straight=0.10999, teammate=0.25, tech=0.053512, time=0.077778, try=0.057407, weak=0.072274} &  \\ \hline 
+80f70e80-deae-11e7-8575-75834ce46b2b & 0.28093905504089817 & {ball=1.02752, basketball=0.105943, big=0.083333, breh=0.083333, clearly=0.054362, close=0.166667, come=0.185185, damn=0.174866, deal=0.083333, dear=0.052632, delly=0.67002, different=0.052632, dirty=0.106756, even=0.206349, final=0.076923, foul=0.144569, get=0.055556, hard=0.05, hit=0.068966, hoopin=0.0625, iggy=0.054765, jackson=0.102426, let=0.19516, long=0.083333, make=0.268307, man=0.559965, mark=0.102426, meat=0.0625, miss=0.083333, much=0.166667, nba=0.083333, near=0.074974, nut=0.177419, play=0.677461, punch=0.083333, pussy=0.166667, reaction=0.05, say=0.083333, soft=0.083333, stupid=0.085965, swing=0.061002, take=0.083333, tap=0.101716, team=0.069048, touch=0.124903, try=0.110434, wrong=0.41919, young=0.0625} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069926 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+dbe24e80-dec3-11e7-8575-75834ce46b2b & 1.0 & {associate=0.09905, auto=0.055556, available=0.090909, beauty=0.055556, care=0.052885, cheesecake=0.064516, consultant=0.095006, corporation=0.146418, dollar=0.130289, enterprise=0.076923, factory=0.064516, general=0.130289, join=0.66923, kelly=0.09867, latest=1.0, leader=0.090909, mail=0.090909, mound=0.090909, open=0.355254, opening=0.859687, part=0.089061, pharmacy=0.107955, position=0.090909, read=0.567, register=0.098485, representative=0.090909, restaurant=0.111111, retail=0.119039, sale=0.179395, see=0.66923, service=0.130697, shift=0.092657, specialty=0.090909, team=0.642409, technician=0.052885, travel=0.068408, ulta=0.055556, view=0.45717, west=0.090909, window=0.076923} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069031 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+24130030-dea3-11e7-8575-75834ce46b2b & 1.0 & {check=1.0, please=1.0, song=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069543 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+880afe20-deb8-11e7-8575-75834ce46b2b & 0.016933287994970413 & {ali=0.942806, anymore=0.083333, boxing=0.064027, champ=0.171425, finally=0.0625, float=0.051787, greatest=0.20196, happen=0.083333, icon=0.083333, leave=0.076389, legend=0.099125, loss=0.083333, man=0.056196, miss=0.076389, muhamm=0.054478, muhammad=0.845363, pain=0.083333, peace=0.225574, power=0.05595, quick=0.083333, rattle=0.05, rest=0.306554, rip=0.656678, sport=0.061059, time=0.055797, true=0.087571, walk=0.0625} &  \\ \hline 
+8813d7c0-deb8-11e7-8575-75834ce46b2b & 0.017061890640435125 & {ali=0.979381, alus=0.119871, bee=0.128757, boxer=0.062964, butterfly=0.137931, damn=0.085081, dead=0.054372, float=0.128757, goat=0.066349, greatest=0.172396, legend=0.09102, miss=0.059857, muhammad=0.904706, rest=0.055152, rip=0.73656, sting=0.137931, time=0.083242} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069665 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+17837030-debb-11e7-8575-75834ce46b2b & 1.0 & {assist=0.076923, bryan=0.076923, certify=0.076923, corporation=0.053191, crew=0.076923, cruise=0.076923, dollar=0.053191, esthetician=0.076923, general=0.053191, housekeeper=0.055556, international=0.076923, join=0.722436, jose=0.068841, latest=1.0, lowe=0.076923, luke=0.066667, member=0.076923, open=0.459397, opening=0.788099, part=0.085714, read=0.348531, restaurant=0.076923, saint=0.066667, san=0.068841, see=0.722436, siemen=0.066667, software=0.066667, sonic=0.076923, staffing=0.051383, store=0.089744, system=0.066667, team=0.753586, view=0.524238} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069278 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+9b125d70-dead-11e7-8575-75834ce46b2b & 1.0 & {actual=0.333333, ass=0.083333, athletic=0.055556, baby=0.058824, ball=0.083333, bang=0.083333, block=0.083333, blow=0.058824, call=0.177635, choke=0.067775, contact=0.083333, damn=0.33229, effort=0.058824, feel=0.083333, foul=0.411152, game=0.089724, get=0.484069, good=0.079127, guess=0.333333, kevin=0.869755, look=0.117473, love=0.990385, man=0.141249, mess=0.058824, move=0.058824, murder=0.083333, nice=0.058824, non=0.055556, play=0.168121, pressure=0.058824, put=0.333333, refuse=0.083333, series=0.068377, slow=0.055556, soft=0.173267, trash=0.096774, trip=0.083333} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069150 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+3bc12d70-dea7-11e7-8575-75834ce46b2b & 1.0 & {aerotek=0.138685, analyst=0.144033, assistant=0.114347, associate=0.070848, benefit=0.056663, business=0.111111, customer=0.055812, half=0.135696, join=0.500107, kindred=0.083333, latest=1.0, lead=0.111111, leader=0.113131, license=0.111111, lpn=0.111111, mgr=0.111111, officer=0.111111, ohio=0.093496, open=0.320666, opening=0.785454, pharmacy=0.053977, practical=0.111111, read=0.604737, register=0.089788, retail=0.111111, robert=0.135696, sale=0.128021, security=0.111111, see=0.509198, senior=0.061376, service=0.077317, shift=0.126984, supervisor=0.154853, system=0.111111, team=0.563731, technology=0.135696, trainee=0.111111, view=0.598422} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069530 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+ba1ccac0-deb7-11e7-8575-75834ce46b2b & 1.0 & {code=1.0, free=1.0, lyft=1.7619, lyftontwitter=1.0, promo=1.0, ride=1.0, try=1.0, use=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069273 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+316fabc0-dead-11e7-8575-75834ce46b2b & 1.0 & {almost=0.08875, ankle=0.28987, ass=0.053253, boy=0.131667, bra=0.111111, break=0.33712, breaker=0.125, cross=0.055, curry=0.314645, dirty=0.121154, dude=0.078974, fall=0.302862, floor=0.05778, get=0.219351, gon=0.074937, jab=0.976744, make=0.227975, man=0.204329, map=0.111111, nigga=0.124414, simple=0.069681, slip=0.218556, step=0.984495, tho=0.067222, thompson=0.303672, touch=0.09809, tristan=0.198139, wait=0.125} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069270 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+fa2920b0-deac-11e7-8575-75834ce46b2b & 1.0 & {anthem=0.22073, every=0.054287, final=0.070028, game=0.066365, get=0.120249, good=0.076491, john=0.984436, kill=0.074235, legend=0.996109, love=0.092662, man=0.056156, national=0.19728, ohio=0.056362, oracle=0.050207, sing=0.191005, singing=0.09548, sound=0.058866, voice=0.096671} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4070036 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+c1154980-dec9-11e7-8575-75834ce46b2b & 1.0 & {fdb=1.0, music=1.0, official=1.0, ringtone=1.0, video=1.0, ztro=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069650 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+872e6ee0-deba-11e7-8575-75834ce46b2b & 0.3223395387312686 & {assistant=0.072739, company=0.071429, cook=0.071429, customer=0.142857, day=0.071429, executive=0.07722, facility=0.071429, fire=0.071429, fit=1.0, food=0.071429, franchise=0.071429, great=1.0, grow=0.071429, interest=0.530795, kentucky=0.071429, life=0.071429, machine=0.071429, manager=0.098097, might=0.693147, near=0.530795, operation=0.071429, operator=0.081981, pool=0.071429, processing=0.071429, restaurant=0.071429, retail=0.071429, safety=0.071429, sale=0.153795, server=0.071429, service=0.215584, shift=0.142857, specialist=0.087692, supervisory=0.071429, system=0.073214, team=0.062036, technician=0.077922} &  \\ \hline 
+8733c610-deba-11e7-8575-75834ce46b2b & 0.29661640672213563 & {administrative=0.142857, care=0.067562, cashier=0.142857, delivery=0.057031, director=0.142857, information=0.05, interpreter=0.05, join=0.364601, latest=1.0, lead=0.138249, manager=0.146565, officer=0.14986, open=0.279463, opening=0.787642, operation=0.142857, part=0.057031, physician=0.067708, read=0.549819, sale=0.167702, security=0.058824, see=0.364601, senior=0.05, staffing=0.056397, supervisor=0.086957, surgical=0.05, team=0.364601, technician=0.05, technologist=0.05, view=0.600681} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069776 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+476fb600-dec0-11e7-8575-75834ce46b2b & 1.0 & {agree=0.104344, app=0.108014, back=0.496054, brock=0.972477, card=0.117647, christ=0.142857, come=0.199708, comeback=0.079439, completely=0.058824, contract=0.142857, deal=0.104344, excited=0.142857, expect=0.058824, expire=0.142857, fight=0.403331, gon=0.238428, holy=0.092216, jesus=0.142857, joke=0.058824, july=0.113962, lesnar=0.862566, lesner=0.332441, let=0.212198, light=0.125506, lose=0.058824, make=0.10496, money=0.2, name=0.104344, night=0.090909, officially=0.058673, opponent=0.11174, please=0.2, punk=0.06754, real=0.079404, return=0.104709, shit=0.121219, take=0.2, ufc=0.72919, welcome=0.080281, wwe=0.142857} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069136 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+0980a520-dea7-11e7-8575-75834ce46b2b & 1.0 & {cavalier=0.618705, final=1.0, lock=0.374101, nba=1.0, take=1.0, warrior=0.381295, win=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4070032 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+c10f5610-dec9-11e7-8575-75834ce46b2b & 1.0 & {celebrity=0.08561, clearly=0.144444, feel=0.115489, get=0.658315, gon=0.062945, hack=0.986486, hope=0.070565, idol=0.1, kylie=0.813853, laugh=0.097333, man=0.052632, morning=0.1, must=0.091892, night=0.052632, probably=0.0625, right=0.053526, ruin=0.052632, see=0.06617, study=0.068966, talk=0.1, twitter=0.440408, tyler=0.0625, wait=0.055333, well=0.05416, wildin=0.0625} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068750 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+e3291d80-de97-11e7-8575-75834ce46b2b & 1.0 & {across=0.132716, america=0.132716, cloud=0.176282, company=0.166667, east=0.166667, energy=0.166667, harvey=0.166667, join=0.673103, latest=1.0, open=0.464343, opening=0.826126, peak=0.166667, read=0.468769, see=0.673103, service=0.080455, speedway=0.166667, supply=0.166667, support=0.055556, team=0.673103, tractor=0.166667, travel=0.152416, view=0.3893} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069135 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+0980a520-dea7-11e7-8575-75834ce46b2b & 1.0 & {cavalier=0.626935, final=1.0, lock=0.373065, nba=1.0, take=1.0, warrior=0.373065, win=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068491 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+983e9510-de8e-11e7-8575-75834ce46b2b & 1.0 & {amazing=0.080321, beautiful=0.176303, big=0.166667, birthday=0.892477, bless=0.166667, booger=0.166667, code=0.090909, crazy=0.166667, day=0.771694, end=0.090909, enjoy=0.090909, freedom=0.10719, friend=0.183088, get=0.066667, god=0.166667, good=0.127748, great=0.185772, hang=0.0625, happy=0.861345, hope=0.346158, jack=0.0625, little=0.166667, love=0.200333, magical=0.055556, main=0.05, man=0.103509, memorial=0.752026, miss=0.208908, remembrance=0.066379, sale=0.090909, serve=0.058455, service=0.065525, soon=0.073718, suppose=0.05, thug=0.085366, tomorrow=0.090909, uncle=0.053626, weekend=0.076923, woman=0.094361} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069257 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+ee9a1a20-deab-11e7-8575-75834ce46b2b & 1.0 & {fdb=0.972973, film=0.055556, music=1.0, official=1.0, ringtone=0.972973, selection=0.055556, video=1.0, ztro=0.972973} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4070150 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+f87f0210-decb-11e7-8575-75834ce46b2b & 1.0 & {aerotek=0.092334, associate=0.117284, cook=0.117284, corporation=0.077155, dell=0.0625, dollar=0.061026, geico=0.0625, general=0.074196, hair=0.111111, harvey=0.0625, join=0.718148, latest=1.0, member=0.111111, minnesota=0.0625, oklahoma=0.0625, open=0.65967, opening=0.736898, read=0.60872, royal=0.0625, sale=0.141007, see=0.718148, sonic=0.083237, stylist=0.111111, team=0.739844, tire=0.0625, view=0.453539} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069890 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+688c5b20-dec2-11e7-8575-75834ce46b2b & 1.0 & {affair=0.061321, apply=0.620907, argosy=0.111111, associate=0.092575, bring=0.055556, casino=0.111111, cca=0.111111, click=0.620907, corporation=0.123656, department=0.061321, dignity=0.111111, dixie=0.111111, dollar=0.111111, envision=0.111111, general=0.1156, group=0.069841, hotel=0.111111, join=0.838935, kelly=0.055556, latest=0.954545, manager=0.090518, member=0.052803, open=0.473413, opening=0.471652, panera=0.064815, premise=0.055556, providence=0.055556, restaurant=0.064815, sale=0.125521, see=0.918182, service=0.10717, spa=0.111111, team=0.777979, technician=0.051341, veteran=0.061321, view=0.1156, whbm=0.111111, winn=0.111111} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068737 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+59f780b0-de97-11e7-8575-75834ce46b2b & 1.0 & {assistant=0.05071, care=0.086466, cna=0.2, crew=0.066288, customer=0.073333, day=0.0625, experience=0.125, fte=0.0625, georgia=0.2, incoming=0.0625, join=0.487042, latest=1.0, lexington=0.125, member=0.0625, open=0.249334, opening=0.802864, practitioner=0.0625, read=0.508922, representative=0.125, restaurant=0.0625, sacramento=0.0625, sale=0.140392, scanner=0.0625, see=0.487042, service=0.093038, shift=0.050847, silverado=0.052632, stanford=0.052632, ste=0.05, supervisor=0.05, team=0.472228, view=0.576395} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069630 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+151d8930-deba-11e7-8575-75834ce46b2b & 1.0 & {agent=0.111111, associate=0.129956, automation=0.052632, candidate=0.061878, car=0.111111, corporate=0.054839, customer=0.181287, datum=0.052632, driver=0.054839, fit=1.0, great=1.0, interest=0.569465, management=0.052632, manager=0.19107, might=0.683897, near=0.569465, plano=0.090909, register=0.056075, rental=0.111111, retail=0.052632, sale=0.160389, service=0.18803, store=0.131113, technical=0.056075, test=0.052632} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4070012 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+909d8fc0-dec8-11e7-8575-75834ce46b2b & 1.0 & {comment=1.0, jdameanor=1.0, love=1.0, post=1.0, see=1.0, share=1.0, show=1.0, sorry=1.0, support=1.0, youtube=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068730 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+11938d00-de97-11e7-8575-75834ce46b2b & 1.0 & {analyst=0.327273, business=0.166667, delivery=0.0625, driver=0.0625, join=0.432821, labor=0.089583, latest=1.0, member=0.054348, open=0.382584, opening=0.709615, oracle=0.166667, read=0.502094, register=0.071023, sale=0.056261, see=0.432821, senior=0.176587, store=0.073787, team=0.448593, travel=0.068627, view=0.714849} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068985 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+de470760-dea0-11e7-8575-75834ce46b2b & 1.0 & {adjunct=0.052632, administrative=0.08134, beauty=0.070636, call=0.052632, chemist=0.142857, counter=0.059685, designer=0.052632, desk=0.142857, diem=0.059211, engineering=0.052632, front=0.142857, hair=0.163265, information=0.142857, inside=0.052632, join=0.487679, laboratory=0.052632, latest=1.0, lead=0.25, leader=0.25, manager=0.144301, office=0.142857, open=0.248194, opening=0.8125, operation=0.052632, per=0.059211, physics=0.052632, position=0.142857, practitioner=0.052632, read=0.670659, retail=0.240385, sale=0.221585, security=0.142857, see=0.467507, service=0.073841, shift=0.234375, store=0.075786, stylist=0.163265, target=0.052632, team=0.571257, technician=0.068971, trainee=0.25, travel=0.054615, ulta=0.070636, variable=0.052632, view=0.419965} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4070130 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+3a8791a0-decb-11e7-8575-75834ce46b2b & 1.0 & {analyst=0.11066, arizona=0.058824, associate=0.126696, cook=0.111291, coordinator=0.066441, counter=0.099888, customer=0.060713, delivery=0.090909, field=0.090909, financial=0.090909, fit=1.0, great=1.0, interest=0.709776, lead=0.05161, line=0.090909, manager=0.108206, might=0.850105, near=0.709776, operation=0.088097, part=0.090909, pharmacist=0.054315, production=0.090909, representative=0.054398, sale=0.257486, service=0.062928, staff=0.054315, store=0.099888, supervisor=0.090909, surgical=0.110193, tech=0.102767, technologist=0.090909} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068720 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+a971d600-de96-11e7-8575-75834ce46b2b & 1.0 & {aerotek=0.285714, auto=0.171429, bagel=0.0625, care=0.068454, centura=0.0625, cinta=0.142857, corporation=0.142857, einstein=0.0625, elena=0.0625, join=0.859754, kindred=0.142857, kold=0.0625, latest=1.0, live=0.061207, open=0.533869, opening=0.715691, part=0.171429, read=0.408203, register=0.059418, ryder=0.154634, see=0.859754, senior=0.076281, speedway=0.142857, staffing=0.073042, sunrise=0.061207, team=0.859754, trans=0.0625, view=0.464678, wisconsin=0.142857} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4070001 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+727fdd50-dec7-11e7-8575-75834ce46b2b & 1.0 & {con=1.0, nalgita=1.0, vamo=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068849 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+b17e0520-de9c-11e7-8575-75834ce46b2b & 1.0 & {fdb=1.0, music=1.0, official=1.0, ringtone=1.0, video=1.0, ztro=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069998 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+873dec50-dec7-11e7-8575-75834ce46b2b & 1.0 & {back=0.172917, break=0.054788, bron=0.068924, call=0.898891, career=0.07938, finally=0.233484, first=0.062436, game=0.08002, get=0.186393, jame=0.094077, last=0.052545, lebron=0.692745, nba=0.17941, nigga=0.067889, possession=0.095039, ref=0.139936, row=0.11061, see=0.070999, start=0.133164, straight=0.053763, time=0.144882, tonight=0.066723, travel=0.870459, travels=0.462245, unusual=0.051882, year=0.077383} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069999 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+9e36f730-dec7-11e7-8575-75834ce46b2b & 1.0 & {boy=0.203774, bron=0.125926, cav=0.840164, chance=0.088333, cleveland=0.219971, come=0.0575, damn=0.059423, drop=0.052632, easy=0.052632, get=0.961366, gon=0.273962, green=0.052632, gsw=0.052632, heat=0.2, hope=0.105793, joke=0.111111, kill=0.052586, least=0.111111, lebron=0.509807, look=0.112847, might=0.099075, people=0.054054, play=0.134134, poor=0.088889, replace=0.052632, say=0.081081, sense=0.090909, series=0.192125, suprise=0.052632, sweep=0.579773, together=0.207767, try=0.053333, way=0.105263, woulda=0.090909} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069989 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+d9b10f40-dec6-11e7-8575-75834ce46b2b & 1.0 & {ass=0.107626, back=0.056304, big=0.060665, boy=0.161972, call=0.171811, cav=0.055574, concussion=0.116522, curry=0.201009, elbow=0.128554, flop=0.095238, fragile=0.052049, game=0.182567, get=0.354523, god=0.052034, ground=0.055027, hoe=0.053019, hurt=0.149372, jump=0.059211, kevin=0.911061, love=1.00617, man=0.072965, play=0.078636, please=0.153101, probably=0.166667, pussy=0.076612, repeat=0.052985, right=0.052632, shake=0.169591, shoot=0.156467, skate=0.166667, soft=0.198692, swear=0.166667} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068961 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+addbd0c0-de9f-11e7-8575-75834ce46b2b & 1.0 & {affair=0.066667, assistant=0.094921, associate=0.166667, cane=0.1, care=0.05102, cashier=0.166667, centennial=0.1, center=0.119048, customer=0.166667, dell=0.066667, department=0.066667, georgia=0.066667, join=0.5871, latest=1.0, lowe=0.066667, manager=0.208598, open=0.396374, opening=0.747332, ped=0.166667, pediatrics=0.166667, raise=0.1, read=0.563776, register=0.33631, retail=0.050927, sale=0.061292, see=0.591109, service=0.181276, sonic=0.086559, speedway=0.110932, store=0.086845, supplemental=0.05102, take=0.166667, team=0.600916, veteran=0.066667, view=0.579976} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068574 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+d653ff30-de92-11e7-8575-75834ce46b2b & 0.1972846643938876 & {able=0.125, alexi=0.058824, alot=0.125, ass=0.099899, back=0.104698, bandwagon=0.080817, beat=0.149809, blow=0.058824, bout=0.058824, cav=0.599884, chance=0.125, come=0.170023, curry=0.137654, cut=0.058824, decide=0.071785, dollar=0.055556, even=0.081088, fact=0.111111, fan=0.597645, final=0.34191, game=0.091355, get=0.148031, glad=0.075105, gon=0.194623, good=0.092243, hater=0.087139, hoe=0.055556, hop=0.071785, hope=0.097115, jus=0.125, last=0.112167, lebron=0.169586, lose=0.168793, make=0.057619, moment=0.125, name=0.058824, ready=0.076923, rematch=0.078168, right=0.129834, ring=0.062927, row=0.125, say=0.217716, season=0.167126, series=0.180438, shit=0.117647, sit=0.058824, stomach=0.125, tell=0.078428, texa=0.058824, thunder=0.191557, time=0.055848, title=0.127962, warrior=1.03791, wildin=0.05, win=0.614695, word=0.054054, year=0.171559} &  \\ \hline 
+d65cd8d0-de92-11e7-8575-75834ce46b2b & 0.3526258872245935 & {awful=0.055556, baby=0.135528, bandwagon=0.072603, beat=0.095829, bet=0.06032, bron=0.068966, call=0.073758, cav=0.149297, cleveland=0.122747, clutch=0.062212, come=0.051108, curry=0.061894, damn=0.080804, dang=0.071429, doubt=0.071429, dub=0.083036, everybody=0.066667, excuse=0.071429, fan=0.128755, final=0.125669, game=0.125499, get=0.114061, golden=1.00549, gon=0.064099, hate=0.096985, honestly=0.071429, illuminatus=0.058824, incredible=0.071429, klay=0.055556, lebron=0.079192, lose=0.089641, make=0.073546, mind=0.071429, nba=0.071429, perfect=0.071429, piece=0.055556, quarter=0.058824, rig=0.073758, rollin=0.071429, row=0.078818, say=0.056453, see=0.134316, series=0.094826, shit=0.068939, state=1.00549, take=0.050189, team=0.074554, thang=0.071429, tonight=0.107643, wait=0.187849, wan=0.057752, warrior=0.094816, well=0.05052, win=0.243108} &  \\ \hline 
+d6658b60-de92-11e7-8575-75834ce46b2b & 0.30637796807568757 & {ass=0.067328, baby=0.123702, back=0.990476, basketball=0.058824, become=0.055556, believe=0.089511, come=0.979901, conference=0.111111, crazy=0.073769, curry=0.058824, damn=0.051667, deficit=0.228119, durant=0.057143, feel=0.069231, final=0.240054, forget=0.058824, game=0.095444, get=0.061111, goodbye=0.2, great=0.063041, gsw=0.092275, hell=0.058561, hurt=0.25, lame=0.142857, lead=0.086274, let=0.327232, make=0.355459, nba=0.054834, problem=0.058824, prop=0.058824, say=0.340735, see=0.142857, series=0.281577, team=0.36746, teammate=0.2, tell=0.163798, tho=0.066667, thunder=0.06978, warrior=0.34091, way=0.16417, western=0.111111, win=0.250801, year=0.064367} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4070110 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+cb0df8a0-deca-11e7-8575-75834ce46b2b & 1.0 & {coordinator=0.090909, counter=0.065495, customer=0.095105, delivery=0.058645, facility=0.090909, join=0.254441, latest=1.0, leader=0.090909, license=0.117884, maintenance=0.090909, martin=0.090909, merchandise=0.090909, multus=0.090909, open=0.286165, opening=0.828825, panera=0.090909, practical=0.106858, read=0.579163, sale=0.157739, see=0.254441, service=0.151084, shift=0.090909, specialist=0.058645, store=0.082492, team=0.254441, technician=0.090909, unit=0.090909, view=0.596603} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069980 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+4cdef320-dec6-11e7-8575-75834ce46b2b & 1.0 & {almost=0.1, amazing=0.05, anthem=0.990826, await=0.1, bad=0.1, beautiful=0.101923, boy=0.05, carlo=0.209873, carlos=0.097143, chile=0.261946, chill=0.1, cringe=0.05, disneyland=0.068966, drum=0.060811, even=0.055509, fan=0.055403, game=0.105128, get=0.065054, guitar=0.331838, happen=0.05, hate=0.057658, hear=0.113043, hype=0.1, indian=0.083333, instead=0.100074, last=0.083333, mexican=0.178719, mexico=0.068998, national=0.953496, performance=0.101142, play=0.426913, put=0.110726, response=0.1, right=0.127679, rock=0.060452, santana=0.376312, see=0.056356, sick=0.055495, sing=0.197782, solo=0.1, sound=0.094129, stop=0.1, sweet=0.083333, trump=0.108257, ultimate=0.05, uruguay=0.355499, viva=0.05, wife=0.055184, william=0.083333, wrong=0.186749} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068700 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+e4cfda90-de95-11e7-8575-75834ce46b2b & 1.0 & {analyst=0.2, california=0.061022, care=0.115796, community=0.063467, compliance=0.2, consultant=0.052632, design=0.1, director=0.106359, educational=0.1, engineer=0.110896, enterprise=0.1, federal=0.1, independent=0.1, indirect=0.1, join=0.454758, latest=1.0, line=0.052632, manager=0.096845, mechanic=0.052632, mechanical=0.1, open=0.180319, opening=0.866667, pharmacy=0.1, program=0.1, prologistix=0.076923, read=0.646617, register=0.134694, retail=0.050673, sale=0.07594, see=0.454758, server=0.1, service=0.065159, stanford=0.100427, tax=0.1, tcc=0.052632, team=0.44072, top=0.052632, umc=0.076923, verizon=0.052632, veteran=0.061706, view=0.454763} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069853 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+e8c3f420-dec1-11e7-8575-75834ce46b2b & 1.0 & {comment=1.0, jdameanor=1.0, love=1.0, post=1.0, see=1.0, share=1.0, show=1.0, sorry=1.0, support=1.0, youtube=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069210 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+dcf480a0-dea9-11e7-8575-75834ce46b2b & 1.0 & {agency=0.142857, care=0.14311, center=0.0625, clinical=0.142857, delivery=0.137755, dialysis=0.142857, diesel=0.142857, digital=0.151261, downtown=0.142857, driver=0.142857, engineer=0.153707, executive=0.142857, join=0.510459, latest=0.991071, manager=0.145007, mechanic=0.142857, open=0.410106, opening=0.817053, payless=0.0625, read=0.759576, register=0.075439, representative=0.157895, sale=0.157895, see=0.510459, service=0.052632, shoesource=0.0625, team=0.510459, tire=0.142857, trade=0.142857, utah=0.142857, view=0.51785, water=0.052632, win=0.142857} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068955 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+5d0144a0-de9f-11e7-8575-75834ce46b2b & 1.0 & {administrative=0.111111, assistant=0.219136, associate=0.119565, barista=0.111111, cashier=0.124579, centura=0.05, company=0.083333, customer=0.111111, denny=0.05, entry=0.076923, join=0.686309, latest=1.0, level=0.076923, lowe=0.116905, luke=0.05, manager=0.154164, military=0.111111, mytherapycompany=0.059574, open=0.336493, opening=0.790716, premise=0.083333, read=0.573226, rep=0.076923, saint=0.05, sale=0.076923, see=0.686309, service=0.114198, store=0.118815, street=0.111111, supply=0.090136, system=0.05, team=0.686309, tractor=0.083333, view=0.537952, walnut=0.111111, whbm=0.083333} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069460 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+626b7ae0-deb4-11e7-8575-75834ce46b2b & 1.0 & {assistant=0.070318, associate=0.060008, cashier=0.088462, chef=0.089357, clerk=0.083333, cook=0.166667, executive=0.083333, insurance=0.08, intern=0.083333, join=0.508283, latest=1.0, manager=0.077418, member=0.18872, open=0.380745, opening=0.778218, pharmacy=0.083333, read=0.683078, restaurant=0.063908, sale=0.070318, see=0.508283, speedway=0.087647, staff=0.107143, team=0.558343, technician=0.098485, therapist=0.056671, title=0.083333, travel=0.083333, view=0.491089} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068565 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+164e4830-de92-11e7-8575-75834ce46b2b & 1.0 & {adam=0.972635, ankle=0.103983, back=0.120667, bust=0.083333, center=0.083333, cook=0.125, court=0.083333, crossover=0.0625, curry=0.860807, day=0.083333, dem=0.0625, destroy=0.054577, dirty=0.0625, espn=0.083333, everytime=0.063095, fck=0.0625, fight=0.083333, get=0.436415, gettin=0.0625, good=0.053296, green=0.083333, guard=0.329528, help=0.076844, island=0.054054, keep=0.167375, klay=0.099708, let=0.094637, line=0.058544, live=0.083333, make=0.104207, man=0.17713, mouth=0.0625, perimeter=0.096818, play=0.057243, put=0.056657, science=0.083333, seem=0.064823, sense=0.083333, series=0.080952, shit=0.104565, spray=0.150538, steven=0.614166, stop=0.054614, switch=0.128161, thompson=0.10301, time=0.058203, try=0.057773} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068558 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+8f2d3be0-de91-11e7-8575-75834ce46b2b & 1.0 & {back=0.102056, better=0.073326, cameron=0.066667, carry=0.111246, column=0.066667, curry=0.112068, dive=0.066667, drain=0.066667, drip=0.066667, familiar=0.055556, fire=0.107063, game=0.071301, get=0.429334, goodness=0.058824, great=0.07451, guard=0.058217, hate=0.070102, hot=0.261204, klay=0.98515, let=0.085452, look=0.074172, make=0.1065, man=0.075167, mvp=0.130781, name=0.066667, nickname=0.066667, nigga=0.080107, payne=0.066667, play=0.122962, player=0.104532, put=0.066667, real=0.05709, respeck=0.066667, save=0.055099, say=0.083446, shooter=0.053298, shoulder=0.066667, sink=0.052632, sittin=0.066667, slay=0.066667, soft=0.066667, stay=0.068966, stop=0.109554, straight=0.058339, take=0.099781, team=0.113984, thompson=0.905436, though=0.068889, tonight=0.062669, transition=0.066667, unanimous=0.081232, valuable=0.066667, view=0.066667, warrior=0.20128, zone=0.066667} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068559 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+a260da50-de91-11e7-8575-75834ce46b2b & 1.0 & {adam=0.599473, arm=0.059007, ass=0.097106, deserve=0.052288, dirty=0.190809, draymond=0.774633, foul=0.070194, get=0.239403, green=0.809173, hate=0.113552, hit=0.066767, hurt=0.082544, look=0.060789, man=0.060699, play=0.06908, player=0.149317, pull=0.138249, respect=0.062359, shit=0.079469, steven=0.257374, take=0.075177, team=0.05751, try=0.097787, would=0.063352} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068930 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+356d8b20-de9e-11e7-8575-75834ce46b2b & 1.0 & {advisor=0.083333, affair=0.096055, beauty=0.098485, california=0.083333, center=0.075284, cognizant=0.5, department=0.096055, dishwasher=0.083333, dominican=0.071429, join=0.774863, latest=1.0, missourus=0.083333, open=0.342703, opening=0.816817, prestige=0.083333, read=0.503614, register=0.083333, resourcemfg=0.5, respiratory=0.083333, rise=0.071429, see=0.774863, service=0.06702, system=0.061948, team=0.776891, therapist=0.083333, veteran=0.096055, view=0.51421, whbm=0.090909} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068547 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+d123a300-de90-11e7-8575-75834ce46b2b & 1.0 & {comment=1.0, jdameanor=1.0, love=1.0, post=1.0, see=1.0, share=1.0, show=1.0, sorry=1.0, support=1.0, youtube=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+
+ Round: 4069310 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+0160a210-deb0-11e7-9fc8-a1645f9c291c & 1.0 & {album=0.06383, chapter=0.93617, follow=1.0, love=0.06383, please=1.0, since=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4068559 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+95c8abb0-de91-11e7-9fc8-a1645f9c291c & 1.0 & {adam=0.978558, ass=0.088068, dirty=0.102273, draymond=0.921928, foul=0.057143, get=0.178136, green=0.761905, hate=0.068182, hit=0.079545, hurt=0.113625, literally=0.052632, move=0.053634, player=0.056818, pull=0.097744, steven=0.482493, try=0.087555, tryna=0.052632} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4070031 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+a5645be0-dec9-11e7-9fc8-a1645f9c291c & 1.0 & {fdb=1.0, music=1.0, official=1.0, ringtone=1.0, video=1.0, ztro=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069546 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+aa1bb220-deb8-11e7-9fc8-a1645f9c291c & 1.0 & {boxer=0.10678, goat=0.051724, great=0.086207, greatest=0.389492, legend=0.152299, man=0.055287, muhamm=0.054828, muhammad=0.793388, paradise=0.059524, peace=0.127119, rest=0.169492, rip=0.610057, sport=0.059524, time=0.191034, world=0.071429} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069545 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+9b2177a0-deb8-11e7-9fc8-a1645f9c291c & 1.0 & {bee=0.171181, boxer=0.070423, butterfly=0.171181, champ=0.05042, float=0.149693, greatest=0.239437, legend=0.077465, man=0.058824, muhamm=0.077465, muhammad=0.683099, rest=0.070423, rip=0.802817, sting=0.164139, time=0.153846} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069254 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+f3908c80-deab-11e7-9fc8-a1645f9c291c & 1.0 & {guitar=1.0, lie=1.0, many=1.0} &  \\ \hline 
+\end{longtable}    \newpage 
+  
+ Round: 4069159 ----------------- 
+ \begin{longtable}{|p{2cm}|p{2cm}|p{6cm}|p{4cm}|} \hline 
+ cluster id&silhoutte coefficient &cosine vector & comment \\ \hline 
+5aabe950-dea7-11e7-9fc8-a1645f9c291c & 1.0 & {cavalier=0.486486, final=1.0, lock=0.459459, nba=1.0, take=1.0, warrior=0.486486, win=1.0} &  \\ \hline 
+\end{longtable}    \newpage

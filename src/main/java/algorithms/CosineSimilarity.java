@@ -68,8 +68,8 @@ public class CosineSimilarity implements Serializable {
         double magnitude1 = 0.0;
         double magnitude2 = 0.0;
         double cosineSimilarity;
-        double numTweets1 = 0.0;
-        double numTweets2 = 0.0;
+        double numTweets1 = -1.0;
+        double numTweets2 = -1.0;
 
         if(docVector1.containsKey("numTweets")) {
             numTweets1 = docVector1.get("numTweets");
@@ -99,12 +99,15 @@ public class CosineSimilarity implements Serializable {
         magnitude2 = Math.sqrt(magnitude2);//sqrt(a^2)
 
         if (Math.abs(magnitude1) < 0.001 && Math.abs(magnitude2) < 0.001) {
-            return 0.0;
+            System.out.println("here");
+            return 1.0;
         } else {
             cosineSimilarity = dotProduct / (magnitude1 * magnitude2);
         }
 
+        if(numTweets1 != -1.0)
         docVector1.put("numTweets", numTweets1);
+        if(numTweets2 != -1.0)
         docVector2.put("numTweets", numTweets2);
 
         return cosineSimilarity;
