@@ -176,7 +176,7 @@ public class CompareClusters {
 
         String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
-        String EVENTS_TABLE1 = "eventsHybridForExperiment5";
+        String EVENTS_TABLE1 = "hybridevents1";
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");

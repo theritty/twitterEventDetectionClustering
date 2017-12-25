@@ -28,6 +28,12 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
     private int count ;
     private int taskNum = 0;
 
+    private int updateCntCond = 50;
+    private double updateCntPer = 0.01;
+    private double similarityThreshold = 0.5;
+    private int totCntThre = 100;
+    private double newCntPer = 0.05;
+
     private CassandraDao cassandraDao;
 
     private CosineSimilarity cosineSimilarity = new CosineSimilarity();
@@ -63,7 +69,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                 double value1 = entry.getValue();
                 double value2 = cluster2.cosinevector.get(key);
                 double newValue = (value1 * numTweets1 + value2 * numTweets2) / (numTweets1+numTweets2);
-                if(numTweets1+numTweets2>50 && newValue<0.01) {
+                if(numTweets1+numTweets2>updateCntCond && newValue<updateCntPer) {
                     it.remove();
                 }
                 else {
@@ -79,7 +85,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             String key = entry.getKey();
             double value = entry.getValue();
             double newValue = (value * numTweets2) / (numTweets1+numTweets2);
-            if(numTweets1+numTweets2<50 || newValue>0.01) {
+            if(numTweets1+numTweets2<updateCntCond || newValue>updateCntPer) {
                 cluster1.cosinevector.put(key, newValue);
             }
         }
@@ -89,7 +95,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
         for(int i=0;i<clusters.size()-1;i++) {
             for(int j=i+1; j< clusters.size();){
                 double similarity = cosineSimilarity.cosineSimilarityFromMap(clusters.get(j).cosinevector, clusters.get(i).cosinevector);
-                if(similarity>0.5) {
+                if(similarity>similarityThreshold) {
                     updateCluster(clusters.get(i), clusters.get(j));
                     clusters.get(i).currentnumtweets += clusters.get(j).currentnumtweets;
                     clusters.get(i).tweetList.addAll(clusters.get(j).tweetList);
@@ -206,7 +212,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                             }
                         }
 
-                        if( ((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > 0.5) ) {
+                        if( ((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > similarityThreshold) ) {
                             System.out.println("updated event again: " + cNew.id);
                             List<Object> values_event = new ArrayList<>();
                             values_event.add(round);
@@ -251,7 +257,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                 while(it.hasNext()) {
                     Map.Entry<String, Double> entry = it.next();
                     double value = entry.getValue();
-                    if(value < 0.05) {
+                    if(value < newCntPer) {
                         it.remove();
                     }
                 }
@@ -304,7 +310,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             values.add(round);
             cassandraDao.insertIntoClusters(values.toArray());
 
-            if(numTweets > 100) {
+            if(numTweets > totCntThre) {
                 List<Object> values_event = new ArrayList<>();
                 values_event.add(round);
                 values_event.add(clusterid);
@@ -345,7 +351,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
 
             double newValue = (value * numTweetsCluster + valueLocal * numTweetsLocal) / (numTweetsLocal + numTweetsCluster);
             cosinevectorCluster.put(key, newValue);
-            if(newValue<0.1)cosinevectorCluster.remove(key);
+            if(newValue<updateCntPer)cosinevectorCluster.remove(key);
             cosinevectorLocal.cosinevector.remove(key);
         }
 
@@ -356,7 +362,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             double value = entry.getValue();
             double newValue = (value * numTweetsLocal) / (numTweetsLocal + numTweetsCluster);
             cosinevectorCluster.put(key, newValue);
-            if(newValue<0.05)cosinevectorCluster.remove(key);
+            if(newValue<newCntPer)cosinevectorCluster.remove(key);
         }
 
 //        System.out.println("CHECK:::  " + cosinevectorLocal.get("clusterid") + " String " +  String.valueOf( (long) (double) cosinevectorLocal.get("clusterid")));

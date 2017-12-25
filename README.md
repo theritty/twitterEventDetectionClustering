@@ -64,7 +64,7 @@ TRUNCATE countsForExperimentSleep ;TRUNCATE eventsForExperimentSleep ;TRUNCATE p
 
 
 
-CREATE TABLE tweetcollection.clustershybridforexperiment_thesis (
+CREATE TABLE tweetcollection.hybridclusters1 (
 country text,
 id timeuuid,
 cosinevector map<text, double>,
@@ -74,7 +74,7 @@ prevnumtweets int,
 PRIMARY KEY (country, id)
 );
 
-CREATE TABLE tweetcollection.countshybridforexperiment_thesis (
+CREATE TABLE tweetcollection.hybridcounts1 (
 round bigint,
 word text,
 country text,
@@ -83,7 +83,7 @@ totalnumofwords bigint,
 PRIMARY KEY (round, word, country)
 );
 
-CREATE TABLE tweetcollection.eventshybridforexperiment_thesis (
+CREATE TABLE tweetcollection.hybridevents1 (
 round bigint,
 clusterid timeuuid,
 cosinevector map<text, double>,
@@ -92,14 +92,14 @@ incrementrate double,
 numtweet int,
 PRIMARY KEY (round, clusterid)
 );
-CREATE TABLE tweetcollection.eventskeybasedhybridforexperiment_thesis(
+CREATE TABLE tweetcollection.hybrideventskeybased1(
 round bigint,
 country text,
 word text,
 incrementpercent double,
 PRIMARY KEY (round, country, word)
 );
-CREATE TABLE tweetcollection.processedhybridforexperiment_thesis (
+CREATE TABLE tweetcollection.hybridbolts1 (
 round bigint,
 boltid int,
 finished boolean,
@@ -107,14 +107,14 @@ PRIMARY KEY (round, boltid)
 );
 
 
-CREATE TABLE tweetcollection.processtimeshybridforexperiment_thesis (
+CREATE TABLE tweetcollection.hybridtimes1 (
 row int,
 column int,
 id int,
 PRIMARY KEY (row, column)
 );
 
-CREATE TABLE tweetcollection.tweetsandclusterhybrid_thesis (
+CREATE TABLE tweetcollection.hybridtweets1 (
 round bigint,
 clusterid timeuuid,
 tweetid bigint,
@@ -134,7 +134,8 @@ clustering.processtimes.table=processtimesforexperiment_thesis
 clustering.tweetsandcluster.table=tweetsandcluster_thesis
 
 
-CREATE TABLE tweetcollection.clusterforexperiment_thesis (
+
+CREATE TABLE tweetcollection.clusteringClusters1(
 country text,
 id timeuuid,
 cosinevector map<text, double>,
@@ -143,7 +144,7 @@ lastround bigint,
 prevnumtweets int,
 PRIMARY KEY (country, id)
 );
-CREATE TABLE tweetcollection.eventclusterforexperiment_thesis (
+CREATE TABLE tweetcollection.clusteringEvents1(
 round bigint,
 clusterid timeuuid,
 cosinevector map<text, double>,
@@ -152,7 +153,13 @@ incrementrate double,
 numtweet int,
 PRIMARY KEY (round, clusterid)
 );
-CREATE TABLE tweetcollection.processedtweetsforexperiment_thesis (
+CREATE TABLE tweetcollection.clusteringTimes1(
+row int,
+column int,
+id int,
+PRIMARY KEY (row, column)
+);
+CREATE TABLE tweetcollection.clusteringBolts1(
 round bigint,
 boltid int,
 boltprocessed bigint,
@@ -161,13 +168,7 @@ finished boolean,
 spoutsent bigint,
 PRIMARY KEY (round, boltid)
 );
-CREATE TABLE tweetcollection.processtimesforexperiment_thesis (
-row int,
-column int,
-id int,
-PRIMARY KEY (row, column)
-);
-CREATE TABLE tweetcollection.tweetsandcluster_thesis (
+CREATE TABLE tweetcollection.clusteringTweets1(
 round bigint,
 clusterid timeuuid,
 tweetid bigint,
@@ -175,7 +176,7 @@ PRIMARY KEY (round, tweetid, clusterid)
 );
 
 
-TRUNCATE clusterforexperiment_thesis; TRUNCATE eventclusterforexperiment_thesis; TRUNCATE eventsforexperiment_thesis; TRUNCATE processedtweetsforexperiment_thesis; TRUNCATE processtimesforexperiment_thesis; TRUNCATE processtimesforexperiment_thesis;
+TRUNCATE clusteringClusters1; TRUNCATE clusteringEvents1; TRUNCATE clusteringTimes1; TRUNCATE clusteringBolts1; TRUNCATE clusteringTweets1;
 
 
 
@@ -297,3 +298,13 @@ CREATE TABLE tweetcollection.tweets_updated (
     userid bigint,
     PRIMARY KEY (round, country, id, class_music, class_sports, class_politics, tweettime)
 )
+
+
+
+copy hybridevents1 (round , clusterid , cosinevector , country , incrementrate , numtweet ) to '/Users/ozlemcerensahin/Desktop/eventshybrid.csv';
+copy hybridtweets1 (round , clusterid , tweetid )  to '/Users/ozlemcerensahin/Desktop/tweetshybrid.csv';
+copy hybridtimes1 (row ,   to '/Users/ozlemcerensahin/Desktop/tweetshybrid.csv';
+
+copy clusteringevents1 (round , clusterid , cosinevector , country , incrementrate , numtweet ) to '/Users/ozlemcerensahin/Desktop/eventshybrid.csv';
+copy clusteringtweets1 (round , clusterid , tweetid )  to '/Users/ozlemcerensahin/Desktop/tweetshybrid.csv';
+copy clusteringtimes1 (row ,   to '/Users/ozlemcerensahin/Desktop/tweetshybrid.csv';
