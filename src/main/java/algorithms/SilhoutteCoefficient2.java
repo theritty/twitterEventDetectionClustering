@@ -12,6 +12,7 @@ import java.util.*;
  * Created by ceren on 03.12.2017.
  */
 public class SilhoutteCoefficient2 {
+
     public static class Cluster  {
         public UUID id;
         public HashMap<String, Double> cosinevector;
@@ -47,14 +48,34 @@ public class SilhoutteCoefficient2 {
 
 
     public static void main(String[] args) {
-        getResult("USA", "clustering");
-        getResult("CAN", "clustering");
-        getResult("USA", "hybrid");
-        getResult("CAN", "hybrid");
+        String res = "\\begin{longtable}{|p{2cm}|p{1cm}|p{1cm}|p{2cm}|p{2cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}|} \\hline\n" +
+                "\n" +
+                "method & country & number of clusters &  number of rounds containing one cluster & avg & avg of (0,1) &  min & max & standard deviation \\\\ \\hline\n";
+
+        System.out.println("\\begin{longtable}{|p{2cm}|p{1cm}|p{2cm}|p{2cm}|p{4cm}|} \\hline\n" +
+                "\n" +
+                "method & country & round & coefficient & common words &  \\\\ \\hline");
+
+        res += getResult("USA", "clustering");
+        res += getResult("CAN", "clustering");
+
+        System.out.println("\\end{longtable}");
+        System.out.println("\\begin{longtable}{|p{2cm}|p{1cm}|p{2cm}|p{2cm}|p{4cm}|} \\hline\n" +
+                "\n" +
+                "method & country & round & coefficient & common words &  \\\\ \\hline");
+
+        res += getResult("USA", "hybrid");
+        res += getResult("CAN", "hybrid");
+        System.out.println("\\end{longtable}");
+
+        res += "\\end{longtable}";
+
+        System.out.println(res);
 
     }
-    public static void getResult(String country, String mode) {
+    public static String getResult(String country, String mode) {
 
+        String res = "";
         HashMap<Long, List<Cluster>> clusters = new HashMap<>();
         TopologyHelper topologyHelper = new TopologyHelper();
         Properties properties = null;
@@ -158,7 +179,7 @@ public class SilhoutteCoefficient2 {
 //            System.out.println("Round: "+ key + " -----------------");
 
             for(int i=0; i<value.size(); i++) {
-                coeffs.add(avgSilhoutteCoefForCluster(value, i, key));
+                coeffs.add(avgSilhoutteCoefForCluster(value, i, key, mode, country));
             }
 
 
@@ -181,7 +202,10 @@ public class SilhoutteCoefficient2 {
         }
         avg = avg / clusterNum;
         avgMed = avgMed / medCnt;
-        System.out.println(mode + "-" + country + " -> num clusters: " + clusterNum + ", number of rounds containing one cluster: " + oneClusterNum + ", avg: " + avg + ", avg of (0,1): " + avgMed + ", min: " + min + ", max: " + max + ", std-dev: " + var) ;
+        res += mode + " & " + country + " & " + clusterNum + " & " + oneClusterNum + " & " + avg + " & " + avgMed + " & " + min + " & " + max + " & " + var + " \\\\ \\hline";
+//        System.out.println(mode + "-" + country + " -> num clusters: " + clusterNum + ", number of rounds containing one cluster: " + oneClusterNum + ", avg: " + avg + ", avg of (0,1): " + avgMed + ", min: " + min + ", max: " + max + ", std-dev: " + var) ;
+
+        return res;
     }
 
 
@@ -223,7 +247,7 @@ public class SilhoutteCoefficient2 {
         }
     }
 
-    public static double avgSilhoutteCoefForCluster(List<Cluster> clusters, int clusterIndex, long round) {
+    public static double avgSilhoutteCoefForCluster(List<Cluster> clusters, int clusterIndex, long round, String method, String country) {
         double coeff = 0.0;
         double minCoeff = Double.MAX_VALUE;
         double maxCoeff = Double.MIN_VALUE;
@@ -248,7 +272,7 @@ public class SilhoutteCoefficient2 {
         avgCoeff = avgCoeff * factor;
         long tmp = Math.round(avgCoeff);
 
-        System.out.println(round + "&" +  clusters.get(clusterIndex).id + " & " + (double) tmp / factor + " & " + clusters.get(clusterIndex).cosinevector + "& " + commonWrds + " &  \\\\ \\hline");
+        System.out.println( method + " & " + country + " & " +round + " & " + (double) tmp / factor + "& " + commonWrds + " &  \\\\ \\hline");
         return (double) tmp / factor;
     }
 
