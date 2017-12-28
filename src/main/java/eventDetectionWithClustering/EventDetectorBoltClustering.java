@@ -28,16 +28,30 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
     private int count ;
     private int taskNum = 0;
 
-    private int updateCntCond = 50;
-    private double updateCntPer = 0.01;
-    private double similarityThreshold = 0.5;
+    private int updateCntCond = 60;
+    private double updateCntPer = 0.02;
+    private double similarityThreshold = 0.6;
     private int totCntThre = 100;
-    private double newCntPer = 0.05;
+    private double newCntPer = 0.06;
+
+//    private int updateCntCond = 50;
+//    private double updateCntPer = 0.01;
+//    private double similarityThreshold = 0.5;
+//    private int totCntThre = 120;
+//    private double newCntPer = 0.05;
+
+//    private int updateCntCond = 40;
+//    private double updateCntPer = 0.01;
+//    private double similarityThreshold = 0.4;
+//    private int totCntThre = 150;
+//    private double newCntPer = 0.04;
+
 
     private CassandraDao cassandraDao;
 
     private CosineSimilarity cosineSimilarity = new CosineSimilarity();
     private ArrayList<Cluster> clusters = new ArrayList<>();
+    private ArrayList<Cluster> eventList = new ArrayList<>();
 
 
     public EventDetectorBoltClustering(String filenum, CassandraDao cassandraDao, String country, int taskNum)
@@ -113,6 +127,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
         String country = tuple.getStringByField("country");
         ArrayList<Cluster> clustersx = (ArrayList<Cluster>) tuple.getValueByField("clusters");
         clusters.addAll(clustersx);
+        eventList.clear();
 
 
         if(++count < taskNum) {
@@ -212,18 +227,17 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
                             }
                         }
 
-                        if( ((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > similarityThreshold) ) {
+                        if( ((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) > similarityThreshold) && ((cNew.currentnumtweets + cNew.prevnumtweets) > totCntThre)) {
                             System.out.println("updated event again: " + cNew.id);
-                            List<Object> values_event = new ArrayList<>();
-                            values_event.add(round);
-                            values_event.add(cNew.id);
-                            values_event.add(cNew.country);
-                            values_event.add(cNew.cosinevector);
-                            values_event.add((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets));
-                            values_event.add(cNew.currentnumtweets + cNew.prevnumtweets );
-                            cassandraDao.insertIntoEvents(values_event.toArray());
-
-
+                            eventList.add(cNew);
+//                            List<Object> values_event = new ArrayList<>();
+//                            values_event.add(round);
+//                            values_event.add(cNew.id);
+//                            values_event.add(cNew.country);
+//                            values_event.add(cNew.cosinevector);
+//                            values_event.add((double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets));
+//                            values_event.add(cNew.currentnumtweets + cNew.prevnumtweets );
+//                            cassandraDao.insertIntoEvents(values_event.toArray());
                         }
                         else
                             System.out.println("event rate " + (double) cNew.currentnumtweets / (double) (cNew.currentnumtweets + cNew.prevnumtweets) );
@@ -268,6 +282,7 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
 
             TopologyHelper.writeToFile(Constants.RESULT_FILE_PATH + fileNum + "sout.txt", new Date() + " Event Detector " + componentId + " finished evaluating clusters for "  + round + " " + country);
 
+            mergeAndInsertEvents(round);
             List<Object> values3 = new ArrayList<>();
             values3.add(round);
             values3.add(componentId);
@@ -281,6 +296,8 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
             e.printStackTrace();
             count=0;
         }
+
+
         lastDate = new Date();
         count=0;
         System.out.println("update done");
@@ -294,37 +311,70 @@ public class EventDetectorBoltClustering extends BaseRichBolt {
 
     }
 
+    public void mergeAndInsertEvents(long round) throws Exception {
+        for(int i=0;i<eventList.size()-1;i++) {
+            for(int j=i+1; j< eventList.size();){
+                double similarity = cosineSimilarity.cosineSimilarityFromMap(eventList.get(j).cosinevector, eventList.get(i).cosinevector);
+                if(similarity>0.3) {
+                    updateCluster(eventList.get(i), eventList.get(j));
+                    eventList.get(i).currentnumtweets += eventList.get(j).currentnumtweets;
+                    eventList.get(i).tweetList.addAll(eventList.get(j).tweetList);
+                    eventList.remove(j);
+                }
+                else j++;
+            }
+        }
+
+        for(Cluster c: eventList) {
+            List<Object> values = new ArrayList<>();
+            values.add(round);
+            values.add(c.id);
+            values.add(c.country);
+            values.add(c.cosinevector);
+            values.add((double) c.currentnumtweets / (double) (c.currentnumtweets + c.prevnumtweets));
+            values.add(c.currentnumtweets + c.prevnumtweets);
+            cassandraDao.insertIntoEvents(values.toArray());
+
+            for(long tweetId: c.tweetList) {
+                List<Object> values_event = new ArrayList<>();
+                values_event.add(round);
+                values_event.add(c.id);
+                values_event.add(tweetId);
+                cassandraDao.insertIntoTweetsAndCluster(values_event.toArray());
+            }
+        }
+    }
 
     public void addNewCluster(long round, Cluster newCluster)  {
 //        "(id, country, cosinevector, prevnumtweets, currentnumtweets, lastround)"
         try {
             System.out.println("New");
-            int numTweets = newCluster.currentnumtweets;
-            UUID clusterid = UUIDs.timeBased();
+            newCluster.id = UUIDs.timeBased();
             List<Object> values = new ArrayList<>();
-            values.add(clusterid);
+            values.add(newCluster.id);
             values.add(country);
             values.add(newCluster.cosinevector);
             values.add(0);
-            values.add(numTweets);
+            values.add(newCluster.currentnumtweets);
             values.add(round);
             cassandraDao.insertIntoClusters(values.toArray());
 
-            if(numTweets > totCntThre) {
-                List<Object> values_event = new ArrayList<>();
-                values_event.add(round);
-                values_event.add(clusterid);
-                values_event.add(country);
-                values_event.add(newCluster.cosinevector);
-                values_event.add(1.0);
-                values_event.add(numTweets);
-                cassandraDao.insertIntoEvents(values_event.toArray());
+            if(newCluster.currentnumtweets > totCntThre) {
+                eventList.add(newCluster);
+//                List<Object> values_event = new ArrayList<>();
+//                values_event.add(round);
+//                values_event.add(clusterid);
+//                values_event.add(country);
+//                values_event.add(newCluster.cosinevector);
+//                values_event.add(1.0);
+//                values_event.add(numTweets);
+//                cassandraDao.insertIntoEvents(values_event.toArray());
             }
 
             for(long tweetId: newCluster.tweetList) {
                 List<Object> values_event = new ArrayList<>();
                 values_event.add(round);
-                values_event.add(clusterid);
+                values_event.add(newCluster.id);
                 values_event.add(tweetId);
                 cassandraDao.insertIntoTweetsAndCluster(values_event.toArray());
             }

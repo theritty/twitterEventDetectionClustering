@@ -1,7 +1,6 @@
 package algorithms;
 
 import cassandraConnector.CassandraDao;
-import clojure.lang.IFn;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import topologyBuilder.TopologyHelper;
@@ -12,7 +11,7 @@ import java.util.*;
 /**
  * Created by ceren on 03.12.2017.
  */
-public class SilhoutteCoefficient {
+public class SilhoutteCoefficient2 {
     public static class Cluster  {
         public UUID id;
         public HashMap<String, Double> cosinevector;
@@ -67,12 +66,13 @@ public class SilhoutteCoefficient {
 
         String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
-        String EVENTS_TABLE1 =  properties.getProperty(mode + ".events.table");
+        String EVENTS_TABLE1 = mode + "events3";
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
-        String TWEETSANDCLUSTER_TABLE = properties.getProperty(mode + ".tweetsandcluster.table");
+        String TWEETSANDCLUSTER_TABLE =mode + "tweets3";
         List<Long> rounds = new ArrayList<>();
+
         CassandraDao cassandraDao;
         try {
             cassandraDao = new CassandraDao(TWEETS_TABLE, CLUSTER_TABLE, EVENTS_TABLE1, EVENTS_WORDBASED_TABLE, PROCESSEDTWEET_TABLE, PROCESSTIMES_TABLE, TWEETSANDCLUSTER_TABLE);
@@ -95,7 +95,8 @@ public class SilhoutteCoefficient {
                     Row row = iterator.next();
                     UUID clusterid = row.getUUID("clusterid");
                     long round = row.getLong("round");
-
+                    int numtweet = row.getInt("numtweet");
+//                    if(numtweet<150) continue;
                     if(!rounds.contains(round)) rounds.add(round);
 
 //                    if(roundCount.get(round)<2) continue;
@@ -185,41 +186,41 @@ public class SilhoutteCoefficient {
 
 
 
-    public static double averageSimilarityInsideCluster(Cluster c, int objIndex, HashMap<String, Double> currentVector) {
+    public static double averageDistanceInsideCluster(Cluster c, int objIndex, HashMap<String, Double> currentVector) {
         double sum = 0.0;
         int count = 0;
         CosineSimilarity sim = new CosineSimilarity();
         for(HashMap h : c.tweetList) {
             if(count++ != objIndex) {
-                sum += sim.cosineSimilarityFromMap(currentVector, h);
+                sum += 1-sim.cosineSimilarityFromMap(currentVector, h);
             }
         }
         return sum/((double)count);
     }
 
-    public static double maxSimilarityBetweenClusters(List<Cluster> clusters, int clusterIndex, int objIndex) {
+    public static double minDistanceBetweenClusters(List<Cluster> clusters, int clusterIndex, int objIndex) {
         int ind = 0;
-        double maxSim = 0.0;
+        double minSim = 1.0;
         for(Cluster c : clusters) {
             if(ind++ != clusterIndex) {
-                double clusterSim = averageSimilarityInsideCluster(c, -1, clusters.get(clusterIndex).tweetList.get(objIndex));
-                if(maxSim < clusterSim) maxSim = clusterSim;
+                double clusterSim = averageDistanceInsideCluster(c, -1, clusters.get(clusterIndex).tweetList.get(objIndex));
+                if(minSim > clusterSim) minSim = clusterSim;
             }
         }
-        return maxSim;
+        return minSim;
     }
 
     public static double silhoutteCoefForObject(List<Cluster> clusters, int clusterIndex, int objIndex) {
-        double a = averageSimilarityInsideCluster(clusters.get(clusterIndex), objIndex, clusters.get(clusterIndex).tweetList.get(objIndex));
-        double b = maxSimilarityBetweenClusters(clusters, clusterIndex, objIndex);
+        double a = averageDistanceInsideCluster(clusters.get(clusterIndex), objIndex, clusters.get(clusterIndex).tweetList.get(objIndex));
+        double b = minDistanceBetweenClusters(clusters, clusterIndex, objIndex);
 
-
-        double avgDistInsideCluster = 1 - a;
-        double minDistToOtherClusters = 1 - b;
-
-        return (minDistToOtherClusters - avgDistInsideCluster) / Math.max(minDistToOtherClusters,avgDistInsideCluster);
-//        System.out.println(a + " - " + b + " : " + (a-b)/Math.max(a,b) + " AND " + avgDistInsideCluster + "  -  " + minDistToOtherClusters + " : " + (minDistToOtherClusters - avgDistInsideCluster) / Math.max(minDistToOtherClusters,avgDistInsideCluster));
-//        return (a-b)/Math.max(a,b);
+        //System.out.println("a: " + a + ", b: " + b);
+        if(a > b) {
+            return (b-a)/a;
+        }
+        else {
+            return (b-a)/b;
+        }
     }
 
     public static double avgSilhoutteCoefForCluster(List<Cluster> clusters, int clusterIndex, long round) {
@@ -228,7 +229,7 @@ public class SilhoutteCoefficient {
         double maxCoeff = Double.MIN_VALUE;
         int count = 0;
         double avgCoeff = 1.0;
-        if(clusters.size()>1) {
+        if(clusters.size() >1) {
             for (int i = 0; i < clusters.get(clusterIndex).tweetList.size(); i++) {
                 double curCoef = silhoutteCoefForObject(clusters, clusterIndex, i);
                 coeff += curCoef;
@@ -238,7 +239,6 @@ public class SilhoutteCoefficient {
             }
             avgCoeff = coeff / ((double) count);
         }
-
         List<String> commonWrds = new ArrayList<>();
         for (String word : clusters.get(clusterIndex).cosinevector.keySet()) {
             if(clusters.get(clusterIndex).cosinevector.get(word) > 0.3) commonWrds.add(word);
@@ -248,7 +248,7 @@ public class SilhoutteCoefficient {
         avgCoeff = avgCoeff * factor;
         long tmp = Math.round(avgCoeff);
 
-        System.out.println( round + "&" + clusters.get(clusterIndex).id + " & " + (double) tmp / factor + " & " + clusters.get(clusterIndex).cosinevector + "& " + commonWrds + " &  \\\\ \\hline");
+        System.out.println(round + "&" +  clusters.get(clusterIndex).id + " & " + (double) tmp / factor + " & " + clusters.get(clusterIndex).cosinevector + "& " + commonWrds + " &  \\\\ \\hline");
         return (double) tmp / factor;
     }
 

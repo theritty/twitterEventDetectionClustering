@@ -64,7 +64,7 @@ TRUNCATE countsForExperimentSleep ;TRUNCATE eventsForExperimentSleep ;TRUNCATE p
 
 
 
-CREATE TABLE tweetcollection.hybridclusters1 (
+CREATE TABLE tweetcollection.hybridclusters5_sub_4 (
 country text,
 id timeuuid,
 cosinevector map<text, double>,
@@ -74,7 +74,7 @@ prevnumtweets int,
 PRIMARY KEY (country, id)
 );
 
-CREATE TABLE tweetcollection.hybridcounts1 (
+CREATE TABLE tweetcollection.hybridcounts5_sub_4 (
 round bigint,
 word text,
 country text,
@@ -83,7 +83,7 @@ totalnumofwords bigint,
 PRIMARY KEY (round, word, country)
 );
 
-CREATE TABLE tweetcollection.hybridevents1 (
+CREATE TABLE tweetcollection.hybridevents5_sub_4 (
 round bigint,
 clusterid timeuuid,
 cosinevector map<text, double>,
@@ -92,14 +92,14 @@ incrementrate double,
 numtweet int,
 PRIMARY KEY (round, clusterid)
 );
-CREATE TABLE tweetcollection.hybrideventskeybased1(
+CREATE TABLE tweetcollection.hybrideventskeybased5_sub_4(
 round bigint,
 country text,
 word text,
 incrementpercent double,
 PRIMARY KEY (round, country, word)
 );
-CREATE TABLE tweetcollection.hybridbolts1 (
+CREATE TABLE tweetcollection.hybridbolts5_sub_4 (
 round bigint,
 boltid int,
 finished boolean,
@@ -107,21 +107,21 @@ PRIMARY KEY (round, boltid)
 );
 
 
-CREATE TABLE tweetcollection.hybridtimes1 (
+CREATE TABLE tweetcollection.hybridtimes5_sub_4 (
 row int,
 column int,
 id int,
 PRIMARY KEY (row, column)
 );
 
-CREATE TABLE tweetcollection.hybridtweets1 (
+CREATE TABLE tweetcollection.hybridtweets5_sub_4 (
 round bigint,
 clusterid timeuuid,
 tweetid bigint,
 PRIMARY KEY (round, tweetid, clusterid)
 );
 
-TRUNCATE clustershybridforexperiment_thesis; TRUNCATE countshybridforexperiment_thesis; TRUNCATE eventskeybasedhybridforexperiment_thesis; TRUNCATE eventshybridforexperiment_thesis; TRUNCATE processedhybridforexperiment_thesis; TRUNCATE processtimeshybridforexperiment_thesis; TRUNCATE tweetsandclusterhybrid_thesis;
+TRUNCATE hybridclusters4; TRUNCATE hybridcounts4; TRUNCATE hybridevents4; TRUNCATE hybrideventskeybased4; TRUNCATE hybridbolts4; TRUNCATE hybridtimes4; TRUNCATE hybridtweets4;
 
 
 
@@ -135,7 +135,7 @@ clustering.tweetsandcluster.table=tweetsandcluster_thesis
 
 
 
-CREATE TABLE tweetcollection.clusteringClusters1(
+CREATE TABLE tweetcollection.clusteringClusters5_sub_4(
 country text,
 id timeuuid,
 cosinevector map<text, double>,
@@ -144,7 +144,7 @@ lastround bigint,
 prevnumtweets int,
 PRIMARY KEY (country, id)
 );
-CREATE TABLE tweetcollection.clusteringEvents1(
+CREATE TABLE tweetcollection.clusteringEvents5_sub_4(
 round bigint,
 clusterid timeuuid,
 cosinevector map<text, double>,
@@ -153,13 +153,13 @@ incrementrate double,
 numtweet int,
 PRIMARY KEY (round, clusterid)
 );
-CREATE TABLE tweetcollection.clusteringTimes1(
+CREATE TABLE tweetcollection.clusteringTimes5_sub_4(
 row int,
 column int,
 id int,
 PRIMARY KEY (row, column)
 );
-CREATE TABLE tweetcollection.clusteringBolts1(
+CREATE TABLE tweetcollection.clusteringBolts5_sub_4(
 round bigint,
 boltid int,
 boltprocessed bigint,
@@ -168,7 +168,7 @@ finished boolean,
 spoutsent bigint,
 PRIMARY KEY (round, boltid)
 );
-CREATE TABLE tweetcollection.clusteringTweets1(
+CREATE TABLE tweetcollection.clusteringTweets5_sub_4(
 round bigint,
 clusterid timeuuid,
 tweetid bigint,
@@ -176,7 +176,7 @@ PRIMARY KEY (round, tweetid, clusterid)
 );
 
 
-TRUNCATE clusteringClusters1; TRUNCATE clusteringEvents1; TRUNCATE clusteringTimes1; TRUNCATE clusteringBolts1; TRUNCATE clusteringTweets1;
+TRUNCATE clusteringClusters4; TRUNCATE clusteringEvents4; TRUNCATE clusteringTimes4; TRUNCATE clusteringBolts4; TRUNCATE clusteringTweets4;
 
 
 

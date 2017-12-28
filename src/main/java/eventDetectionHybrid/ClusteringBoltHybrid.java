@@ -37,6 +37,25 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
     private CosineSimilarity cosineSimilarity = new CosineSimilarity();
     private ArrayList<Cluster> clusters = new ArrayList<>();
 
+    private int updateCntCond = 60;
+    private double updateCntPer = 0.02;
+    private double similarityThreshold = 0.6;
+    private int totCntThre = 120;
+    private double newCntPer = 0.06;
+
+//    private int updateCntCond = 50;
+//    private double updateCntPer = 0.01;
+//    private double similarityThreshold = 0.5;
+//    private int totCntThre = 120;
+//    private double newCntPer = 0.05;
+//
+//    private int updateCntCond = 40;
+//    private double updateCntPer = 0.01;
+//    private double similarityThreshold = 0.4;
+//    private int totCntThre = 150;
+//    private double newCntPer = 0.04;
+
+
     public ClusteringBoltHybrid(CassandraDaoHybrid cassandraDao, String filePath, String fileNum, double tfidfEventRate, int compareSize, String country, int numWordCountBolts )
     {
         this.cassandraDao = cassandraDao;
@@ -156,7 +175,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
                 double value1 = entry.getValue();
                 double value2 = cluster2.cosinevector.get(key);
                 double newValue = (value1 * numTweets1 + value2 * numTweets2) / (numTweets1+numTweets2);
-                if(numTweets1+numTweets2>50 && newValue<0.03) {
+                if(numTweets1+numTweets2>updateCntCond && newValue<updateCntPer) {
                     it.remove();
                 }
                 else {
@@ -171,7 +190,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
             String key = entry.getKey();
             double value = entry.getValue();
             double newValue = (value * numTweets2) / (numTweets1+numTweets2);
-            if(numTweets1+numTweets2<50 || newValue>0.03) {
+            if(numTweets1+numTweets2<updateCntCond || newValue>updateCntPer) {
                 cluster1.cosinevector.put(key, newValue);
             }
         }
@@ -182,7 +201,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
         for(int i=0;i<clusters.size()-1;i++) {
             for(int j=i+1; j< clusters.size();){
                 double similarity = cosineSimilarity.cosineSimilarityFromMap(clusters.get(j).cosinevector, clusters.get(i).cosinevector);
-                if(similarity>0.5) {
+                if(similarity>similarityThreshold) {
                     updateCluster(clusters.get(i), clusters.get(j));
                     clusters.get(i).currentnumtweets += clusters.get(j).currentnumtweets;
                     clusters.get(i).tweetList.addAll(clusters.get(j).tweetList);
@@ -205,7 +224,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
 
             double similarity = cosineSimilarity.cosineSimilarityFromMap(clustermap, tweetmap, magnitude2);
             if (maxSim < similarity) maxSim = similarity;
-            if (similarity > 0.5) {
+            if (similarity > similarityThreshold) {
                 return i;
             }
         }

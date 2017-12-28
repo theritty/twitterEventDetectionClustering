@@ -35,6 +35,25 @@ public class ClusteringBolt extends BaseRichBolt {
     private double clusterUp=0;
     private long clusterUpNum=0L;
 
+    private int updateCntCond = 60;
+    private double updateCntPer = 0.02;
+    private double similarityThreshold = 0.6;
+    private int totCntThre = 120;
+    private double newCntPer = 0.06;
+
+
+//    private int updateCntCond = 50;
+//    private double updateCntPer = 0.01;
+//    private double similarityThreshold = 0.5;
+//    private int totCntThre = 120;
+//    private double newCntPer = 0.05;
+////
+//    private int updateCntCond = 40;
+//    private double updateCntPer = 0.01;
+//    private double similarityThreshold = 0.4;
+//    private int totCntThre = 150;
+//    private double newCntPer = 0.04;
+
     private CassandraDao cassandraDao;
 
 
@@ -130,7 +149,7 @@ public class ClusteringBolt extends BaseRichBolt {
 
                     double similarity = cosineSimilarity.cosineSimilarityFromMap(clustermap, tweetmap, magnitude2);
                     if(maxSim<similarity) maxSim=similarity;
-                    if (similarity > 0.5) {
+                    if (similarity > similarityThreshold) {
                         similarclusterfound = true;
                         updateCluster(clustermap, tweetmap, i, tweetid, round);
                         break;
