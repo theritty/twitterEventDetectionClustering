@@ -40,7 +40,7 @@ public class ClusteringBoltHybrid extends BaseRichBolt {
     private int updateCntCond = 60;
     private double updateCntPer = 0.02;
     private double similarityThreshold = 0.6;
-    private int totCntThre = 120;
+    private int totCntThre = 100;
     private double newCntPer = 0.06;
 
 //    private int updateCntCond = 50;

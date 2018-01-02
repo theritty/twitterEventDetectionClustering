@@ -24,7 +24,7 @@ public class ExcelWriter {
     private static int[][] times;
     private static Date startTime = new Date();
     private static long startRound = 0;
-    private static String fileNum="experiment-4-keybased-hybrid-xxx";
+    private static String fileNum="tez-clustering-set3";
     private static int lastInd ;
     private static int rowNum = 3000000;
     private static int columnNum = 250;
@@ -240,7 +240,8 @@ public class ExcelWriter {
 //        run("experiment-4-method-keybased-no1", "keybased.processtimes.table");
 //        run("experiment-4-method-keybasedSleep-no1", "keybasedsleep.processtimes.table");
 //        run("experiment-4-method-clustering-thesis", "clustering.processtimes.table");
-        run("experiment-4-method-hybrid-thesis", "hybrid.processtimes.table");
+//        run("tez-clustering-set3", "clustering.processtimes.table");
+        run("tez-hybrid-set4", "hybrid.processtimes.table");
 
         System.out.println("DONEXX");
 //

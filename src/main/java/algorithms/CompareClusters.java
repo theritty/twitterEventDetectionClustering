@@ -90,8 +90,8 @@ public class CompareClusters {
 
     public static void xx(double perc) {
         try {
-            String EVENTS_TABLE1 = "eventclusterForExperiment5";
-            String EVENTS_TABLE2 = "eventsHybridForExperiment5";
+            String EVENTS_TABLE1 = "clusteringevents3";
+            String EVENTS_TABLE2 = "hybridevents4";
             System.out.println("CAN_____________________________");
             clusterPercentage("CAN", EVENTS_TABLE1, EVENTS_TABLE2, perc);
             System.out.println("USA_____________________________");
@@ -176,11 +176,16 @@ public class CompareClusters {
 
         String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
-        String EVENTS_TABLE1 = "hybridevents1";
+        String EVENTS_TABLE1 = "clusteringevents3";
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
         String TWEETSANDCLUSTER_TABLE = properties.getProperty("clustering.tweetsandcluster.table");
+
+
+     System.out.println("\\begin{longtable}{|p{1cm}|p{1cm}|p{1cm}|p{5cm}|p{4cm}|p{4cm}|} \\hline\n" +
+             "\n" +
+             "round & country & number of tweets & cosine vector & common words & comment \\\\ \\hline");
 
         CassandraDao cassandraDao;
         try {
@@ -198,9 +203,11 @@ public class CompareClusters {
                         while (it2.hasNext()) {
                             Map.Entry<String, Double> entry2 = it2.next();
                             String key2 = entry2.getKey();
+                            long factor = (long) Math.pow(10, 2);
+                            entry2.setValue((double) Math.round(entry2.getValue() * factor) / 100);
                             if(entry2.getValue()>0.2) mostlyUsed.add(key2+":"+entry2.getValue());
                         }
-                        System.out.println(clusterid2 + " | " + round2 + " | "  + row.getString("country") + " | " + row.getInt("numtweet") + " | " + cosinevector2 + " | " + mostlyUsed );
+                        System.out.println( round2 + " & "  + row.getString("country") + " & " + row.getInt("numtweet") + " & " + cosinevector2.toString().replace("{","\\{").replace("}","\\}") + " & " + mostlyUsed + " & \\\\ \\hline" );
                     }
 
 
@@ -220,9 +227,13 @@ public class CompareClusters {
                     while (it2.hasNext()) {
                         Map.Entry<String, Double> entry2 = it2.next();
                         String key2 = entry2.getKey();
-                        if(entry2.getValue()>0.2) mostlyUsed.add(key2+":"+entry2.getValue());
+                        long factor = (long) Math.pow(10, 2);
+                        entry2.setValue((double) Math.round(entry2.getValue() * factor));
+                        if(entry2.getValue()>0.2) {
+                            mostlyUsed.add(key2+":"+entry2.getValue());
+                        }
                     }
-                    System.out.println(clusterid2 + " | " + round2 + " | "  + row.getString("country") + " | " + row.getInt("numtweet") + " | " + cosinevector2 + " | " + mostlyUsed );
+                    System.out.println( round2 + " & "  + row.getString("country") + " & " + row.getInt("numtweet") + " & " + cosinevector2.toString().replace("{","\\{").replace("}","\\}") + " & " + mostlyUsed + " & \\\\ \\hline" );
                 }
 
 
@@ -232,7 +243,7 @@ public class CompareClusters {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+     System.out.println("\\end{longtable}\n");
 
 
     }

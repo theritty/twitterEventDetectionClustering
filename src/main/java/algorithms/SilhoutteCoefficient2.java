@@ -87,11 +87,11 @@ public class SilhoutteCoefficient2 {
 
         String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("clustering.events_wordbased.table");
-        String EVENTS_TABLE1 = mode + "events3";
+        String EVENTS_TABLE1 = mode + "events4";
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
         String PROCESSTIMES_TABLE = properties.getProperty("clustering.processtimes.table");
-        String TWEETSANDCLUSTER_TABLE =mode + "tweets3";
+        String TWEETSANDCLUSTER_TABLE =mode + "tweets4";
         List<Long> rounds = new ArrayList<>();
 
         CassandraDao cassandraDao;
@@ -202,7 +202,7 @@ public class SilhoutteCoefficient2 {
         }
         avg = avg / clusterNum;
         avgMed = avgMed / medCnt;
-        res += mode + " & " + country + " & " + clusterNum + " & " + oneClusterNum + " & " + avg + " & " + avgMed + " & " + min + " & " + max + " & " + var + " \\\\ \\hline";
+        res += mode + " & " + country + " & " + clusterNum + " & " + oneClusterNum + " & " + avg + " & " + avgMed + " & " + min + " & " + max + " & " + var + " \\\\ \\hline \n";
 //        System.out.println(mode + "-" + country + " -> num clusters: " + clusterNum + ", number of rounds containing one cluster: " + oneClusterNum + ", avg: " + avg + ", avg of (0,1): " + avgMed + ", min: " + min + ", max: " + max + ", std-dev: " + var) ;
 
         return res;

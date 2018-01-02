@@ -33,7 +33,7 @@ public class EventDetectorBoltHybrid extends BaseRichBolt {
     private double similarityThreshold = 0.6;
     private int totCntThre = 100;
     private double newCntPer = 0.06;
-    //
+
 //    private int updateCntCond = 50;
 //    private double updateCntPer = 0.01;
 //    private double similarityThreshold = 0.5;
