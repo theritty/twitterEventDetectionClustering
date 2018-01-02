@@ -301,10 +301,10 @@ CREATE TABLE tweetcollection.tweets_updated (
 
 
 
-copy hybridevents1 (round , clusterid , cosinevector , country , incrementrate , numtweet ) to '/Users/ozlemcerensahin/Desktop/eventshybrid.csv';
-copy hybridtweets1 (round , clusterid , tweetid )  to '/Users/ozlemcerensahin/Desktop/tweetshybrid.csv';
-copy hybridtimes1 (row ,   to '/Users/ozlemcerensahin/Desktop/tweetshybrid.csv';
+copy hybridevents4 (round , clusterid , cosinevector , country , incrementrate , numtweet ) to '/Users/ozlemcerensahin/Desktop/thesis-withthresholds/eventshybrid.csv';
+copy hybridtweets4 (round , clusterid , tweetid )  to '/Users/ozlemcerensahin/Desktop/thesis-withthresholds/tweetshybrid.csv';
+copy hybridtimes4 (row, column, id)   to '/Users/ozlemcerensahin/Desktop/thesis-withthresholds/timeshybrid.csv';
 
-copy clusteringevents1 (round , clusterid , cosinevector , country , incrementrate , numtweet ) to '/Users/ozlemcerensahin/Desktop/eventshybrid.csv';
-copy clusteringtweets1 (round , clusterid , tweetid )  to '/Users/ozlemcerensahin/Desktop/tweetshybrid.csv';
-copy clusteringtimes1 (row ,   to '/Users/ozlemcerensahin/Desktop/tweetshybrid.csv';
+copy clusteringevents3 (round , clusterid , cosinevector , country , incrementrate , numtweet ) to '/Users/ozlemcerensahin/Desktop/thesis-withthresholds/eventsclustering.csv';
+copy clusteringtweets3 (round , clusterid , tweetid )  to '/Users/ozlemcerensahin/Desktop/thesis-withthresholds/tweetsclustering.csv';
+copy clusteringtimes3 (row  , column, id)   to '/Users/ozlemcerensahin/Desktop/thesis-withthresholds/timesclustering.csv';
