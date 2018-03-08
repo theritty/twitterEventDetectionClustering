@@ -51,15 +51,15 @@ public class SilhoutteCoefficient2 {
         String res = "\\begin{longtable}{|p{2cm}|p{1cm}|p{1cm}|p{2cm}|p{2cm}|p{1cm}|p{1cm}|p{1cm}|p{1cm}|} \\hline\n" +
                 "\n" +
                 "method & country & number of clusters &  number of rounds containing one cluster & avg & avg of (0,1) &  min & max & standard deviation \\\\ \\hline\n";
-
-        System.out.println("\\begin{longtable}{|p{2cm}|p{1cm}|p{2cm}|p{2cm}|p{4cm}|} \\hline\n" +
-                "\n" +
-                "method & country & round & coefficient & common words &  \\\\ \\hline");
-
-        res += getResult("USA", "clustering");
-        res += getResult("CAN", "clustering");
-
-        System.out.println("\\end{longtable}");
+//
+//        System.out.println("\\begin{longtable}{|p{2cm}|p{1cm}|p{2cm}|p{2cm}|p{4cm}|} \\hline\n" +
+//                "\n" +
+//                "method & country & round & coefficient & common words &  \\\\ \\hline");
+//
+//        res += getResult("USA", "clustering");
+//        res += getResult("CAN", "clustering");
+//
+//        System.out.println("\\end{longtable}");
         System.out.println("\\begin{longtable}{|p{2cm}|p{1cm}|p{2cm}|p{2cm}|p{4cm}|} \\hline\n" +
                 "\n" +
                 "method & country & round & coefficient & common words &  \\\\ \\hline");
@@ -133,11 +133,13 @@ public class SilhoutteCoefficient2 {
                         UUID clusteridx = row2.getUUID("clusterid");
                         if(!clusterid.equals(clusteridx)) continue;
 
+
                         ResultSet resultSet3 = cassandraDao.getTweetsById(round, country, tweetid);
                         Iterator<Row> iterator3 = resultSet3.iterator();
                         while (iterator3.hasNext()) {
                             Row row3 = iterator3.next();
                             String tweet = row3.getString("tweet");
+                            if(round == 4069989) System.out.println(tweet);
                             List<String> tweets = Arrays.asList(tweet.split(" "));
                             HashMap<String, Double> tweetMap = new HashMap<>();
                             for (String key : tweets) {

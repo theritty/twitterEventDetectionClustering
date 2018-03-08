@@ -13,7 +13,7 @@ public class CompareMethodsClustering {
         Properties properties = topologyHelper.loadProperties( "config.properties" );
 
         String TWEETS_TABLE = properties.getProperty("clustering.tweets.table");
-        String EVENTS_TABLE = properties.getProperty("clustering.events.table");
+        String EVENTS_TABLE = properties.getProperty("hybrid.events.table");
         String EVENTS_WORDBASED_TABLE = properties.getProperty("keybased.events.table");
         String CLUSTER_TABLE = properties.getProperty("clustering.clusters.table");
         String PROCESSEDTWEET_TABLE = properties.getProperty("clustering.processed_tweets.table");
@@ -66,7 +66,7 @@ public class CompareMethodsClustering {
                         String word = rowWordBased.getString("word").replace("#","").replace(".","");
                         String country = rowWordBased.getString("country");
                         long roundWordBased = rowWordBased.getLong("round");
-                        if(roundClustering <= roundWordBased+5  && roundClustering >= roundWordBased -5 && country.equals(c) && (word.equals(key) || word.equals("#"+key))) {
+                        if( country.equals(c) && (word.equals(key) || word.equals("#"+key))) {
                             System.out.println("Word: " + word + " clustering " + roundClustering + " keybased " + roundWordBased);
                             HashMap<String, Integer> x = new HashMap<>();
                             if(!wordNums.containsKey(roundClustering))
@@ -129,8 +129,8 @@ public class CompareMethodsClustering {
     }
     public static void main(String[] args) {
         try {
-            System.out.println("CAN_____________________________");
-            clusterPercentage("CAN");
+//            System.out.println("CAN_____________________________");
+//            clusterPercentage("CAN");
             System.out.println("USA_____________________________");
             clusterPercentage("USA");
         } catch (Exception e) {
