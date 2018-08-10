@@ -26,7 +26,7 @@ public class ExcelWriter {
     private static long startRound = 0;
     private static String fileNum="tez-clustering-set3";
     private static int lastInd ;
-    private static int rowNum = 3000000;
+    private static int rowNum = 1500;
     private static int columnNum = 250;
     private static int numOfBolts = 15;
     private static int createChart = 0;
@@ -153,6 +153,7 @@ public class ExcelWriter {
 //                    System.out.println("wow " + process_col + " " + process_id);;
 //                }
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                if(process_row<rowNum)
                 times[process_row][process_col]=process_id;
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
@@ -176,7 +177,7 @@ public class ExcelWriter {
 
     public static void clean () {
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        rowNum = 96000;
+        rowNum = 1500;
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!
         for(int i = rowNum -1; i>=0; i--) {
             for(int j = 1; j<columnNum; j++) {
@@ -237,11 +238,11 @@ public class ExcelWriter {
 //        times[9][7] = 3;
 //        writeExcel();
 
-//        run("experiment-4-method-keybased-no1", "keybased.processtimes.table");
+        run("test-hybrid", "hybrid.processtimes.table");
 //        run("experiment-4-method-keybasedSleep-no1", "keybasedsleep.processtimes.table");
 //        run("experiment-4-method-clustering-thesis", "clustering.processtimes.table");
 //        run("tez-clustering-set3", "clustering.processtimes.table");
-        run("tez-hybrid-set4", "hybrid.processtimes.table");
+//        run("tez-hybrid-set4", "hybrid.processtimes.table");
 
         System.out.println("DONEXX");
 //

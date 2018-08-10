@@ -1,12 +1,12 @@
-package algorithms;
+package algorithms.evaluation;
 
 
 import cassandraConnector.CassandraDao;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import topologyBuilder.TopologyHelper;
 
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 public class MatchEventsClustering {
 
@@ -83,39 +83,39 @@ public class MatchEventsClustering {
 //    }
 
   public static void main(String[] args) throws Exception {
-    double x = Double.parseDouble("462913");
-    HashMap<String, Double> cosinevectorLocal = new HashMap<>();
-    cosinevectorLocal.put("cs", x);
-    System.out.println(x);
-    String y = String.valueOf( (long) (double) cosinevectorLocal.get("cs"));
-    System.out.println(y);
-  }
-//
-//    MatchEventsClustering m = new MatchEventsClustering();
-//    for (long i=m.start; i <= m.end; i++) {
-//      ResultSet resultSet = m.cassandraDao.getClusters();
-//      Iterator<Row> iterator = resultSet.iterator();
-//      List<Cluster> clusters = new ArrayList<>();
-//      while (iterator.hasNext()) {
-//        Row row = iterator.next();
-//        List<Object> values = new ArrayList<>();
-//        values.add(row.getUUID("id"));
-//        HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
-//        Cluster c = new Cluster(row.getLong("round"), row.getUUID("id"), row.getInt("numberoftweets"), cosinevector);
-//        clusters.add(c);
-//      }
-//
-//      Collections.sort(clusters, new Comparator<Cluster>() {
-//
-//        public int compare(Cluster o1, Cluster o2) {
-//          return o1.number - o2.number;
-//        }
-//      });
-//
-//      for (Cluster p : clusters) {
-//        if(p.number>=10 )
-//          System.out.println(p.round + "\t" + p.id + "\t" + p.number + "\t" + p.cosinevector);
-//      }
-//    }
+//    double x = Double.parseDouble("462913");
+//    HashMap<String, Double> cosinevectorLocal = new HashMap<>();
+//    cosinevectorLocal.put("cs", x);
+//    System.out.println(x);
+//    String y = String.valueOf( (long) (double) cosinevectorLocal.get("cs"));
+//    System.out.println(y);
 //  }
+//
+    MatchEventsClustering m = new MatchEventsClustering();
+    for (long i=m.start; i <= m.end; i++) {
+      ResultSet resultSet = m.cassandraDao.getClusters("CAN");
+      Iterator<Row> iterator = resultSet.iterator();
+      List<Cluster> clusters = new ArrayList<>();
+      while (iterator.hasNext()) {
+        Row row = iterator.next();
+        List<Object> values = new ArrayList<>();
+        values.add(row.getUUID("id"));
+        HashMap<String, Double> cosinevector = (HashMap<String, Double>) row.getMap("cosinevector", String.class, Double.class);
+        Cluster c = new Cluster(row.getLong("round"), row.getUUID("id"), row.getInt("numberoftweets"), cosinevector);
+        clusters.add(c);
+      }
+
+      Collections.sort(clusters, new Comparator<Cluster>() {
+
+        public int compare(Cluster o1, Cluster o2) {
+          return o1.number - o2.number;
+        }
+      });
+
+      for (Cluster p : clusters) {
+        if(p.number>=10 )
+          System.out.println(p.round + "\t" + p.id + "\t" + p.number + "\t" + p.cosinevector);
+      }
+    }
+  }
 }

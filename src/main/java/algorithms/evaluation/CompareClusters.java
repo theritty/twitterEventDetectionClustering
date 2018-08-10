@@ -1,13 +1,11 @@
-package algorithms;
+package algorithms.evaluation;
 
 import cassandraConnector.CassandraDao;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import topologyBuilder.TopologyHelper;
 
-import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 class x {
@@ -96,7 +94,7 @@ public class CompareClusters {
         }
     }
 
-    public static void xx(double perc) {
+    public static void main(double perc) {
         try {
             String EVENTS_TABLE1 = "clusteringevents3";
             String EVENTS_TABLE2 = "hybridevents4";
@@ -114,7 +112,7 @@ public class CompareClusters {
             e.printStackTrace();
         }
     }
-    public static void main(String[] args) throws ParseException {
+    public static void mainxx(String[] args) throws ParseException {
 
 //        String s =
 //                                                "31 May 2016, Tuesday, 10:48 AM & USA & 151 & \\{arrive=0.09, back=0.06, better=0.1, big=0.11, cable=0.11, catch=0.07, curry=0.1, example=0.11, fire=0.12, game=0.42, get=0.09, great=0.11, hate=0.11, heating=0.11, klay=1.01, light=0.1, look=0.06, make=0.08, man=0.06, mission=0.08, mvp=0.09, nigga=0.06, past=0.08, play=0.08, player=0.11, prime=0.11, pull=0.11, respect=0.11, right=0.12, save=0.05, say=0.09, shoot=0.12, shooter=0.14, song=0.11, stop=0.09, swear=0.11, take=0.05, thompson=0.93, trouble=0.11, unanimous=0.06, warrior=0.15\\} & [game:0.42, klay:1.01, thompson:0.93] & Thompson knocked down an NBA playoff record 11 3s, Thompson scored 41 points in Game 6 in NBA 2016 Western Conference finals.(Bir playoff maçında en çok üçlük atan oyuncu olmuş bu maçta ve NBA tarihine geçmiş) \\\\  \\hline\n" +

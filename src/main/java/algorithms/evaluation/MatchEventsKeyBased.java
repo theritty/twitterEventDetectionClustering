@@ -1,5 +1,6 @@
-package algorithms;
+package algorithms.evaluation;
 
+import algorithms.CosineSimilarity;
 import cassandraConnector.CassandraDaoKeyBased;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
